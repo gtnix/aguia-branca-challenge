@@ -1,5 +1,9 @@
 package com.gtnix.aguiabranca.presentation.screens.ideias
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,10 +35,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -55,7 +65,7 @@ fun IdeiaDetalheScreen(
     onNavigateBack: () -> Unit,
     onNavigateToNovoProjeto: (String) -> Unit = {}
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     IdeiaDetalheScreenContent(
         uiState = uiState,
@@ -83,6 +93,18 @@ private fun IdeiaDetalheScreenContent(
     onReprovar: () -> Unit,
     onCriarProjeto: (String) -> Unit = {}
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.actionSuccess) {
+        if (uiState.actionSuccess) {
+            snackbarHostState.showSnackbar("Ação realizada com sucesso!")
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -101,7 +123,8 @@ private fun IdeiaDetalheScreenContent(
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         when {
             uiState.isLoading -> {
@@ -275,7 +298,11 @@ private fun IdeiaDetalheScreenContent(
                         }
                     }
 
-                    if (uiState.actionSuccess) {
+                    AnimatedVisibility(
+                        visible = uiState.actionSuccess,
+                        enter = fadeIn() + slideInVertically(),
+                        exit = fadeOut()
+                    ) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
