@@ -1,7 +1,9 @@
 package com.gtnix.aguiabranca.presentation.screens.ideias
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,8 +14,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -22,18 +27,23 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
+import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
 import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
 
@@ -44,7 +54,7 @@ fun NovaIdeiaScreen(
     onNavigateBack: () -> Unit,
     onIdeiaCreated: () -> Unit
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     NovaIdeiaScreenContent(
         uiState = uiState,
@@ -74,6 +84,12 @@ private fun NovaIdeiaScreenContent(
 ) {
     var areaExpanded by remember { mutableStateOf(false) }
     var tipoExpanded by remember { mutableStateOf(false) }
+    var orientacoesExpanded by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
+    }
 
     Scaffold(
         topBar = {
@@ -93,7 +109,8 @@ private fun NovaIdeiaScreenContent(
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -103,7 +120,14 @@ private fun NovaIdeiaScreenContent(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Título
+            if (uiState.orientacoes.isNotEmpty()) {
+                OrientacoesCard(
+                    orientacoes = uiState.orientacoes,
+                    expanded = orientacoesExpanded,
+                    onToggle = { orientacoesExpanded = !orientacoesExpanded }
+                )
+            }
+
             OutlinedTextField(
                 value = uiState.titulo,
                 onValueChange = onTituloChange,
@@ -225,6 +249,47 @@ private fun NovaIdeiaScreenContent(
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text("Submeter Ideia")
+            }
+        }
+    }
+}
+
+@Composable
+private fun OrientacoesCard(
+    orientacoes: List<OrientacaoEstrategica>,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onToggle
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Orientações Estratégicas",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (expanded) "Recolher" else "Expandir"
+                )
+            }
+
+            AnimatedVisibility(visible = expanded) {
+                Column(modifier = Modifier.padding(top = 8.dp)) {
+                    orientacoes.forEach { orientacao ->
+                        Text(
+                            text = "• ${orientacao.titulo}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+                    }
+                }
             }
         }
     }
