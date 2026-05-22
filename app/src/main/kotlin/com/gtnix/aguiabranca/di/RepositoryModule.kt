@@ -1,10 +1,12 @@
 package com.gtnix.aguiabranca.di
 
 import com.gtnix.aguiabranca.data.repository.IdeiaRepositoryImpl
+import com.gtnix.aguiabranca.data.repository.InovacaoAbertaRepositoryImpl
 import com.gtnix.aguiabranca.data.repository.OrientacaoRepositoryImpl
 import com.gtnix.aguiabranca.data.repository.ProjetoRepositoryImpl
 import com.gtnix.aguiabranca.data.repository.UsuarioRepositoryImpl
 import com.gtnix.aguiabranca.domain.repository.IdeiaRepository
+import com.gtnix.aguiabranca.domain.repository.InovacaoAbertaRepository
 import com.gtnix.aguiabranca.domain.repository.OrientacaoRepository
 import com.gtnix.aguiabranca.domain.repository.ProjetoRepository
 import com.gtnix.aguiabranca.domain.repository.UsuarioRepository
@@ -86,4 +88,10 @@ abstract class RepositoryModule {
     abstract fun bindProjetoRepository(
         impl: ProjetoRepositoryImpl
     ): ProjetoRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindInovacaoAbertaRepository(
+        impl: InovacaoAbertaRepositoryImpl
+    ): InovacaoAbertaRepository
 }
