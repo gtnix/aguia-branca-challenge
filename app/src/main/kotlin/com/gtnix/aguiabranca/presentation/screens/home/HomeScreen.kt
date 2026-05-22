@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lightbulb
@@ -58,12 +57,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.components.FunilInovacao
 import com.gtnix.aguiabranca.presentation.util.formatCurrency
 import com.gtnix.aguiabranca.presentation.util.formatPercent
 
@@ -79,7 +79,7 @@ fun HomeScreen(
     onNavigateToNovaIdeia: () -> Unit,
     onNavigateToRadar: () -> Unit
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(perfil) {
         viewModel.carregarDados(perfil)
@@ -226,7 +226,10 @@ private fun HomeScreenContent(
                         LazyRow(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(uiState.orientacoes) { orientacao ->
+                            items(
+                                items = uiState.orientacoes,
+                                key = { it.id }
+                            ) { orientacao ->
                                 OrientacaoCard(
                                     titulo = orientacao.titulo,
                                     categoria = orientacao.categoria.name
@@ -242,10 +245,10 @@ private fun HomeScreenContent(
                         SectionHeader(title = stringResource(R.string.dashboard_titulo))
                     }
                     item {
-                        FunilCard(
+                        FunilInovacao(
                             totalIdeias = uiState.totalIdeias,
-                            aprovadas = uiState.ideiasAprovadas,
-                            emProjeto = uiState.ideiasEmProjeto
+                            ideiasAprovadas = uiState.ideiasAprovadas,
+                            projetosAtivos = uiState.ideiasEmProjeto
                         )
                     }
                     item {
@@ -311,7 +314,10 @@ private fun HomeScreenContent(
                     item {
                         SectionHeader(title = stringResource(R.string.home_section_minhas_ideias))
                     }
-                    items(uiState.minhasIdeias) { ideia ->
+                    items(
+                        items = uiState.minhasIdeias,
+                        key = { it.id }
+                    ) { ideia ->
                         IdeiaResumoCard(
                             titulo = ideia.titulo,
                             status = ideia.status.name,
@@ -328,80 +334,6 @@ private fun HomeScreenContent(
 // Dashboard Executivo Components
 // =========================================================================
 
-@Composable
-private fun FunilCard(
-    totalIdeias: Int,
-    aprovadas: Int,
-    emProjeto: Int
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.dashboard_funil),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FunilStep(
-                    valor = totalIdeias.toString(),
-                    label = stringResource(R.string.dashboard_total_ideias)
-                )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(20.dp)
-                )
-                FunilStep(
-                    valor = aprovadas.toString(),
-                    label = stringResource(R.string.dashboard_aprovadas)
-                )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(20.dp)
-                )
-                FunilStep(
-                    valor = emProjeto.toString(),
-                    label = stringResource(R.string.dashboard_em_projeto)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun FunilStep(valor: String, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = valor,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center
-        )
-    }
-}
 
 @Composable
 private fun FinanceiroCard(
