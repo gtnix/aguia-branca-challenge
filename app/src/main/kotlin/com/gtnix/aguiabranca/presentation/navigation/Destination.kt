@@ -100,8 +100,16 @@ sealed class Destination(val route: String) {
 
     /**
      * Novo projeto - Formulário para criar.
+     * Aceita ideiaId opcional para conversão de ideia em projeto.
      */
-    data object NovoProjeto : Destination("projetos/novo")
+    data object NovoProjeto : Destination("projetos/novo?ideiaId={ideiaId}") {
+        const val ARG_IDEIA_ID = "ideiaId"
+
+        fun createRoute(ideiaId: String? = null): String {
+            return if (ideiaId != null) "projetos/novo?ideiaId=$ideiaId"
+            else "projetos/novo"
+        }
+    }
 
     /**
      * Detalhes de um projeto.
@@ -138,6 +146,16 @@ sealed class Destination(val route: String) {
      * Perfil do usuário.
      */
     data object Perfil : Destination("perfil")
+
+    // =========================================================================
+    // INOVAÇÃO ABERTA
+    // =========================================================================
+
+    /**
+     * Radar de Inovação - Startups parceiras recomendadas.
+     * Acessível apenas para LIDER e GESTOR.
+     */
+    data object Radar : Destination("radar")
 }
 
 /**

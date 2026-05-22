@@ -18,13 +18,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Lightbulb
@@ -34,6 +37,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -52,49 +56,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.util.formatCurrency
+import com.gtnix.aguiabranca.presentation.util.formatPercent
 
-/**
- * HomeScreen - Tela Principal / Dashboard
- *
- * ## Conceito FIAP - Material 04A (Scaffold)
- *
- * O Scaffold é a estrutura padrão de uma tela Material Design:
- *
- * ```
- * ┌────────────────────────────────────┐
- * │           TopAppBar               │ ← topBar
- * ├────────────────────────────────────┤
- * │                                    │
- * │                                    │
- * │           Content                  │ ← content (recebe padding)
- * │                                    │
- * │                                    │
- * │                              [FAB] │ ← floatingActionButton
- * ├────────────────────────────────────┤
- * │        Bottom Navigation          │ ← bottomBar
- * └────────────────────────────────────┘
- * ```
- *
- * ### paddingValues
- *
- * O Scaffold passa `paddingValues` para o conteúdo para que
- * ele não fique escondido atrás do topBar ou bottomBar.
- *
- * ```kotlin
- * Scaffold { paddingValues ->
- *     LazyColumn(
- *         modifier = Modifier.padding(paddingValues)
- *     ) {
- *         // Conteúdo
- *     }
- * }
- * ```
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -104,11 +76,11 @@ fun HomeScreen(
     onNavigateToProjetos: () -> Unit,
     onNavigateToOrientacoes: () -> Unit,
     onNavigateToPerfil: () -> Unit,
-    onNavigateToNovaIdeia: () -> Unit
+    onNavigateToNovaIdeia: () -> Unit,
+    onNavigateToRadar: () -> Unit
 ) {
     val uiState = viewModel.uiState
 
-    // Carrega dados quando a tela é exibida
     LaunchedEffect(perfil) {
         viewModel.carregarDados(perfil)
     }
@@ -118,7 +90,8 @@ fun HomeScreen(
         onNavigateToIdeias = onNavigateToIdeias,
         onNavigateToProjetos = onNavigateToProjetos,
         onNavigateToPerfil = onNavigateToPerfil,
-        onNavigateToNovaIdeia = onNavigateToNovaIdeia
+        onNavigateToNovaIdeia = onNavigateToNovaIdeia,
+        onNavigateToRadar = onNavigateToRadar
     )
 }
 
@@ -129,20 +102,29 @@ private fun HomeScreenContent(
     onNavigateToIdeias: () -> Unit,
     onNavigateToProjetos: () -> Unit,
     onNavigateToPerfil: () -> Unit,
-    onNavigateToNovaIdeia: () -> Unit
+    onNavigateToNovaIdeia: () -> Unit,
+    onNavigateToRadar: () -> Unit
 ) {
     var selectedNavIndex by remember { mutableIntStateOf(0) }
 
+    val navItems = remember(uiState.perfil) {
+        buildList {
+            add(BottomNavItemData("Home", Icons.Filled.Home, Icons.Outlined.Home))
+            add(BottomNavItemData("Ideias", Icons.Filled.Lightbulb, Icons.Outlined.Lightbulb))
+            if (uiState.perfil != PerfilUsuario.OPERADOR) {
+                add(BottomNavItemData("Projetos", Icons.Filled.Folder, Icons.Outlined.Folder))
+            }
+            add(BottomNavItemData("Perfil", Icons.Filled.Person, Icons.Outlined.Person))
+        }
+    }
+
     Scaffold(
-        // =====================================================================
-        // TOP APP BAR
-        // =====================================================================
         topBar = {
             TopAppBar(
                 title = {
                     Column {
                         Text(
-                            text = "Olá, ${uiState.nomeUsuario}!",
+                            text = stringResource(R.string.home_welcome, uiState.nomeUsuario),
                             style = MaterialTheme.typography.titleLarge
                         )
                         Text(
@@ -153,10 +135,10 @@ private fun HomeScreenContent(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Notificações */ }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notificações"
+                            contentDescription = stringResource(R.string.cd_notifications)
                         )
                     }
                 },
@@ -168,25 +150,15 @@ private fun HomeScreenContent(
             )
         },
 
-        // =====================================================================
-        // BOTTOM NAVIGATION BAR
-        // =====================================================================
         bottomBar = {
             NavigationBar {
-                val items = listOf(
-                    BottomNavItemData("Home", Icons.Filled.Home, Icons.Outlined.Home),
-                    BottomNavItemData("Ideias", Icons.Filled.Lightbulb, Icons.Outlined.Lightbulb),
-                    BottomNavItemData("Projetos", Icons.Filled.Folder, Icons.Outlined.Folder),
-                    BottomNavItemData("Perfil", Icons.Filled.Person, Icons.Outlined.Person)
-                )
-
-                items.forEachIndexed { index, item ->
+                navItems.forEachIndexed { index, item ->
                     NavigationBarItem(
                         icon = {
                             Icon(
-                                imageVector = if (selectedNavIndex == index) 
-                                    item.selectedIcon 
-                                else 
+                                imageVector = if (selectedNavIndex == index)
+                                    item.selectedIcon
+                                else
                                     item.unselectedIcon,
                                 contentDescription = item.label
                             )
@@ -195,11 +167,11 @@ private fun HomeScreenContent(
                         selected = selectedNavIndex == index,
                         onClick = {
                             selectedNavIndex = index
-                            when (index) {
-                                0 -> { /* Já está no Home */ }
-                                1 -> onNavigateToIdeias()
-                                2 -> onNavigateToProjetos()
-                                3 -> onNavigateToPerfil()
+                            when (item.label) {
+                                "Home" -> { }
+                                "Ideias" -> onNavigateToIdeias()
+                                "Projetos" -> onNavigateToProjetos()
+                                "Perfil" -> onNavigateToPerfil()
                             }
                         }
                     )
@@ -207,24 +179,20 @@ private fun HomeScreenContent(
             }
         },
 
-        // =====================================================================
-        // FLOATING ACTION BUTTON
-        // =====================================================================
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onNavigateToNovaIdeia,
-                containerColor = MaterialTheme.colorScheme.secondary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Nova Ideia"
-                )
+            if (uiState.perfil != PerfilUsuario.LIDER) {
+                FloatingActionButton(
+                    onClick = onNavigateToNovaIdeia,
+                    containerColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.ideias_nova)
+                    )
+                }
             }
         }
     ) { paddingValues ->
-        // =====================================================================
-        // CONTENT
-        // =====================================================================
         if (uiState.isLoading) {
             Box(
                 modifier = Modifier
@@ -242,7 +210,6 @@ private fun HomeScreenContent(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Seção: Métricas Rápidas
                 item {
                     MetricasSection(
                         totalIdeias = uiState.totalIdeias,
@@ -251,10 +218,9 @@ private fun HomeScreenContent(
                     )
                 }
 
-                // Seção: Orientações Estratégicas
                 if (uiState.orientacoes.isNotEmpty()) {
                     item {
-                        SectionHeader(title = "Orientações Estratégicas")
+                        SectionHeader(title = stringResource(R.string.home_section_orientacoes))
                     }
                     item {
                         LazyRow(
@@ -270,7 +236,30 @@ private fun HomeScreenContent(
                     }
                 }
 
-                // Seção: Ações Rápidas
+                // Dashboard Executivo for LIDER
+                if (uiState.perfil == PerfilUsuario.LIDER) {
+                    item {
+                        SectionHeader(title = stringResource(R.string.dashboard_titulo))
+                    }
+                    item {
+                        FunilCard(
+                            totalIdeias = uiState.totalIdeias,
+                            aprovadas = uiState.ideiasAprovadas,
+                            emProjeto = uiState.ideiasEmProjeto
+                        )
+                    }
+                    item {
+                        FinanceiroCard(
+                            investimentoTotal = uiState.investimentoTotal,
+                            retornoTotal = uiState.retornoTotal
+                        )
+                    }
+                    item {
+                        RoiCard(roi = uiState.roiConsolidado)
+                    }
+                }
+
+                // Quick actions (differentiated by profile)
                 item {
                     SectionHeader(title = "Ações Rápidas")
                 }
@@ -279,25 +268,48 @@ private fun HomeScreenContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        if (uiState.perfil != PerfilUsuario.LIDER) {
+                            ActionCard(
+                                modifier = Modifier.weight(1f),
+                                icon = Icons.Default.Lightbulb,
+                                title = stringResource(R.string.ideias_nova),
+                                onClick = onNavigateToNovaIdeia
+                            )
+                        }
+                        if (uiState.perfil != PerfilUsuario.OPERADOR) {
+                            ActionCard(
+                                modifier = Modifier.weight(1f),
+                                icon = Icons.Default.Folder,
+                                title = stringResource(R.string.nav_projetos),
+                                onClick = onNavigateToProjetos
+                            )
+                        }
+                        if (uiState.perfil == PerfilUsuario.OPERADOR) {
+                            ActionCard(
+                                modifier = Modifier.weight(1f),
+                                icon = Icons.Default.Lightbulb,
+                                title = stringResource(R.string.nav_ideias),
+                                onClick = onNavigateToIdeias
+                            )
+                        }
+                    }
+                }
+
+                if (uiState.perfil == PerfilUsuario.LIDER || uiState.perfil == PerfilUsuario.GESTOR) {
+                    item {
                         ActionCard(
-                            modifier = Modifier.weight(1f),
-                            icon = Icons.Default.Lightbulb,
-                            title = "Nova Ideia",
-                            onClick = onNavigateToNovaIdeia
-                        )
-                        ActionCard(
-                            modifier = Modifier.weight(1f),
-                            icon = Icons.Default.Folder,
-                            title = "Ver Projetos",
-                            onClick = onNavigateToProjetos
+                            modifier = Modifier.fillMaxWidth(),
+                            icon = Icons.Default.Radar,
+                            title = "Radar de Inovação",
+                            onClick = onNavigateToRadar
                         )
                     }
                 }
 
-                // Seção: Minhas Ideias Recentes
-                if (uiState.minhasIdeias.isNotEmpty()) {
+                // "Minhas Ideias" only for non-LIDER
+                if (uiState.perfil != PerfilUsuario.LIDER && uiState.minhasIdeias.isNotEmpty()) {
                     item {
-                        SectionHeader(title = "Minhas Ideias Recentes")
+                        SectionHeader(title = stringResource(R.string.home_section_minhas_ideias))
                     }
                     items(uiState.minhasIdeias) { ideia ->
                         IdeiaResumoCard(
@@ -312,9 +324,192 @@ private fun HomeScreenContent(
     }
 }
 
-/**
- * Header de seção com título estilizado.
- */
+// =========================================================================
+// Dashboard Executivo Components
+// =========================================================================
+
+@Composable
+private fun FunilCard(
+    totalIdeias: Int,
+    aprovadas: Int,
+    emProjeto: Int
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.dashboard_funil),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FunilStep(
+                    valor = totalIdeias.toString(),
+                    label = stringResource(R.string.dashboard_total_ideias)
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.size(20.dp)
+                )
+                FunilStep(
+                    valor = aprovadas.toString(),
+                    label = stringResource(R.string.dashboard_aprovadas)
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.size(20.dp)
+                )
+                FunilStep(
+                    valor = emProjeto.toString(),
+                    label = stringResource(R.string.dashboard_em_projeto)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FunilStep(valor: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = valor,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun FinanceiroCard(
+    investimentoTotal: Double,
+    retornoTotal: Double
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.AccountBalance,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.dashboard_financeiro),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.dashboard_investimento),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Text(
+                        text = formatCurrency(investimentoTotal),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = stringResource(R.string.dashboard_retorno),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Text(
+                        text = formatCurrency(retornoTotal),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RoiCard(roi: Double) {
+    val roiColor = if (roi >= 0)
+        MaterialTheme.colorScheme.primary
+    else
+        MaterialTheme.colorScheme.error
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.dashboard_roi_anual),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = formatPercent(roi),
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+                color = roiColor
+            )
+        }
+    }
+}
+
+// =========================================================================
+// Shared Components
+// =========================================================================
+
 @Composable
 private fun SectionHeader(title: String) {
     Text(
@@ -325,9 +520,6 @@ private fun SectionHeader(title: String) {
     )
 }
 
-/**
- * Seção de métricas rápidas do dashboard.
- */
 @Composable
 private fun MetricasSection(
     totalIdeias: Int,
@@ -342,26 +534,23 @@ private fun MetricasSection(
             modifier = Modifier.weight(1f),
             icon = Icons.Default.Lightbulb,
             valor = totalIdeias.toString(),
-            label = "Ideias"
+            label = stringResource(R.string.nav_ideias)
         )
         MetricaCard(
             modifier = Modifier.weight(1f),
             icon = Icons.Default.Star,
             valor = ideiasAprovadas.toString(),
-            label = "Aprovadas"
+            label = stringResource(R.string.dashboard_aprovadas)
         )
         MetricaCard(
             modifier = Modifier.weight(1f),
-            icon = Icons.Default.TrendingUp,
+            icon = Icons.AutoMirrored.Filled.TrendingUp,
             valor = totalProjetos.toString(),
-            label = "Projetos"
+            label = stringResource(R.string.nav_projetos)
         )
     }
 }
 
-/**
- * Card de métrica individual.
- */
 @Composable
 private fun MetricaCard(
     modifier: Modifier = Modifier,
@@ -404,9 +593,6 @@ private fun MetricaCard(
     }
 }
 
-/**
- * Card de orientação estratégica.
- */
 @Composable
 private fun OrientacaoCard(
     titulo: String,
@@ -438,9 +624,6 @@ private fun OrientacaoCard(
     }
 }
 
-/**
- * Card de ação rápida.
- */
 @Composable
 private fun ActionCard(
     modifier: Modifier = Modifier,
@@ -477,9 +660,6 @@ private fun ActionCard(
     }
 }
 
-/**
- * Card de resumo de ideia.
- */
 @Composable
 private fun IdeiaResumoCard(
     titulo: String,
@@ -524,16 +704,13 @@ private fun IdeiaResumoCard(
     }
 }
 
-/**
- * Chip de status colorido.
- */
 @Composable
 private fun StatusChip(status: String) {
     val (color, text) = when (status) {
-        "PENDENTE" -> MaterialTheme.colorScheme.outline to "Pendente"
-        "EM_ANALISE" -> MaterialTheme.colorScheme.tertiary to "Em Análise"
-        "APROVADA" -> MaterialTheme.colorScheme.primary to "Aprovada"
-        "REPROVADA" -> MaterialTheme.colorScheme.error to "Reprovada"
+        "PENDENTE" -> MaterialTheme.colorScheme.outline to stringResource(R.string.status_pendente)
+        "EM_ANALISE" -> MaterialTheme.colorScheme.tertiary to stringResource(R.string.status_em_analise)
+        "APROVADA" -> MaterialTheme.colorScheme.primary to stringResource(R.string.status_aprovado)
+        "REPROVADA" -> MaterialTheme.colorScheme.error to stringResource(R.string.status_reprovado)
         else -> MaterialTheme.colorScheme.outline to status
     }
 
@@ -552,9 +729,6 @@ private fun StatusChip(status: String) {
     }
 }
 
-/**
- * Data class para itens do Bottom Navigation.
- */
 private data class BottomNavItemData(
     val label: String,
     val selectedIcon: ImageVector,
@@ -575,7 +749,32 @@ private fun HomeScreenPreview() {
             onNavigateToIdeias = {},
             onNavigateToProjetos = {},
             onNavigateToPerfil = {},
-            onNavigateToNovaIdeia = {}
+            onNavigateToNovaIdeia = {},
+            onNavigateToRadar = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun HomeScreenLiderPreview() {
+    AguiaBrancaTheme {
+        HomeScreenContent(
+            uiState = HomeUiState(
+                perfil = PerfilUsuario.LIDER,
+                totalIdeias = 42,
+                ideiasAprovadas = 18,
+                ideiasEmProjeto = 7,
+                totalProjetos = 7,
+                investimentoTotal = 350000.0,
+                retornoTotal = 48000.0,
+                roiConsolidado = 64.6
+            ),
+            onNavigateToIdeias = {},
+            onNavigateToProjetos = {},
+            onNavigateToPerfil = {},
+            onNavigateToNovaIdeia = {},
+            onNavigateToRadar = {}
         )
     }
 }

@@ -9,6 +9,7 @@ import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.Projeto
+import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.repository.IdeiaRepository
 import com.gtnix.aguiabranca.domain.repository.OrientacaoRepository
 import com.gtnix.aguiabranca.domain.repository.ProjetoRepository
@@ -60,6 +61,12 @@ class HomeViewModel @Inject constructor(
                 ) { orientacoes, ideias, projetos ->
                     Triple(orientacoes, ideias, projetos)
                 }.collect { (orientacoes, ideias, projetos) ->
+                    val investimento = projetos.sumOf { it.investimentoRealizado }
+                    val retorno = projetos.sumOf { it.retornoRealizadoMensal }
+                    val roi = if (investimento > 0)
+                        ((retorno * 12) - investimento) / investimento * 100
+                    else 0.0
+
                     uiState = uiState.copy(
                         isLoading = false,
                         orientacoes = orientacoes.take(3),
@@ -70,8 +77,12 @@ class HomeViewModel @Inject constructor(
                         totalIdeias = ideias.size,
                         totalProjetos = projetos.size,
                         ideiasAprovadas = ideias.count { 
-                            it.status.name == "APROVADA" || it.status.name == "CONVERTIDA_PROJETO"
-                        }
+                            it.status == StatusIdeia.APROVADA || it.status == StatusIdeia.CONVERTIDA_PROJETO
+                        },
+                        ideiasEmProjeto = ideias.count { it.status == StatusIdeia.CONVERTIDA_PROJETO },
+                        investimentoTotal = investimento,
+                        retornoTotal = retorno,
+                        roiConsolidado = roi
                     )
                 }
             } catch (e: Exception) {
@@ -96,6 +107,10 @@ data class HomeUiState(
     val totalIdeias: Int = 0,
     val totalProjetos: Int = 0,
     val ideiasAprovadas: Int = 0,
+    val ideiasEmProjeto: Int = 0,
+    val investimentoTotal: Double = 0.0,
+    val retornoTotal: Double = 0.0,
+    val roiConsolidado: Double = 0.0,
     val errorMessage: String? = null
 ) {
     val nomeUsuario: String

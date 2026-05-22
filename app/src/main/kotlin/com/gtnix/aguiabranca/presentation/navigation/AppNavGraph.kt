@@ -12,8 +12,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gtnix.aguiabranca.presentation.screens.auth.LoginScreen
 import com.gtnix.aguiabranca.presentation.screens.home.HomeScreen
+import com.gtnix.aguiabranca.presentation.screens.ideias.IdeiaDetalheScreen
 import com.gtnix.aguiabranca.presentation.screens.ideias.IdeiasScreen
 import com.gtnix.aguiabranca.presentation.screens.ideias.NovaIdeiaScreen
+import com.gtnix.aguiabranca.presentation.screens.inovacao.RadarScreen
+import com.gtnix.aguiabranca.presentation.screens.perfil.PerfilScreen
+import com.gtnix.aguiabranca.presentation.screens.projetos.NovoProjetoScreen
+import com.gtnix.aguiabranca.presentation.screens.projetos.ProjetoDetalheScreen
 import com.gtnix.aguiabranca.presentation.screens.projetos.ProjetosScreen
 
 /**
@@ -120,6 +125,9 @@ fun AppNavGraph(
                 },
                 onNavigateToNovaIdeia = {
                     navController.navigate(Destination.NovaIdeia.route)
+                },
+                onNavigateToRadar = {
+                    navController.navigate(Destination.Radar.route)
                 }
             )
         }
@@ -150,6 +158,23 @@ fun AppNavGraph(
             )
         }
 
+        composable(
+            route = Destination.IdeiaDetalhe.route,
+            arguments = listOf(
+                navArgument(Destination.IdeiaDetalhe.ARG_IDEIA_ID) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            IdeiaDetalheScreen(
+                viewModel = hiltViewModel(),
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToNovoProjeto = { ideiaId ->
+                    navController.navigate(Destination.NovoProjeto.createRoute(ideiaId))
+                }
+            )
+        }
+
         // =====================================================================
         // PROJETOS
         // =====================================================================
@@ -158,10 +183,43 @@ fun AppNavGraph(
                 viewModel = hiltViewModel(),
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToNovoProjeto = {
-                    navController.navigate(Destination.NovoProjeto.route)
+                    navController.navigate(Destination.NovoProjeto.createRoute())
                 },
                 onNavigateToDetalhe = { projetoId ->
                     navController.navigate(Destination.ProjetoDetalhe.createRoute(projetoId))
+                }
+            )
+        }
+
+        composable(
+            route = Destination.ProjetoDetalhe.route,
+            arguments = listOf(
+                navArgument(Destination.ProjetoDetalhe.ARG_PROJETO_ID) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            ProjetoDetalheScreen(
+                viewModel = hiltViewModel(),
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Destination.NovoProjeto.route,
+            arguments = listOf(
+                navArgument(Destination.NovoProjeto.ARG_IDEIA_ID) {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
+            NovoProjetoScreen(
+                viewModel = hiltViewModel(),
+                onNavigateBack = { navController.popBackStack() },
+                onProjetoCreated = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -174,10 +232,28 @@ fun AppNavGraph(
         }
 
         // =====================================================================
-        // PERFIL (Placeholder)
+        // PERFIL
         // =====================================================================
         composable(route = Destination.Perfil.route) {
-            // TODO: Implementar PerfilScreen
+            PerfilScreen(
+                viewModel = hiltViewModel(),
+                onNavigateBack = { navController.popBackStack() },
+                onLogout = {
+                    navController.navigate(Destination.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // =====================================================================
+        // RADAR DE INOVAÇÃO
+        // =====================================================================
+        composable(route = Destination.Radar.route) {
+            RadarScreen(
+                viewModel = hiltViewModel(),
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

@@ -59,6 +59,55 @@
     <string name="status_em_andamento">Em Andamento</string>
     <string name="status_concluido">Concluído</string>
     
+    <!-- Dashboard Executivo -->
+    <string name="dashboard_titulo">Dashboard Executivo</string>
+    <string name="dashboard_funil">Funil de Inovação</string>
+    <string name="dashboard_total_ideias">Total Ideias</string>
+    <string name="dashboard_aprovadas">Aprovadas</string>
+    <string name="dashboard_em_projeto">Em Projeto</string>
+    <string name="dashboard_financeiro">Financeiro</string>
+    <string name="dashboard_investimento">Investimento Realizado</string>
+    <string name="dashboard_retorno">Retorno Mensal</string>
+    <string name="dashboard_roi">ROI Consolidado</string>
+    <string name="dashboard_roi_anual">ROI Anual da Carteira</string>
+    
+    <!-- Projeto Detalhe -->
+    <string name="projeto_detalhe_titulo">Detalhe do Projeto</string>
+    <string name="projeto_detalhe_area">Área</string>
+    <string name="projeto_detalhe_responsavel">Responsável</string>
+    <string name="projeto_detalhe_status">Status</string>
+    <string name="projeto_detalhe_financeiro">Painel Financeiro</string>
+    <string name="projeto_detalhe_investimento_estimado">Investimento Estimado</string>
+    <string name="projeto_detalhe_investimento_realizado">Investimento Realizado</string>
+    <string name="projeto_detalhe_retorno_estimado">Retorno Estimado/Mês</string>
+    <string name="projeto_detalhe_retorno_realizado">Retorno Realizado/Mês</string>
+    <string name="projeto_detalhe_roi">ROI</string>
+    <string name="projeto_detalhe_progresso">Progresso</string>
+    <string name="projeto_detalhe_salvar_progresso">Salvar Progresso</string>
+    <string name="projeto_detalhe_concluir">Concluir Projeto</string>
+    <string name="projeto_detalhe_nao_encontrado">Projeto não encontrado</string>
+    <string name="projeto_detalhe_erro_carregar">Erro ao carregar projeto</string>
+    <string name="projeto_detalhe_sucesso">Ação realizada com sucesso!</string>
+    
+    <!-- Novo Projeto -->
+    <string name="novo_projeto_titulo">Novo Projeto</string>
+    <string name="novo_projeto_nome">Nome do Projeto</string>
+    <string name="novo_projeto_nome_placeholder">Ex: Modernização da Frota</string>
+    <string name="novo_projeto_objetivo">Objetivo</string>
+    <string name="novo_projeto_objetivo_placeholder">Descreva o objetivo principal</string>
+    <string name="novo_projeto_area">Área de Atuação</string>
+    <string name="novo_projeto_investimento">Investimento Estimado (R$)</string>
+    <string name="novo_projeto_investimento_placeholder">Ex: 50000</string>
+    <string name="novo_projeto_retorno">Retorno Estimado Mensal (R$)</string>
+    <string name="novo_projeto_retorno_placeholder">Ex: 8000</string>
+    <string name="novo_projeto_salvar">Salvar Projeto</string>
+    <string name="novo_projeto_origem_ideia">Origem: Ideia #%1$s</string>
+    <string name="novo_projeto_erro_campos">Preencha todos os campos obrigatórios</string>
+    <string name="novo_projeto_erro_salvar">Erro ao salvar projeto</string>
+    
+    <!-- Ideia -> Projeto -->
+    <string name="ideia_criar_projeto">Criar Projeto</string>
+    
     <!-- Common -->
     <string name="btn_salvar">Salvar</string>
     <string name="btn_cancelar">Cancelar</string>
