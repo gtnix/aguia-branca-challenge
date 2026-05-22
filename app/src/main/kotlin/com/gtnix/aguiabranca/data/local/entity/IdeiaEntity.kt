@@ -87,5 +87,9 @@ data class IdeiaEntity(
     
     val dataCriacao: Long,
     
-    val dataAvaliacao: Long?
+    val dataAvaliacao: Long?,
+    
+    val impactoEstimado: Int = 0,
+    
+    val esforcoEstimado: Int = 0
 )

@@ -38,7 +38,11 @@ class ProjetoMapper @Inject constructor() {
             dataPrevistaConclusao = entity.dataPrevistaConclusao,
             dataConclusao = entity.dataConclusao,
             progresso = entity.progresso,
-            resultados = entity.resultados
+            resultados = entity.resultados,
+            investimentoEstimado = entity.investimentoEstimado,
+            investimentoRealizado = entity.investimentoRealizado,
+            retornoEstimadoMensal = entity.retornoEstimadoMensal,
+            retornoRealizadoMensal = entity.retornoRealizadoMensal
         )
     }
 
@@ -60,7 +64,11 @@ class ProjetoMapper @Inject constructor() {
             dataPrevistaConclusao = domain.dataPrevistaConclusao,
             dataConclusao = domain.dataConclusao,
             progresso = domain.progresso,
-            resultados = domain.resultados
+            resultados = domain.resultados,
+            investimentoEstimado = domain.investimentoEstimado,
+            investimentoRealizado = domain.investimentoRealizado,
+            retornoEstimadoMensal = domain.retornoEstimadoMensal,
+            retornoRealizadoMensal = domain.retornoRealizadoMensal
         )
     }
 

@@ -55,8 +55,13 @@ data class Ideia(
     val feedback: String? = null,
     val projetoId: String? = null,
     val dataCriacao: Long = System.currentTimeMillis(),
-    val dataAvaliacao: Long? = null
-)
+    val dataAvaliacao: Long? = null,
+    val impactoEstimado: Int = 0,
+    val esforcoEstimado: Int = 0
+) {
+    val scorePriorizacao: Int
+        get() = impactoEstimado - esforcoEstimado
+}
 
 /**
  * Tipo da submissão: pode ser uma ideia de melhoria ou um problema identificado.

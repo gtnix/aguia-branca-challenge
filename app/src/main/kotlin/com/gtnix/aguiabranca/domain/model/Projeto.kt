@@ -63,8 +63,17 @@ data class Projeto(
     val dataPrevistaConclusao: Long? = null,
     val dataConclusao: Long? = null,
     val progresso: Int = 0,
-    val resultados: String? = null
-)
+    val resultados: String? = null,
+    val investimentoEstimado: Double = 0.0,
+    val investimentoRealizado: Double = 0.0,
+    val retornoEstimadoMensal: Double = 0.0,
+    val retornoRealizadoMensal: Double = 0.0
+) {
+    val roi: Double
+        get() = if (investimentoRealizado > 0)
+            ((retornoRealizadoMensal * 12) - investimentoRealizado) / investimentoRealizado * 100
+        else 0.0
+}
 
 /**
  * Status do projeto no ciclo de vida.

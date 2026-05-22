@@ -85,5 +85,13 @@ data class ProjetoEntity(
     
     val progresso: Int,
     
-    val resultados: String?
+    val resultados: String?,
+    
+    val investimentoEstimado: Double = 0.0,
+    
+    val investimentoRealizado: Double = 0.0,
+    
+    val retornoEstimadoMensal: Double = 0.0,
+    
+    val retornoRealizadoMensal: Double = 0.0
 )

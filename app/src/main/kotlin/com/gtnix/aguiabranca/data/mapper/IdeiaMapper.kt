@@ -26,7 +26,9 @@ class IdeiaMapper @Inject constructor() {
             feedback = entity.feedback,
             projetoId = entity.projetoId,
             dataCriacao = entity.dataCriacao,
-            dataAvaliacao = entity.dataAvaliacao
+            dataAvaliacao = entity.dataAvaliacao,
+            impactoEstimado = entity.impactoEstimado,
+            esforcoEstimado = entity.esforcoEstimado
         )
     }
 
@@ -44,7 +46,9 @@ class IdeiaMapper @Inject constructor() {
             feedback = domain.feedback,
             projetoId = domain.projetoId,
             dataCriacao = domain.dataCriacao,
-            dataAvaliacao = domain.dataAvaliacao
+            dataAvaliacao = domain.dataAvaliacao,
+            impactoEstimado = domain.impactoEstimado,
+            esforcoEstimado = domain.esforcoEstimado
         )
     }
 
