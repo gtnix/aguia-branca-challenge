@@ -354,19 +354,32 @@ O documento convida a implementar melhorias para promover engajamento:
 
 ---
 
-## 14. GAPS NA IMPLEMENTAÇÃO ATUAL
+## 14. STATUS DA IMPLEMENTAÇÃO
 
-Com base na análise do código vs requisitos:
+### Requisitos Implementados
+
+| Requisito | Status | Observação |
+|-----------|--------|------------|
+| Login com 3 perfis | ✅ Implementado | Operador, Gestor, Líder |
+| Cadastro de ideias/problemas | ✅ Implementado | Com tipo (Ideia/Problema) e área |
+| Consulta de próprias ideias | ✅ Implementado | Filtro por autor |
+| Listagem de todas ideias | ✅ Implementado | Para Gestor/Líder |
+| Aprovação/Reprovação de ideias | ✅ Implementado | IdeiaDetalheScreen com ações |
+| Priorização de ideias | ✅ Implementado | Campos impacto/esforço + score |
+| Cadastro de projetos | ✅ Implementado | Manual ou via conversão de ideia |
+| Métricas financeiras em Projeto | ✅ Implementado | Investimento, retorno, ROI |
+| Atualizar progresso do projeto | ✅ Implementado | Campo progresso 0-100% |
+| Diferenciação por perfil | ✅ Implementado | Home e ações por perfil |
+| Radar de Inovação | ✅ Implementado | Startups parceiras |
+
+### Requisitos Pendentes
 
 | Gap | Gravidade | Descrição |
 |-----|-----------|-----------|
-| Diferenciação de telas por perfil | **ALTA** | Todas as telas mostram as mesmas funções para todos os perfis |
-| Aprovação/Reprovação de ideias | **ALTA** | Gestor não consegue aprovar/reprovar ideias |
-| CRUD de Orientações | **ALTA** | Líder não consegue gerenciar orientações |
-| Dashboard executivo | **ALTA** | Não há métricas de ROI, investimento, retorno |
-| Controle de visibilidade de botões | MÉDIA | FABs e ações visíveis para todos |
-| Métricas financeiras no Projeto | MÉDIA | Modelo Projeto não tem campos de investimento/retorno |
-| Priorização de ideias | MÉDIA | Não há mecanismo de priorização |
+| CRUD de Orientações | **ALTA** | Telas de criar/editar orientações para Líder |
+| Dashboard executivo | **ALTA** | Métricas consolidadas (ROI total, investimento, retorno) |
+| Testes unitários | MÉDIA | Cobertura de testes para ViewModels e UseCases |
+| Notificações | BAIXA | Avisos de mudança de status |
 
 ---
 
