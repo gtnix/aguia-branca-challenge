@@ -5,9 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gtnix.aguiabranca.data.local.database.DatabaseSeeder
+import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.Usuario
 import com.gtnix.aguiabranca.domain.repository.UsuarioRepository
+import com.gtnix.aguiabranca.domain.session.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -55,7 +58,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val usuarioRepository: UsuarioRepository
+    private val usuarioRepository: UsuarioRepository,
+    private val seeder: DatabaseSeeder,
+    private val userSession: UserSession
 ) : ViewModel() {
 
     /**
@@ -66,6 +71,10 @@ class LoginViewModel @Inject constructor(
      */
     var uiState by mutableStateOf(LoginUiState())
         private set
+
+    init {
+        viewModelScope.launch { seeder.seedDatabaseIfEmpty() }
+    }
 
     /**
      * Atualiza o campo de email.
@@ -118,7 +127,10 @@ class LoginViewModel @Inject constructor(
                 )
 
                 if (usuario != null) {
-                    // Login bem sucedido
+                    userSession.perfil = usuario.perfil
+                    userSession.userId = usuario.id
+                    userSession.userName = usuario.nome
+                    userSession.area = usuario.area
                     uiState = uiState.copy(
                         isLoading = false,
                         loginSuccess = true,
@@ -146,6 +158,8 @@ class LoginViewModel @Inject constructor(
      * Usado para testes sem banco populado.
      */
     fun onDemoLogin(perfil: PerfilUsuario) {
+        userSession.perfil = perfil
+        userSession.area = AreaAtuacao.OPERACOES
         uiState = uiState.copy(
             isLoading = false,
             loginSuccess = true,
