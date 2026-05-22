@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 
+    Material FIAP 04A - Telas Profissionais:
+    Sempre extraia strings para resources para facilitar:
+    - Internacionalização (i18n)
+    - Manutenção centralizada
+    - Acessibilidade
+    -->
+    
+    <!-- App -->
+    <string name="app_name">Águia Branca - Inovação</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_ideias">Ideias</string>
+    <string name="nav_projetos">Projetos</string>
+    <string name="nav_perfil">Perfil</string>
+    
+    <!-- Auth -->
+    <string name="login_title">Bem-vindo!</string>
+    <string name="login_subtitle">Plataforma de Inovação Corporativa</string>
+    <string name="login_email_label">E-mail</string>
+    <string name="login_email_placeholder">seu.email@aguiabranca.com.br</string>
+    <string name="login_password_label">Senha</string>
+    <string name="login_password_placeholder">Digite sua senha</string>
+    <string name="login_button">Entrar</string>
+    <string name="login_forgot_password">Esqueci minha senha</string>
+    <string name="login_error_invalid_credentials">E-mail ou senha inválidos</string>
+    <string name="login_error_empty_fields">Preencha todos os campos</string>
+    
+    <!-- Home -->
+    <string name="home_welcome">Olá, %1$s!</string>
+    <string name="home_section_orientacoes">Orientações Estratégicas</string>
+    <string name="home_section_minhas_ideias">Minhas Ideias</string>
+    <string name="home_section_projetos">Projetos em Andamento</string>
+    
+    <!-- Ideias -->
+    <string name="ideias_title">Ideias</string>
+    <string name="ideias_nova">Nova Ideia</string>
+    <string name="ideias_titulo_label">Título da Ideia</string>
+    <string name="ideias_descricao_label">Descrição</string>
+    <string name="ideias_area_label">Área de Atuação</string>
+    <string name="ideias_submit">Submeter Ideia</string>
+    
+    <!-- Projetos -->
+    <string name="projetos_title">Projetos</string>
+    <string name="projetos_novo">Novo Projeto</string>
+    <string name="projetos_nome_label">Nome do Projeto</string>
+    <string name="projetos_objetivo_label">Objetivo</string>
+    <string name="projetos_equipe_label">Equipe</string>
+    <string name="projetos_criar">Criar Projeto</string>
+    
+    <!-- Status -->
+    <string name="status_pendente">Pendente</string>
+    <string name="status_em_analise">Em Análise</string>
+    <string name="status_aprovado">Aprovado</string>
+    <string name="status_reprovado">Reprovado</string>
+    <string name="status_em_andamento">Em Andamento</string>
+    <string name="status_concluido">Concluído</string>
+    
+    <!-- Common -->
+    <string name="btn_salvar">Salvar</string>
+    <string name="btn_cancelar">Cancelar</string>
+    <string name="btn_editar">Editar</string>
+    <string name="btn_excluir">Excluir</string>
+    <string name="btn_voltar">Voltar</string>
+    <string name="loading">Carregando…</string>
+    <string name="error_generic">Ocorreu um erro. Tente novamente.</string>
+    
+    <!-- Content Descriptions (Acessibilidade) -->
+    <string name="cd_logo">Logo Águia Branca</string>
+    <string name="cd_menu">Menu de navegação</string>
+    <string name="cd_search">Buscar</string>
+    <string name="cd_notifications">Notificações</string>
+</resources>
