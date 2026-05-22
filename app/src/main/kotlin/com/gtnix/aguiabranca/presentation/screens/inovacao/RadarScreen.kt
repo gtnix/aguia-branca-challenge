@@ -31,6 +31,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -45,7 +47,7 @@ fun RadarScreen(
     viewModel: RadarViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     RadarScreenContent(
         uiState = uiState,
@@ -152,8 +154,14 @@ private fun RadarScreenContent(
                         )
                     }
 
-                    items(uiState.startups) { startup ->
-                        StartupCard(startup = startup)
+                    items(
+                        items = uiState.startups,
+                        key = { it.id }
+                    ) { startup ->
+                        StartupCard(
+                            startup = startup,
+                            modifier = Modifier.animateItem()
+                        )
                     }
                 }
             }
@@ -162,9 +170,12 @@ private fun RadarScreenContent(
 }
 
 @Composable
-private fun StartupCard(startup: StartupPartner) {
+private fun StartupCard(
+    startup: StartupPartner,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),

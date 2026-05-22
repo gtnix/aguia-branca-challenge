@@ -37,8 +37,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -57,6 +56,10 @@ import com.gtnix.aguiabranca.presentation.navigation.Destination
 import com.gtnix.aguiabranca.presentation.util.formatCurrency
 import com.gtnix.aguiabranca.presentation.util.formatPercent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -71,8 +74,8 @@ class ProjetoDetalheViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(ProjetoDetalheUiState())
-        private set
+    private val _uiState = MutableStateFlow(ProjetoDetalheUiState())
+    val uiState: StateFlow<ProjetoDetalheUiState> = _uiState.asStateFlow()
 
     private val projetoId: String = savedStateHandle[Destination.ProjetoDetalhe.ARG_PROJETO_ID] ?: ""
 
@@ -81,45 +84,44 @@ class ProjetoDetalheViewModel @Inject constructor(
     }
 
     private fun carregarProjeto() {
-        uiState = uiState.copy(isLoading = true)
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
                 val projeto = projetoRepository.buscarPorId(projetoId)
-                uiState = uiState.copy(
-                    isLoading = false,
-                    projeto = projeto,
-                    perfil = userSession.perfil,
-                    progressoSlider = projeto?.progresso?.toFloat() ?: 0f
-                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        projeto = projeto,
+                        perfil = userSession.perfil,
+                        progressoSlider = projeto?.progresso?.toFloat() ?: 0f
+                    )
+                }
             } catch (e: Exception) {
-                uiState = uiState.copy(
-                    isLoading = false,
-                    errorMessage = "Erro ao carregar projeto"
-                )
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Erro ao carregar projeto") }
             }
         }
     }
 
     fun onProgressoChange(value: Float) {
-        uiState = uiState.copy(progressoSlider = value)
+        _uiState.update { it.copy(progressoSlider = value) }
     }
 
     fun salvarProgresso() {
-        val projeto = uiState.projeto ?: return
+        val projeto = _uiState.value.projeto ?: return
         viewModelScope.launch {
             try {
-                val novoProgresso = uiState.progressoSlider.toInt()
+                val novoProgresso = _uiState.value.progressoSlider.toInt()
                 projetoRepository.atualizarProgresso(projeto.id, novoProgresso)
                 val atualizado = projeto.copy(progresso = novoProgresso)
-                uiState = uiState.copy(projeto = atualizado, actionSuccess = true)
+                _uiState.update { it.copy(projeto = atualizado, actionSuccess = true) }
             } catch (e: Exception) {
-                uiState = uiState.copy(errorMessage = "Erro ao salvar progresso")
+                _uiState.update { it.copy(errorMessage = "Erro ao salvar progresso") }
             }
         }
     }
 
     fun concluirProjeto() {
-        val projeto = uiState.projeto ?: return
+        val projeto = _uiState.value.projeto ?: return
         viewModelScope.launch {
             try {
                 val concluido = projeto.copy(
@@ -128,13 +130,9 @@ class ProjetoDetalheViewModel @Inject constructor(
                     dataConclusao = System.currentTimeMillis()
                 )
                 projetoRepository.salvar(concluido)
-                uiState = uiState.copy(
-                    projeto = concluido,
-                    progressoSlider = 100f,
-                    actionSuccess = true
-                )
+                _uiState.update { it.copy(projeto = concluido, progressoSlider = 100f, actionSuccess = true) }
             } catch (e: Exception) {
-                uiState = uiState.copy(errorMessage = "Erro ao concluir projeto")
+                _uiState.update { it.copy(errorMessage = "Erro ao concluir projeto") }
             }
         }
     }
@@ -158,7 +156,7 @@ fun ProjetoDetalheScreen(
     viewModel: ProjetoDetalheViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProjetoDetalheContent(
         uiState = uiState,

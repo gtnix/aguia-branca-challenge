@@ -1,51 +1,40 @@
 package com.gtnix.aguiabranca.presentation.screens.ideias
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gtnix.aguiabranca.domain.model.Ideia
-import com.gtnix.aguiabranca.domain.repository.IdeiaRepository
+import com.gtnix.aguiabranca.domain.usecase.ideia.GetIdeiasUseCase
+import com.gtnix.aguiabranca.domain.util.Result
+import com.gtnix.aguiabranca.presentation.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class IdeiasViewModel @Inject constructor(
-    private val ideiaRepository: IdeiaRepository
+    private val getIdeiasUseCase: GetIdeiasUseCase
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(IdeiasUiState())
-        private set
+    private val _uiState = MutableStateFlow<UiState<List<Ideia>>>(UiState.Initial)
+    val uiState: StateFlow<UiState<List<Ideia>>> = _uiState.asStateFlow()
 
     init {
-        carregarIdeias()
+        loadIdeias()
     }
 
-    private fun carregarIdeias() {
-        uiState = uiState.copy(isLoading = true)
-
+    private fun loadIdeias() {
         viewModelScope.launch {
-            try {
-                ideiaRepository.listarTodas().collect { ideias ->
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        ideias = ideias
-                    )
+            _uiState.value = UiState.Loading
+            getIdeiasUseCase().collect { result ->
+                _uiState.value = when (result) {
+                    is Result.Success -> UiState.Success(result.data)
+                    is Result.Error -> UiState.Error(result.message ?: "Erro desconhecido")
+                    is Result.Loading -> UiState.Loading
                 }
-            } catch (e: Exception) {
-                uiState = uiState.copy(
-                    isLoading = false,
-                    errorMessage = "Erro ao carregar ideias"
-                )
             }
         }
     }
 }
-
-data class IdeiasUiState(
-    val isLoading: Boolean = false,
-    val ideias: List<Ideia> = emptyList(),
-    val errorMessage: String? = null
-)

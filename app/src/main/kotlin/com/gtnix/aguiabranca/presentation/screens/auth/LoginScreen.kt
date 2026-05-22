@@ -44,6 +44,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -102,9 +103,8 @@ fun LoginScreen(
     viewModel: LoginViewModel,
     onLoginSuccess: (PerfilUsuario) -> Unit
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Observa sucesso do login para navegar
     LaunchedEffect(uiState.loginSuccess, uiState.perfil) {
         if (uiState.loginSuccess && uiState.perfil != null) {
             onLoginSuccess(uiState.perfil!!)

@@ -1,8 +1,5 @@
 package com.gtnix.aguiabranca.presentation.screens.ideias
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +10,10 @@ import com.gtnix.aguiabranca.domain.repository.IdeiaRepository
 import com.gtnix.aguiabranca.domain.session.UserSession
 import com.gtnix.aguiabranca.presentation.navigation.Destination
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,8 +24,8 @@ class IdeiaDetalheViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(IdeiaDetalheUiState())
-        private set
+    private val _uiState = MutableStateFlow(IdeiaDetalheUiState())
+    val uiState: StateFlow<IdeiaDetalheUiState> = _uiState.asStateFlow()
 
     private val ideiaId: String = savedStateHandle[Destination.IdeiaDetalhe.ARG_IDEIA_ID] ?: ""
 
@@ -33,40 +34,39 @@ class IdeiaDetalheViewModel @Inject constructor(
     }
 
     private fun carregarIdeia() {
-        uiState = uiState.copy(isLoading = true)
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
                 val ideia = ideiaRepository.buscarPorId(ideiaId)
-                uiState = uiState.copy(
-                    isLoading = false,
-                    ideia = ideia,
-                    perfil = userSession.perfil,
-                    impacto = ideia?.impactoEstimado?.toFloat() ?: 1f,
-                    esforco = ideia?.esforcoEstimado?.toFloat() ?: 1f
-                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        ideia = ideia,
+                        perfil = userSession.perfil,
+                        impacto = ideia?.impactoEstimado?.toFloat() ?: 1f,
+                        esforco = ideia?.esforcoEstimado?.toFloat() ?: 1f
+                    )
+                }
             } catch (e: Exception) {
-                uiState = uiState.copy(
-                    isLoading = false,
-                    errorMessage = "Erro ao carregar ideia"
-                )
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Erro ao carregar ideia") }
             }
         }
     }
 
     fun onImpactoChange(value: Float) {
-        uiState = uiState.copy(impacto = value)
+        _uiState.update { it.copy(impacto = value) }
     }
 
     fun onEsforcoChange(value: Float) {
-        uiState = uiState.copy(esforco = value)
+        _uiState.update { it.copy(esforco = value) }
     }
 
     fun onFeedbackChange(text: String) {
-        uiState = uiState.copy(feedback = text)
+        _uiState.update { it.copy(feedback = text) }
     }
 
     fun iniciarAnalise() {
-        val ideia = uiState.ideia ?: return
+        val ideia = _uiState.value.ideia ?: return
         viewModelScope.launch {
             try {
                 val atualizada = ideia.copy(
@@ -74,51 +74,53 @@ class IdeiaDetalheViewModel @Inject constructor(
                     dataAvaliacao = System.currentTimeMillis()
                 )
                 ideiaRepository.salvar(atualizada)
-                uiState = uiState.copy(ideia = atualizada)
+                _uiState.update { it.copy(ideia = atualizada) }
             } catch (e: Exception) {
-                uiState = uiState.copy(errorMessage = "Erro ao iniciar análise")
+                _uiState.update { it.copy(errorMessage = "Erro ao iniciar análise") }
             }
         }
     }
 
     fun aprovar() {
-        val ideia = uiState.ideia ?: return
+        val current = _uiState.value
+        val ideia = current.ideia ?: return
         viewModelScope.launch {
             try {
                 val atualizada = ideia.copy(
                     status = StatusIdeia.APROVADA,
-                    feedback = uiState.feedback.ifBlank { null },
-                    impactoEstimado = uiState.impacto.toInt(),
-                    esforcoEstimado = uiState.esforco.toInt(),
+                    feedback = current.feedback.ifBlank { null },
+                    impactoEstimado = current.impacto.toInt(),
+                    esforcoEstimado = current.esforco.toInt(),
                     dataAvaliacao = System.currentTimeMillis()
                 )
                 ideiaRepository.salvar(atualizada)
-                uiState = uiState.copy(ideia = atualizada, actionSuccess = true)
+                _uiState.update { it.copy(ideia = atualizada, actionSuccess = true) }
             } catch (e: Exception) {
-                uiState = uiState.copy(errorMessage = "Erro ao aprovar ideia")
+                _uiState.update { it.copy(errorMessage = "Erro ao aprovar ideia") }
             }
         }
     }
 
     fun reprovar() {
-        val ideia = uiState.ideia ?: return
-        if (uiState.feedback.isBlank()) {
-            uiState = uiState.copy(errorMessage = "Feedback é obrigatório para reprovar")
+        val current = _uiState.value
+        val ideia = current.ideia ?: return
+        if (current.feedback.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Feedback é obrigatório para reprovar") }
             return
         }
         viewModelScope.launch {
             try {
                 val atualizada = ideia.copy(
                     status = StatusIdeia.REPROVADA,
-                    feedback = uiState.feedback,
-                    impactoEstimado = uiState.impacto.toInt(),
-                    esforcoEstimado = uiState.esforco.toInt(),
+                    feedback = current.feedback,
+                    impactoEstimado = current.impacto.toInt(),
+                    esforcoEstimado = current.esforco.toInt(),
                     dataAvaliacao = System.currentTimeMillis()
                 )
                 ideiaRepository.salvar(atualizada)
-                uiState = uiState.copy(ideia = atualizada, actionSuccess = true)
+                _uiState.update { it.copy(ideia = atualizada, actionSuccess = true) }
             } catch (e: Exception) {
-                uiState = uiState.copy(errorMessage = "Erro ao reprovar ideia")
+                _uiState.update { it.copy(errorMessage = "Erro ao reprovar ideia") }
             }
         }
     }

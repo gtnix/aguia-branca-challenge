@@ -1,8 +1,5 @@
 package com.gtnix.aguiabranca.presentation.screens.auth
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gtnix.aguiabranca.data.local.database.DatabaseSeeder
@@ -10,8 +7,13 @@ import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.Usuario
 import com.gtnix.aguiabranca.domain.repository.UsuarioRepository
+import com.gtnix.aguiabranca.domain.session.SessionManager
 import com.gtnix.aguiabranca.domain.session.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -60,17 +62,12 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val usuarioRepository: UsuarioRepository,
     private val seeder: DatabaseSeeder,
-    private val userSession: UserSession
+    private val userSession: UserSession,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    /**
-     * Estado da UI - Observado pelo Composable.
-     *
-     * `by mutableStateOf` usa delegação para criar getter/setter
-     * que notifica o Compose quando o valor muda.
-     */
-    var uiState by mutableStateOf(LoginUiState())
-        private set
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch { seeder.seedDatabaseIfEmpty() }
@@ -80,20 +77,11 @@ class LoginViewModel @Inject constructor(
      * Atualiza o campo de email.
      */
     fun onEmailChange(email: String) {
-        uiState = uiState.copy(
-            email = email,
-            errorMessage = null // Limpa erro ao digitar
-        )
+        _uiState.update { it.copy(email = email, errorMessage = null) }
     }
 
-    /**
-     * Atualiza o campo de senha.
-     */
     fun onSenhaChange(senha: String) {
-        uiState = uiState.copy(
-            senha = senha,
-            errorMessage = null
-        )
+        _uiState.update { it.copy(senha = senha, errorMessage = null) }
     }
 
     /**
@@ -108,47 +96,35 @@ class LoginViewModel @Inject constructor(
      * 5. Se erro: mostra mensagem
      */
     fun onLoginClick() {
-        // Validação básica
-        if (uiState.email.isBlank() || uiState.senha.isBlank()) {
-            uiState = uiState.copy(errorMessage = "Preencha todos os campos")
+        val current = _uiState.value
+        if (current.email.isBlank() || current.senha.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Preencha todos os campos") }
             return
         }
 
-        // Inicia loading
-        uiState = uiState.copy(isLoading = true, errorMessage = null)
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-        // viewModelScope.launch executa em coroutine
-        // Isso não bloqueia a Main Thread!
         viewModelScope.launch {
             try {
                 val usuario = usuarioRepository.autenticar(
-                    email = uiState.email.trim(),
-                    senha = uiState.senha
+                    email = current.email.trim(),
+                    senha = current.senha
                 )
 
                 if (usuario != null) {
-                    userSession.perfil = usuario.perfil
-                    userSession.userId = usuario.id
-                    userSession.userName = usuario.nome
-                    userSession.area = usuario.area
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        loginSuccess = true,
-                        usuarioLogado = usuario
-                    )
+                    sessionManager.login(usuario)
+                    _uiState.update {
+                        it.copy(isLoading = false, loginSuccess = true, usuarioLogado = usuario)
+                    }
                 } else {
-                    // Credenciais inválidas
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        errorMessage = "E-mail ou senha inválidos"
-                    )
+                    _uiState.update {
+                        it.copy(isLoading = false, errorMessage = "E-mail ou senha inválidos")
+                    }
                 }
             } catch (e: Exception) {
-                // Erro de sistema
-                uiState = uiState.copy(
-                    isLoading = false,
-                    errorMessage = "Erro ao fazer login. Tente novamente."
-                )
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = "Erro ao fazer login. Tente novamente.")
+                }
             }
         }
     }
@@ -158,20 +134,21 @@ class LoginViewModel @Inject constructor(
      * Usado para testes sem banco populado.
      */
     fun onDemoLogin(perfil: PerfilUsuario) {
-        userSession.perfil = perfil
-        userSession.area = AreaAtuacao.OPERACOES
-        uiState = uiState.copy(
-            isLoading = false,
-            loginSuccess = true,
-            demoPerfil = perfil
+        val demoUser = Usuario(
+            id = "demo-${perfil.name.lowercase()}",
+            nome = "Demo ${perfil.name}",
+            email = "demo@aguiabranca.com.br",
+            perfil = perfil,
+            area = AreaAtuacao.OPERACOES
         )
+        viewModelScope.launch {
+            sessionManager.login(demoUser)
+        }
+        _uiState.update { it.copy(isLoading = false, loginSuccess = true, demoPerfil = perfil) }
     }
 
-    /**
-     * Limpa o estado de sucesso após navegação.
-     */
     fun onLoginHandled() {
-        uiState = uiState.copy(loginSuccess = false)
+        _uiState.update { it.copy(loginSuccess = false) }
     }
 }
 

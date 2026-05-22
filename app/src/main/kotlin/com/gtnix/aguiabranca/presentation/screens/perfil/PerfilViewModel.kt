@@ -1,15 +1,17 @@
 package com.gtnix.aguiabranca.presentation.screens.perfil
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gtnix.aguiabranca.domain.repository.UsuarioRepository
+import com.gtnix.aguiabranca.domain.session.SessionManager
 import com.gtnix.aguiabranca.domain.session.UserSession
 import com.gtnix.aguiabranca.domain.usecase.CalcularPontuacaoUseCase
 import com.gtnix.aguiabranca.domain.usecase.Pontuacao
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,55 +19,56 @@ import javax.inject.Inject
 class PerfilViewModel @Inject constructor(
     private val userSession: UserSession,
     private val usuarioRepository: UsuarioRepository,
-    private val calcularPontuacao: CalcularPontuacaoUseCase
+    private val calcularPontuacao: CalcularPontuacaoUseCase,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(PerfilUiState())
-        private set
+    private val _uiState = MutableStateFlow(PerfilUiState())
+    val uiState: StateFlow<PerfilUiState> = _uiState.asStateFlow()
 
     init {
         carregarPerfil()
     }
 
     private fun carregarPerfil() {
-        uiState = uiState.copy(
-            isLoading = true,
-            nome = userSession.userName,
-            area = userSession.area.name,
-            perfil = userSession.perfil.name,
-            inicialNome = userSession.userName.firstOrNull()?.uppercaseChar() ?: 'U'
-        )
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                nome = userSession.userName,
+                area = userSession.area.name,
+                perfil = userSession.perfil.name,
+                inicialNome = userSession.userName.firstOrNull()?.uppercaseChar() ?: 'U'
+            )
+        }
 
         viewModelScope.launch {
             try {
                 val usuario = usuarioRepository.buscarPorId(userSession.userId)
                 if (usuario != null) {
-                    uiState = uiState.copy(
-                        nome = usuario.nome,
-                        area = usuario.area.name,
-                        perfil = usuario.perfil.name,
-                        fotoPerfil = usuario.fotoPerfil,
-                        inicialNome = usuario.nome.firstOrNull()?.uppercaseChar() ?: 'U'
-                    )
+                    _uiState.update {
+                        it.copy(
+                            nome = usuario.nome,
+                            area = usuario.area.name,
+                            perfil = usuario.perfil.name,
+                            fotoPerfil = usuario.fotoPerfil,
+                            inicialNome = usuario.nome.firstOrNull()?.uppercaseChar() ?: 'U'
+                        )
+                    }
                 }
 
                 val pontuacao = calcularPontuacao.calcular(userSession.userId)
-                uiState = uiState.copy(
-                    isLoading = false,
-                    pontuacao = pontuacao
-                )
+                _uiState.update { it.copy(isLoading = false, pontuacao = pontuacao) }
             } catch (e: Exception) {
-                uiState = uiState.copy(
-                    isLoading = false,
-                    errorMessage = "Erro ao carregar perfil"
-                )
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Erro ao carregar perfil") }
             }
         }
     }
 
     fun onLogout() {
-        userSession.clear()
-        uiState = uiState.copy(logoutSuccess = true)
+        viewModelScope.launch {
+            sessionManager.logout()
+        }
+        _uiState.update { it.copy(logoutSuccess = true) }
     }
 }
 

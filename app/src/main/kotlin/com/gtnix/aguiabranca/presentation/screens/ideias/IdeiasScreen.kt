@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,16 +33,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
 import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.util.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,24 +55,8 @@ fun IdeiasScreen(
     onNavigateToNovaIdeia: () -> Unit,
     onNavigateToDetalhe: (String) -> Unit
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    IdeiasScreenContent(
-        uiState = uiState,
-        onNavigateBack = onNavigateBack,
-        onNavigateToNovaIdeia = onNavigateToNovaIdeia,
-        onNavigateToDetalhe = onNavigateToDetalhe
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun IdeiasScreenContent(
-    uiState: IdeiasUiState,
-    onNavigateBack: () -> Unit,
-    onNavigateToNovaIdeia: () -> Unit,
-    onNavigateToDetalhe: (String) -> Unit
-) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -100,57 +88,90 @@ private fun IdeiasScreenContent(
             }
         }
     ) { paddingValues ->
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.ideias.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+        when (val state = uiState) {
+            is UiState.Initial, is UiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Lightbulb,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.outline
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Nenhuma ideia ainda",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                    Text(
-                        text = "Toque no + para adicionar sua primeira ideia",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+                    CircularProgressIndicator()
                 }
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(uiState.ideias) { ideia ->
-                    IdeiaCard(
-                        ideia = ideia,
-                        onClick = { onNavigateToDetalhe(ideia.id) }
-                    )
+
+            is UiState.Error -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.ErrorOutline,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = state.message,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
+
+            is UiState.Success -> {
+                val ideias = state.data
+                if (ideias.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Default.Lightbulb,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.outline
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Nenhuma ideia ainda",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                            Text(
+                                text = "Toque no + para adicionar sua primeira ideia",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(
+                            items = ideias,
+                            key = { it.id }
+                        ) { ideia ->
+                            IdeiaCard(
+                                ideia = ideia,
+                                onClick = { onNavigateToDetalhe(ideia.id) },
+                                modifier = Modifier.animateItem()
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -160,10 +181,11 @@ private fun IdeiasScreenContent(
 @Composable
 private fun IdeiaCard(
     ideia: Ideia,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -258,34 +280,9 @@ private fun StatusChip(status: StatusIdeia) {
 @Composable
 private fun IdeiasScreenPreview() {
     AguiaBrancaTheme {
-        IdeiasScreenContent(
-            uiState = IdeiasUiState(
-                ideias = listOf(
-                    Ideia(
-                        id = "1",
-                        titulo = "Sistema de Rastreamento GPS",
-                        descricao = "Implementar GPS em toda a frota para melhor controle",
-                        tipo = TipoIdeia.IDEIA,
-                        area = AreaAtuacao.LOGISTICA,
-                        status = StatusIdeia.APROVADA,
-                        autorId = "user1",
-                        autorNome = "João Silva"
-                    ),
-                    Ideia(
-                        id = "2",
-                        titulo = "Redução de Papel",
-                        descricao = "Digitalizar documentos para reduzir uso de papel",
-                        tipo = TipoIdeia.IDEIA,
-                        area = AreaAtuacao.OPERACOES,
-                        status = StatusIdeia.PENDENTE,
-                        autorId = "user2",
-                        autorNome = "Maria Santos"
-                    )
-                )
-            ),
-            onNavigateBack = {},
-            onNavigateToNovaIdeia = {},
-            onNavigateToDetalhe = {}
-        )
+        // Preview uses direct content since we can't create a ViewModel in preview
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text("Preview - IdeiasScreen")
+        }
     }
 }

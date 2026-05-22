@@ -1,44 +1,28 @@
 package com.gtnix.aguiabranca.presentation.screens.home
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.Projeto
-import com.gtnix.aguiabranca.domain.model.StatusIdeia
-import com.gtnix.aguiabranca.domain.repository.IdeiaRepository
-import com.gtnix.aguiabranca.domain.repository.OrientacaoRepository
-import com.gtnix.aguiabranca.domain.repository.ProjetoRepository
+import com.gtnix.aguiabranca.domain.usecase.dashboard.GetDashboardUseCase
+import com.gtnix.aguiabranca.domain.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * HomeViewModel - Estado e Lógica da Tela Principal
- *
- * ## Conceito FIAP - Material 10A (MVVM com Flow)
- *
- * Este ViewModel combina múltiplos Flows de dados para
- * construir o estado consolidado do dashboard.
- */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val ideiaRepository: IdeiaRepository,
-    private val projetoRepository: ProjetoRepository,
-    private val orientacaoRepository: OrientacaoRepository
+    private val getDashboardUseCase: GetDashboardUseCase
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(HomeUiState())
-        private set
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    /**
-     * Carrega dados do dashboard baseado no perfil do usuário.
-     */
     fun carregarDados(perfilString: String) {
         val perfil = try {
             PerfilUsuario.valueOf(perfilString)
@@ -46,58 +30,46 @@ class HomeViewModel @Inject constructor(
             PerfilUsuario.OPERADOR
         }
 
-        uiState = uiState.copy(
+        _uiState.value = _uiState.value.copy(
             isLoading = true,
             perfil = perfil
         )
 
         viewModelScope.launch {
-            try {
-                // Combina múltiplos Flows
-                combine(
-                    orientacaoRepository.listarAtivas(),
-                    ideiaRepository.listarTodas(),
-                    projetoRepository.listarTodos()
-                ) { orientacoes, ideias, projetos ->
-                    Triple(orientacoes, ideias, projetos)
-                }.collect { (orientacoes, ideias, projetos) ->
-                    val investimento = projetos.sumOf { it.investimentoRealizado }
-                    val retorno = projetos.sumOf { it.retornoRealizadoMensal }
-                    val roi = if (investimento > 0)
-                        ((retorno * 12) - investimento) / investimento * 100
-                    else 0.0
-
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        orientacoes = orientacoes.take(3),
-                        minhasIdeias = ideias.take(5),
-                        projetosEmAndamento = projetos.filter { 
-                            it.status.name == "EM_ANDAMENTO" 
-                        }.take(5),
-                        totalIdeias = ideias.size,
-                        totalProjetos = projetos.size,
-                        ideiasAprovadas = ideias.count { 
-                            it.status == StatusIdeia.APROVADA || it.status == StatusIdeia.CONVERTIDA_PROJETO
-                        },
-                        ideiasEmProjeto = ideias.count { it.status == StatusIdeia.CONVERTIDA_PROJETO },
-                        investimentoTotal = investimento,
-                        retornoTotal = retorno,
-                        roiConsolidado = roi
-                    )
+            getDashboardUseCase().collect { result ->
+                when (result) {
+                    is Result.Success -> {
+                        val data = result.data
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            orientacoes = data.orientacoes,
+                            minhasIdeias = data.ideias,
+                            projetosEmAndamento = data.projetosEmAndamento,
+                            totalIdeias = data.totalIdeias,
+                            totalProjetos = data.totalProjetos,
+                            ideiasAprovadas = data.ideiasAprovadas,
+                            ideiasEmProjeto = data.ideiasEmProjeto,
+                            investimentoTotal = data.investimentoTotal,
+                            retornoTotal = data.retornoTotal,
+                            roiConsolidado = data.roiConsolidado,
+                            errorMessage = null
+                        )
+                    }
+                    is Result.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            errorMessage = result.message ?: "Erro ao carregar dados"
+                        )
+                    }
+                    is Result.Loading -> {
+                        _uiState.value = _uiState.value.copy(isLoading = true)
+                    }
                 }
-            } catch (e: Exception) {
-                uiState = uiState.copy(
-                    isLoading = false,
-                    errorMessage = "Erro ao carregar dados"
-                )
             }
         }
     }
 }
 
-/**
- * Estado da tela Home/Dashboard.
- */
 data class HomeUiState(
     val isLoading: Boolean = false,
     val perfil: PerfilUsuario = PerfilUsuario.OPERADOR,

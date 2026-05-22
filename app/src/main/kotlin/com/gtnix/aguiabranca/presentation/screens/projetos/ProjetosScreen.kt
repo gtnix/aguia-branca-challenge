@@ -34,8 +34,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +48,10 @@ import com.gtnix.aguiabranca.domain.model.StatusProjeto
 import com.gtnix.aguiabranca.domain.repository.ProjetoRepository
 import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -57,29 +60,23 @@ class ProjetosViewModel @Inject constructor(
     private val projetoRepository: ProjetoRepository
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(ProjetosUiState())
-        private set
+    private val _uiState = MutableStateFlow(ProjetosUiState())
+    val uiState: StateFlow<ProjetosUiState> = _uiState.asStateFlow()
 
     init {
         carregarProjetos()
     }
 
     private fun carregarProjetos() {
-        uiState = uiState.copy(isLoading = true)
+        _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
             try {
                 projetoRepository.listarTodos().collect { projetos ->
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        projetos = projetos
-                    )
+                    _uiState.update { it.copy(isLoading = false, projetos = projetos) }
                 }
             } catch (e: Exception) {
-                uiState = uiState.copy(
-                    isLoading = false,
-                    errorMessage = "Erro ao carregar projetos"
-                )
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Erro ao carregar projetos") }
             }
         }
     }
@@ -99,7 +96,7 @@ fun ProjetosScreen(
     onNavigateToNovoProjeto: () -> Unit,
     onNavigateToDetalhe: (String) -> Unit
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProjetosScreenContent(
         uiState = uiState,
@@ -194,10 +191,14 @@ private fun ProjetosScreenContent(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(uiState.projetos) { projeto ->
+                items(
+                    items = uiState.projetos,
+                    key = { it.id }
+                ) { projeto ->
                     ProjetoCard(
                         projeto = projeto,
-                        onClick = { onNavigateToDetalhe(projeto.id) }
+                        onClick = { onNavigateToDetalhe(projeto.id) },
+                        modifier = Modifier.animateItem()
                     )
                 }
             }
@@ -208,10 +209,11 @@ private fun ProjetosScreenContent(
 @Composable
 private fun ProjetoCard(
     projeto: Projeto,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface

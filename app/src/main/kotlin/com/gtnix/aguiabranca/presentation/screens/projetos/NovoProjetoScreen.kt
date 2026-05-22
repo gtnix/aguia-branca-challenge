@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,6 +51,10 @@ import com.gtnix.aguiabranca.domain.repository.ProjetoRepository
 import com.gtnix.aguiabranca.domain.session.UserSession
 import com.gtnix.aguiabranca.presentation.navigation.Destination
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
@@ -66,8 +71,8 @@ class NovoProjetoViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(NovoProjetoUiState())
-        private set
+    private val _uiState = MutableStateFlow(NovoProjetoUiState())
+    val uiState: StateFlow<NovoProjetoUiState> = _uiState.asStateFlow()
 
     private val ideiaId: String? = savedStateHandle[Destination.NovoProjeto.ARG_IDEIA_ID]
 
@@ -82,58 +87,55 @@ class NovoProjetoViewModel @Inject constructor(
             try {
                 val ideia = ideiaRepository.buscarPorId(id)
                 if (ideia != null) {
-                    uiState = uiState.copy(
-                        nome = ideia.titulo,
-                        area = ideia.area,
-                        ideiaOrigemId = id
-                    )
+                    _uiState.update { it.copy(nome = ideia.titulo, area = ideia.area, ideiaOrigemId = id) }
                 }
             } catch (_: Exception) { }
         }
     }
 
     fun onNomeChange(value: String) {
-        uiState = uiState.copy(nome = value)
+        _uiState.update { it.copy(nome = value) }
     }
 
     fun onObjetivoChange(value: String) {
-        uiState = uiState.copy(objetivo = value)
+        _uiState.update { it.copy(objetivo = value) }
     }
 
     fun onAreaChange(value: AreaAtuacao) {
-        uiState = uiState.copy(area = value)
+        _uiState.update { it.copy(area = value) }
     }
 
     fun onInvestimentoChange(value: String) {
-        uiState = uiState.copy(investimentoEstimado = value)
+        _uiState.update { it.copy(investimentoEstimado = value) }
     }
 
     fun onRetornoChange(value: String) {
-        uiState = uiState.copy(retornoEstimadoMensal = value)
+        _uiState.update { it.copy(retornoEstimadoMensal = value) }
     }
 
     fun salvar(onSuccess: () -> Unit) {
-        if (uiState.nome.isBlank() || uiState.objetivo.isBlank()) {
-            uiState = uiState.copy(errorMessage = "Preencha todos os campos obrigatórios")
+        val current = _uiState.value
+        if (current.nome.isBlank() || current.objetivo.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Preencha todos os campos obrigatórios") }
             return
         }
 
-        val investimento = uiState.investimentoEstimado.toDoubleOrNull() ?: 0.0
-        val retorno = uiState.retornoEstimadoMensal.toDoubleOrNull() ?: 0.0
+        val investimento = current.investimentoEstimado.toDoubleOrNull() ?: 0.0
+        val retorno = current.retornoEstimadoMensal.toDoubleOrNull() ?: 0.0
 
-        uiState = uiState.copy(isSaving = true)
+        _uiState.update { it.copy(isSaving = true) }
         val projetoId = UUID.randomUUID().toString()
 
         viewModelScope.launch {
             try {
                 val projeto = Projeto(
                     id = projetoId,
-                    nome = uiState.nome,
-                    objetivo = uiState.objetivo,
+                    nome = current.nome,
+                    objetivo = current.objetivo,
                     descricao = "",
-                    area = uiState.area,
+                    area = current.area,
                     status = StatusProjeto.PLANEJADO,
-                    ideiaOrigemId = uiState.ideiaOrigemId,
+                    ideiaOrigemId = current.ideiaOrigemId,
                     responsavelId = userSession.userId,
                     responsavelNome = userSession.userName,
                     investimentoEstimado = investimento,
@@ -141,19 +143,16 @@ class NovoProjetoViewModel @Inject constructor(
                 )
                 projetoRepository.salvar(projeto)
 
-                val origem = uiState.ideiaOrigemId
+                val origem = current.ideiaOrigemId
                 if (!origem.isNullOrBlank()) {
                     ideiaRepository.atualizarStatus(origem, StatusIdeia.CONVERTIDA_PROJETO)
                     ideiaRepository.vincularProjeto(origem, projetoId)
                 }
 
-                uiState = uiState.copy(isSaving = false)
+                _uiState.update { it.copy(isSaving = false) }
                 onSuccess()
             } catch (e: Exception) {
-                uiState = uiState.copy(
-                    isSaving = false,
-                    errorMessage = "Erro ao salvar projeto"
-                )
+                _uiState.update { it.copy(isSaving = false, errorMessage = "Erro ao salvar projeto") }
             }
         }
     }
@@ -180,7 +179,7 @@ fun NovoProjetoScreen(
     onNavigateBack: () -> Unit,
     onProjetoCreated: () -> Unit
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     NovoProjetoContent(
         uiState = uiState,
