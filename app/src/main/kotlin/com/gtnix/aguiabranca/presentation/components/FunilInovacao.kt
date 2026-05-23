@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -17,11 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaBlue
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaGreen
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaOrange
 
 @Composable
 fun FunilInovacao(
@@ -31,9 +29,13 @@ fun FunilInovacao(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                contentDescription = "Funil de Inovação: $totalIdeias ideias, $ideiasAprovadas aprovadas, $projetosAtivos em projeto"
+            },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -54,19 +56,19 @@ fun FunilInovacao(
                 label = "Ideias",
                 value = totalIdeias,
                 widthFraction = 0.9f,
-                color = AguiaBrancaBlue
+                color = MaterialTheme.colorScheme.primary
             )
             FunilLevel(
                 label = "Aprovadas",
                 value = ideiasAprovadas,
                 widthFraction = 0.7f,
-                color = AguiaBrancaGreen
+                color = MaterialTheme.colorScheme.tertiary
             )
             FunilLevel(
                 label = "Em Projeto",
                 value = projetosAtivos,
                 widthFraction = 0.5f,
-                color = AguiaBrancaOrange
+                color = MaterialTheme.colorScheme.secondary
             )
         }
     }
@@ -83,7 +85,7 @@ private fun FunilLevel(
         modifier = Modifier
             .fillMaxWidth(widthFraction)
             .height(40.dp)
-            .background(color, RoundedCornerShape(4.dp)),
+            .background(color, MaterialTheme.shapes.extraSmall),
         contentAlignment = Alignment.Center
     ) {
         Text(

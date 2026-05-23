@@ -1,5 +1,6 @@
 package com.gtnix.aguiabranca.presentation.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -16,17 +17,31 @@ import androidx.compose.runtime.Composable
 @Composable
 fun AguiaTopBar(
     title: String,
+    subtitle: String? = null,
     onBackClick: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
-        title = { Text(title) },
+        title = {
+            if (subtitle != null) {
+                Column {
+                    Text(title, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                    )
+                }
+            } else {
+                Text(title)
+            }
+        },
         navigationIcon = {
             if (onBackClick != null) {
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Voltar"
+                        contentDescription = "Voltar à tela anterior"
                     )
                 }
             }
