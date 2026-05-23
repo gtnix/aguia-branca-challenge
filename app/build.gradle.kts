@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation("androidx.compose.material3:material3-window-size-class")
     // Material Icons Extended - ícones adicionais como Delete, Add, Person etc.
     implementation(libs.androidx.material.icons.extended)
 
