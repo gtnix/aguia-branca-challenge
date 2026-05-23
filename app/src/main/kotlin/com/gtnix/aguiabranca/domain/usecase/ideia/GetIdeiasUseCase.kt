@@ -13,9 +13,10 @@ import javax.inject.Inject
 /**
  * Obtém a lista de ideias filtrada pelo perfil do usuário logado.
  *
- * Regras de visibilidade:
+ * Regras de visibilidade por perfil (RBAC):
  * - OPERADOR: vê apenas suas próprias ideias
- * - GESTOR / LIDER: vê todas as ideias
+ * - GESTOR: vê ideias da sua área de atuação
+ * - LIDER: vê todas as ideias (visão consolidada)
  */
 class GetIdeiasUseCase @Inject constructor(
     private val ideiaRepository: IdeiaRepository,
@@ -32,7 +33,8 @@ class GetIdeiasUseCase @Inject constructor(
 
             val filtered = when (user.perfil) {
                 PerfilUsuario.OPERADOR -> ideias.filter { it.autorId == user.id }
-                PerfilUsuario.GESTOR, PerfilUsuario.LIDER -> ideias
+                PerfilUsuario.GESTOR -> ideias.filter { it.area == user.area }
+                PerfilUsuario.LIDER -> ideias
             }
             Result.Success(filtered) as Result<List<Ideia>>
         }.catch { e ->

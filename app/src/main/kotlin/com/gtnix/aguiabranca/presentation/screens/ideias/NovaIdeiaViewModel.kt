@@ -8,6 +8,7 @@ import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
 import com.gtnix.aguiabranca.domain.repository.IdeiaRepository
 import com.gtnix.aguiabranca.domain.repository.OrientacaoRepository
+import com.gtnix.aguiabranca.domain.session.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class NovaIdeiaViewModel @Inject constructor(
     private val ideiaRepository: IdeiaRepository,
-    private val orientacaoRepository: OrientacaoRepository
+    private val orientacaoRepository: OrientacaoRepository,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NovaIdeiaUiState())
@@ -58,6 +60,13 @@ class NovaIdeiaViewModel @Inject constructor(
 
     fun salvar(onSuccess: () -> Unit) {
         val current = _uiState.value
+        val user = sessionManager.getCurrentUser()
+        
+        if (user == null) {
+            _uiState.update { it.copy(errorMessage = "Usuário não logado") }
+            return
+        }
+        
         if (current.titulo.isBlank() || current.descricao.isBlank()) {
             _uiState.update { it.copy(errorMessage = "Preencha todos os campos") }
             return
@@ -73,8 +82,8 @@ class NovaIdeiaViewModel @Inject constructor(
                     descricao = current.descricao.trim(),
                     tipo = current.tipo,
                     area = current.area,
-                    autorId = "demo-user",
-                    autorNome = "Usuário Demo"
+                    autorId = user.id,
+                    autorNome = user.nome
                 )
 
                 ideiaRepository.salvar(novaIdeia)
