@@ -2,6 +2,7 @@ package com.gtnix.aguiabranca.presentation.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,60 +15,61 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Radar
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Lightbulb
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
+import com.gtnix.aguiabranca.presentation.components.AguiaBottomNav
+import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.AnimatedCurrencyCounter
+import com.gtnix.aguiabranca.presentation.components.AnimatedMetricCard
+import com.gtnix.aguiabranca.presentation.components.IdeiaStatusBadge
+import com.gtnix.aguiabranca.presentation.components.SectionHeader
+import com.gtnix.aguiabranca.presentation.components.ShimmerListPlaceholder
+import com.gtnix.aguiabranca.presentation.components.charts.DonutChart
+import com.gtnix.aguiabranca.presentation.components.charts.FunnelChart
+import com.gtnix.aguiabranca.presentation.components.charts.FunnelStep
+import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaBlue
+import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaGreen
+import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaOrange
 import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
-import com.gtnix.aguiabranca.presentation.components.FunilInovacao
+import com.gtnix.aguiabranca.presentation.util.bounceClick
 import com.gtnix.aguiabranca.presentation.util.formatCurrency
 import com.gtnix.aguiabranca.presentation.util.formatPercent
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -89,51 +91,28 @@ fun HomeScreen(
         uiState = uiState,
         onNavigateToIdeias = onNavigateToIdeias,
         onNavigateToProjetos = onNavigateToProjetos,
+        onNavigateToOrientacoes = onNavigateToOrientacoes,
         onNavigateToPerfil = onNavigateToPerfil,
         onNavigateToNovaIdeia = onNavigateToNovaIdeia,
         onNavigateToRadar = onNavigateToRadar
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreenContent(
     uiState: HomeUiState,
     onNavigateToIdeias: () -> Unit,
     onNavigateToProjetos: () -> Unit,
+    onNavigateToOrientacoes: () -> Unit,
     onNavigateToPerfil: () -> Unit,
     onNavigateToNovaIdeia: () -> Unit,
     onNavigateToRadar: () -> Unit
 ) {
-    var selectedNavIndex by remember { mutableIntStateOf(0) }
-
-    val navItems = remember(uiState.perfil) {
-        buildList {
-            add(BottomNavItemData("Home", Icons.Filled.Home, Icons.Outlined.Home))
-            add(BottomNavItemData("Ideias", Icons.Filled.Lightbulb, Icons.Outlined.Lightbulb))
-            if (uiState.perfil != PerfilUsuario.OPERADOR) {
-                add(BottomNavItemData("Projetos", Icons.Filled.Folder, Icons.Outlined.Folder))
-            }
-            add(BottomNavItemData("Perfil", Icons.Filled.Person, Icons.Outlined.Person))
-        }
-    }
-
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.home_welcome, uiState.nomeUsuario),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Text(
-                            text = "Bem-vindo à Plataforma de Inovação",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
-                        )
-                    }
-                },
+            AguiaTopBar(
+                title = stringResource(R.string.home_welcome, uiState.nomeUsuario),
+                subtitle = "Bem-vindo à Plataforma de Inovação",
                 actions = {
                     IconButton(onClick = { }) {
                         Icon(
@@ -141,42 +120,22 @@ private fun HomeScreenContent(
                             contentDescription = stringResource(R.string.cd_notifications)
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                }
             )
         },
 
         bottomBar = {
-            NavigationBar {
-                navItems.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                imageVector = if (selectedNavIndex == index)
-                                    item.selectedIcon
-                                else
-                                    item.unselectedIcon,
-                                contentDescription = item.label
-                            )
-                        },
-                        label = { Text(item.label) },
-                        selected = selectedNavIndex == index,
-                        onClick = {
-                            selectedNavIndex = index
-                            when (item.label) {
-                                "Home" -> { }
-                                "Ideias" -> onNavigateToIdeias()
-                                "Projetos" -> onNavigateToProjetos()
-                                "Perfil" -> onNavigateToPerfil()
-                            }
-                        }
-                    )
+            AguiaBottomNav(
+                currentRoute = "home",
+                userProfile = uiState.perfil,
+                onNavigate = { route ->
+                    when (route) {
+                        "ideias" -> onNavigateToIdeias()
+                        "projetos" -> onNavigateToProjetos()
+                        "perfil" -> onNavigateToPerfil()
+                    }
                 }
-            }
+            )
         },
 
         floatingActionButton = {
@@ -187,21 +146,18 @@ private fun HomeScreenContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.ideias_nova)
+                        contentDescription = "Adicionar nova ideia"
                     )
                 }
             }
         }
     ) { paddingValues ->
         if (uiState.isLoading) {
-            Box(
+            ShimmerListPlaceholder(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+                    .padding(paddingValues)
+            )
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -239,30 +195,30 @@ private fun HomeScreenContent(
                     }
                 }
 
-                // Dashboard Executivo for LIDER
                 if (uiState.perfil == PerfilUsuario.LIDER) {
                     item {
                         SectionHeader(title = stringResource(R.string.dashboard_titulo))
                     }
                     item {
-                        FunilInovacao(
+                        DashboardExecutivo(
                             totalIdeias = uiState.totalIdeias,
                             ideiasAprovadas = uiState.ideiasAprovadas,
-                            projetosAtivos = uiState.ideiasEmProjeto
-                        )
-                    }
-                    item {
-                        FinanceiroCard(
+                            projetosAtivos = uiState.ideiasEmProjeto,
                             investimentoTotal = uiState.investimentoTotal,
-                            retornoTotal = uiState.retornoTotal
+                            retornoTotal = uiState.retornoTotal,
+                            roi = uiState.roiConsolidado
                         )
                     }
                     item {
-                        RoiCard(roi = uiState.roiConsolidado)
+                        ActionCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            icon = Icons.Default.Settings,
+                            title = "Gerenciar Estratégia",
+                            onClick = onNavigateToOrientacoes
+                        )
                     }
                 }
 
-                // Quick actions (differentiated by profile)
                 item {
                     SectionHeader(title = "Ações Rápidas")
                 }
@@ -309,7 +265,6 @@ private fun HomeScreenContent(
                     }
                 }
 
-                // "Minhas Ideias" only for non-LIDER
                 if (uiState.perfil != PerfilUsuario.LIDER && uiState.minhasIdeias.isNotEmpty()) {
                     item {
                         SectionHeader(title = stringResource(R.string.home_section_minhas_ideias))
@@ -320,7 +275,7 @@ private fun HomeScreenContent(
                     ) { ideia ->
                         IdeiaResumoCard(
                             titulo = ideia.titulo,
-                            status = ideia.status.name,
+                            status = ideia.status,
                             area = ideia.area.name
                         )
                     }
@@ -331,9 +286,87 @@ private fun HomeScreenContent(
 }
 
 // =========================================================================
-// Dashboard Executivo Components
+// Dashboard Executivo — Uses DonutChart + FunnelChart components
 // =========================================================================
 
+@Composable
+private fun DashboardExecutivo(
+    totalIdeias: Int,
+    ideiasAprovadas: Int,
+    projetosAtivos: Int,
+    investimentoTotal: Double,
+    retornoTotal: Double,
+    roi: Double
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Card(
+                modifier = Modifier.weight(1f),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.dashboard_roi_anual),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    val roiColor = if (roi >= 0) AguiaBrancaGreen else MaterialTheme.colorScheme.error
+                    DonutChart(
+                        percentage = (roi.toFloat() / 100f).coerceIn(0f, 1f),
+                        centerText = formatPercent(roi),
+                        color = roiColor,
+                        size = 100.dp,
+                        strokeWidth = 10.dp
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier.weight(1f),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Funil de Inovação",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FunnelChart(
+                        steps = listOf(
+                            FunnelStep("Ideias", totalIdeias, AguiaBrancaBlue),
+                            FunnelStep("Aprovadas", ideiasAprovadas, AguiaBrancaGreen),
+                            FunnelStep("Projetos", projetosAtivos, AguiaBrancaOrange)
+                        )
+                    )
+                }
+            }
+        }
+
+        FinanceiroCard(
+            investimentoTotal = investimentoTotal,
+            retornoTotal = retornoTotal
+        )
+    }
+}
 
 @Composable
 private fun FinanceiroCard(
@@ -341,10 +374,12 @@ private fun FinanceiroCard(
     retornoTotal: Double
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                contentDescription = "Resumo financeiro: investimento ${formatCurrency(investimentoTotal)}, retorno ${formatCurrency(retornoTotal)}"
+            },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -376,10 +411,9 @@ private fun FinanceiroCard(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.outline
                     )
-                    Text(
-                        text = formatCurrency(investimentoTotal),
+                    AnimatedCurrencyCounter(
+                        targetValue = investimentoTotal,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -389,51 +423,13 @@ private fun FinanceiroCard(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.outline
                     )
-                    Text(
-                        text = formatCurrency(retornoTotal),
+                    AnimatedCurrencyCounter(
+                        targetValue = retornoTotal,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun RoiCard(roi: Double) {
-    val roiColor = if (roi >= 0)
-        MaterialTheme.colorScheme.primary
-    else
-        MaterialTheme.colorScheme.error
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.dashboard_roi_anual),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = formatPercent(roi),
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-                color = roiColor
-            )
         }
     }
 }
@@ -443,84 +439,61 @@ private fun RoiCard(roi: Double) {
 // =========================================================================
 
 @Composable
-private fun SectionHeader(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onBackground
-    )
-}
-
-@Composable
 private fun MetricasSection(
     totalIdeias: Int,
     ideiasAprovadas: Int,
     totalProjetos: Int
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        MetricaCard(
-            modifier = Modifier.weight(1f),
-            icon = Icons.Default.Lightbulb,
-            valor = totalIdeias.toString(),
-            label = stringResource(R.string.nav_ideias)
-        )
-        MetricaCard(
-            modifier = Modifier.weight(1f),
-            icon = Icons.Default.Star,
-            valor = ideiasAprovadas.toString(),
-            label = stringResource(R.string.dashboard_aprovadas)
-        )
-        MetricaCard(
-            modifier = Modifier.weight(1f),
-            icon = Icons.AutoMirrored.Filled.TrendingUp,
-            valor = totalProjetos.toString(),
-            label = stringResource(R.string.nav_projetos)
-        )
-    }
-}
+    data class MetricItem(
+        val icon: androidx.compose.ui.graphics.vector.ImageVector,
+        val valor: Int,
+        val label: String
+    )
 
-@Composable
-private fun MetricaCard(
-    modifier: Modifier = Modifier,
-    icon: ImageVector,
-    valor: String,
-    label: String
-) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = valor,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-            )
+    val ideiasLabel = stringResource(R.string.nav_ideias)
+    val aprovadasLabel = stringResource(R.string.dashboard_aprovadas)
+    val projetosLabel = stringResource(R.string.nav_projetos)
+
+    val metrics = listOf(
+        MetricItem(Icons.Default.Lightbulb, totalIdeias, ideiasLabel),
+        MetricItem(Icons.Default.Star, ideiasAprovadas, aprovadasLabel),
+        MetricItem(Icons.AutoMirrored.Filled.TrendingUp, totalProjetos, projetosLabel)
+    )
+
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val isExpanded = maxWidth > 600.dp
+
+        if (isExpanded) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(metrics) { metric ->
+                    AnimatedMetricCard(
+                        icon = metric.icon,
+                        valor = metric.valor,
+                        label = metric.label
+                    )
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                metrics.forEach { metric ->
+                    AnimatedMetricCard(
+                        modifier = Modifier.weight(1f),
+                        icon = metric.icon,
+                        valor = metric.valor,
+                        label = metric.label
+                    )
+                }
+            }
         }
     }
 }
@@ -559,16 +532,13 @@ private fun OrientacaoCard(
 @Composable
 private fun ActionCard(
     modifier: Modifier = Modifier,
-    icon: ImageVector,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     onClick: () -> Unit
 ) {
     Card(
-        modifier = modifier,
-        onClick = onClick,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        modifier = modifier.bounceClick(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -595,14 +565,12 @@ private fun ActionCard(
 @Composable
 private fun IdeiaResumoCard(
     titulo: String,
-    status: String,
+    status: com.gtnix.aguiabranca.domain.model.StatusIdeia,
     area: String
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
@@ -614,7 +582,7 @@ private fun IdeiaResumoCard(
         ) {
             Icon(
                 imageVector = Icons.Default.Lightbulb,
-                contentDescription = null,
+                contentDescription = "Ideia",
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(32.dp)
             )
@@ -631,41 +599,10 @@ private fun IdeiaResumoCard(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
-            StatusChip(status = status)
+            IdeiaStatusBadge(status = status)
         }
     }
 }
-
-@Composable
-private fun StatusChip(status: String) {
-    val (color, text) = when (status) {
-        "PENDENTE" -> MaterialTheme.colorScheme.outline to stringResource(R.string.status_pendente)
-        "EM_ANALISE" -> MaterialTheme.colorScheme.tertiary to stringResource(R.string.status_em_analise)
-        "APROVADA" -> MaterialTheme.colorScheme.primary to stringResource(R.string.status_aprovado)
-        "REPROVADA" -> MaterialTheme.colorScheme.error to stringResource(R.string.status_reprovado)
-        else -> MaterialTheme.colorScheme.outline to status
-    }
-
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = color.copy(alpha = 0.1f)
-        ),
-        shape = RoundedCornerShape(4.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = color,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-        )
-    }
-}
-
-private data class BottomNavItemData(
-    val label: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector
-)
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -680,6 +617,7 @@ private fun HomeScreenPreview() {
             ),
             onNavigateToIdeias = {},
             onNavigateToProjetos = {},
+            onNavigateToOrientacoes = {},
             onNavigateToPerfil = {},
             onNavigateToNovaIdeia = {},
             onNavigateToRadar = {}
@@ -704,6 +642,7 @@ private fun HomeScreenLiderPreview() {
             ),
             onNavigateToIdeias = {},
             onNavigateToProjetos = {},
+            onNavigateToOrientacoes = {},
             onNavigateToPerfil = {},
             onNavigateToNovaIdeia = {},
             onNavigateToRadar = {}

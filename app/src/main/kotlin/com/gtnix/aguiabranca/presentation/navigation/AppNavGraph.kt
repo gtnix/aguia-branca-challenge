@@ -1,5 +1,9 @@
 package com.gtnix.aguiabranca.presentation.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -16,10 +20,14 @@ import com.gtnix.aguiabranca.presentation.screens.ideias.IdeiaDetalheScreen
 import com.gtnix.aguiabranca.presentation.screens.ideias.IdeiasScreen
 import com.gtnix.aguiabranca.presentation.screens.ideias.NovaIdeiaScreen
 import com.gtnix.aguiabranca.presentation.screens.inovacao.RadarScreen
+import com.gtnix.aguiabranca.presentation.screens.orientacoes.NovaOrientacaoScreen
+import com.gtnix.aguiabranca.presentation.screens.orientacoes.OrientacoesScreen
 import com.gtnix.aguiabranca.presentation.screens.perfil.PerfilScreen
 import com.gtnix.aguiabranca.presentation.screens.projetos.NovoProjetoScreen
 import com.gtnix.aguiabranca.presentation.screens.projetos.ProjetoDetalheScreen
 import com.gtnix.aguiabranca.presentation.screens.projetos.ProjetosScreen
+
+private const val TRANSITION_DURATION = 300
 
 /**
  * AppNavGraph - Configuração de Navegação
@@ -78,12 +86,40 @@ fun AppNavGraph(
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(TRANSITION_DURATION)
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(TRANSITION_DURATION)
+            )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                animationSpec = tween(TRANSITION_DURATION)
+            )
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                animationSpec = tween(TRANSITION_DURATION)
+            )
+        }
     ) {
         // =====================================================================
-        // LOGIN
+        // LOGIN — uses fade instead of slide
         // =====================================================================
-        composable(route = Destination.Login.route) {
+        composable(
+            route = Destination.Login.route,
+            enterTransition = { fadeIn(tween(TRANSITION_DURATION)) },
+            exitTransition = { fadeOut(tween(TRANSITION_DURATION)) }
+        ) {
             LoginScreen(
                 viewModel = hiltViewModel(),
                 onLoginSuccess = { perfil ->
@@ -104,7 +140,9 @@ fun AppNavGraph(
                 navArgument(Destination.Home.ARG_PERFIL) {
                     type = NavType.StringType
                 }
-            )
+            ),
+            enterTransition = { fadeIn(tween(TRANSITION_DURATION)) },
+            popEnterTransition = { fadeIn(tween(TRANSITION_DURATION)) }
         ) { backStackEntry ->
             val perfil = backStackEntry.arguments?.getString(Destination.Home.ARG_PERFIL) ?: "OPERADOR"
 
@@ -225,10 +263,26 @@ fun AppNavGraph(
         }
 
         // =====================================================================
-        // ORIENTAÇÕES (Placeholder)
+        // ORIENTAÇÕES ESTRATÉGICAS
         // =====================================================================
         composable(route = Destination.Orientacoes.route) {
-            // TODO: Implementar OrientacoesScreen
+            OrientacoesScreen(
+                viewModel = hiltViewModel(),
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToNova = {
+                    navController.navigate(Destination.NovaOrientacao.route)
+                }
+            )
+        }
+
+        composable(route = Destination.NovaOrientacao.route) {
+            NovaOrientacaoScreen(
+                viewModel = hiltViewModel(),
+                onNavigateBack = { navController.popBackStack() },
+                onOrientacaoCreated = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         // =====================================================================
