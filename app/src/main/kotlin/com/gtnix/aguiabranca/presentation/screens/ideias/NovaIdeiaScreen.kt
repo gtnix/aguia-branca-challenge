@@ -1,6 +1,8 @@
 package com.gtnix.aguiabranca.presentation.screens.ideias
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,29 +11,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,15 +41,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
+import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
 import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NovaIdeiaScreen(
     viewModel: NovaIdeiaViewModel,
@@ -86,6 +91,7 @@ private fun NovaIdeiaScreenContent(
     var tipoExpanded by remember { mutableStateOf(false) }
     var orientacoesExpanded by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val isFormValid = uiState.titulo.isNotBlank() && uiState.descricao.isNotBlank()
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
@@ -93,21 +99,9 @@ private fun NovaIdeiaScreenContent(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Nova Ideia") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+            AguiaTopBar(
+                title = "Nova Ideia",
+                onBackClick = onNavigateBack
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -135,10 +129,10 @@ private fun NovaIdeiaScreenContent(
                 label = { Text("Título da Ideia") },
                 placeholder = { Text("Descreva sua ideia em uma frase") },
                 singleLine = true,
-                shape = RoundedCornerShape(8.dp)
+                shape = MaterialTheme.shapes.small,
+                isError = uiState.errorMessage != null && uiState.titulo.isBlank()
             )
 
-            // Descrição
             OutlinedTextField(
                 value = uiState.descricao,
                 onValueChange = onDescricaoChange,
@@ -147,10 +141,10 @@ private fun NovaIdeiaScreenContent(
                     .height(150.dp),
                 label = { Text("Descrição") },
                 placeholder = { Text("Detalhe sua ideia, problema identificado e solução proposta") },
-                shape = RoundedCornerShape(8.dp)
+                shape = MaterialTheme.shapes.small,
+                isError = uiState.errorMessage != null && uiState.descricao.isBlank()
             )
 
-            // Tipo (Ideia ou Problema)
             ExposedDropdownMenuBox(
                 expanded = tipoExpanded,
                 onExpandedChange = { tipoExpanded = !tipoExpanded }
@@ -169,7 +163,7 @@ private fun NovaIdeiaScreenContent(
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = tipoExpanded)
                     },
-                    shape = RoundedCornerShape(8.dp)
+                    shape = MaterialTheme.shapes.small
                 )
                 ExposedDropdownMenu(
                     expanded = tipoExpanded,
@@ -194,7 +188,6 @@ private fun NovaIdeiaScreenContent(
                 }
             }
 
-            // Área de Atuação
             ExposedDropdownMenuBox(
                 expanded = areaExpanded,
                 onExpandedChange = { areaExpanded = !areaExpanded }
@@ -210,7 +203,7 @@ private fun NovaIdeiaScreenContent(
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = areaExpanded)
                     },
-                    shape = RoundedCornerShape(8.dp)
+                    shape = MaterialTheme.shapes.small
                 )
                 ExposedDropdownMenu(
                     expanded = areaExpanded,
@@ -228,7 +221,6 @@ private fun NovaIdeiaScreenContent(
                 }
             }
 
-            // Mensagem de erro
             if (uiState.errorMessage != null) {
                 Text(
                     text = uiState.errorMessage,
@@ -237,18 +229,30 @@ private fun NovaIdeiaScreenContent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Botão Salvar
             Button(
                 onClick = onSalvar,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                enabled = !uiState.isLoading && uiState.titulo.isNotBlank() && uiState.descricao.isNotBlank(),
-                shape = RoundedCornerShape(8.dp)
+                enabled = !uiState.isLoading && isFormValid,
+                shape = MaterialTheme.shapes.small,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    disabledContentColor = MaterialTheme.colorScheme.outline
+                )
             ) {
-                Text("Submeter Ideia")
+                Text(if (uiState.isLoading) "Salvando..." else "Submeter Ideia")
+            }
+
+            if (!isFormValid && !uiState.isLoading) {
+                Text(
+                    text = "Preencha título e descrição para habilitar o envio",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
             }
         }
     }
@@ -260,32 +264,65 @@ private fun OrientacoesCard(
     expanded: Boolean,
     onToggle: () -> Unit
 ) {
+    val azulClaro = Color(0xFFBBDEFB)
+    val azulEscuro = Color(0xFF0D47A1)
+    val azulMedio = Color(0xFF1565C0)
+    
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        onClick = onToggle
+        onClick = onToggle,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = azulClaro
+        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "Orientações Estratégicas",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Flag,
+                        contentDescription = "Foco estratégico",
+                        tint = azulEscuro,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(start = 8.dp))
+                    Column {
+                        Text(
+                            text = "Foco Estratégico Atual",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = azulEscuro
+                        )
+                        if (!expanded) {
+                            Text(
+                                text = "${orientacoes.size} orientações ativas",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = azulMedio
+                            )
+                        }
+                    }
+                }
                 Icon(
                     imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (expanded) "Recolher" else "Expandir"
+                    contentDescription = if (expanded) "Recolher orientações" else "Expandir orientações",
+                    tint = azulEscuro
                 )
             }
 
-            AnimatedVisibility(visible = expanded) {
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
                 Column(modifier = Modifier.padding(top = 8.dp)) {
                     orientacoes.forEach { orientacao ->
                         Text(
-                            text = "• ${orientacao.titulo}",
+                            text = "- ${orientacao.titulo}",
                             style = MaterialTheme.typography.bodyMedium,
+                            color = azulMedio,
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
                     }
