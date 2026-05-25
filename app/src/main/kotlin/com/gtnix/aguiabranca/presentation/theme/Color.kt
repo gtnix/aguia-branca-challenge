@@ -2,133 +2,99 @@ package com.gtnix.aguiabranca.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-/**
- * Paleta de Cores - Águia Branca Challenge
- *
- * ## Conceito FIAP - Material Design 3
- *
- * O Material 3 usa um sistema de cores baseado em:
- * - **Primary**: Cor principal da marca
- * - **Secondary**: Cor complementar
- * - **Tertiary**: Cor de destaque
- * - **Surface**: Cor de fundo de cards e containers
- * - **Background**: Cor de fundo geral
- * - **Error**: Cor para erros
- *
- * Cada cor tem variantes:
- * - `Container`: Versão mais clara para backgrounds
- * - `On[Cor]`: Cor do texto/ícone sobre essa cor
- *
- * ## Cores Corporativas Águia Branca
- *
- * Inspiradas na identidade visual da empresa:
- * - Azul: Confiança, profissionalismo
- * - Laranja: Energia, inovação
- * - Verde: Sustentabilidade (parte do challenge!)
- */
-
 // =============================================================================
-// CORES PRIMÁRIAS - Azul Corporativo
+// LIGHT SCHEME - Premium Blue Theme
 // =============================================================================
 
-/** Azul principal - Botões, links, ações primárias */
-val AguiaBrancaBlue = Color(0xFF1565C0)
+val LightPrimary = Color(0xFF0A2540)
+val LightOnPrimary = Color(0xFFFFFFFF)
+val LightPrimaryContainer = Color(0xFFD6F0FF)
+val LightOnPrimaryContainer = Color(0xFF001F33)
 
-/** Azul escuro - Headers, topbar */
-val AguiaBrancaBlueDark = Color(0xFF0D47A1)
+val LightSecondary = Color(0xFFFF5C00)
+val LightOnSecondary = Color(0xFFFFFFFF)
+val LightSecondaryContainer = Color(0xFFFFE0CC)
+val LightOnSecondaryContainer = Color(0xFF331200)
 
-/** Azul claro - Container de destaque */
-val AguiaBrancaBlueLight = Color(0xFFBBDEFB)
+val LightTertiary = Color(0xFF00875A)
+val LightOnTertiary = Color(0xFFFFFFFF)
+val LightTertiaryContainer = Color(0xFFC8F5E0)
+val LightOnTertiaryContainer = Color(0xFF002114)
 
-/** Cor sobre azul - Texto branco */
-val OnAguiaBrancaBlue = Color(0xFFFFFFFF)
+val LightBackground = Color(0xFFF8F9FA)
+val LightOnBackground = Color(0xFF1C1C1E)
+val LightSurface = Color(0xFFFFFFFF)
+val LightOnSurface = Color(0xFF1C1C1E)
+val LightSurfaceVariant = Color(0xFFF0F1F3)
+val LightOnSurfaceVariant = Color(0xFF44474E)
 
-// =============================================================================
-// CORES SECUNDÁRIAS - Laranja Energia
-// =============================================================================
+val LightOutline = Color(0xFF74777F)
+val LightOutlineVariant = Color(0xFFC4C6D0)
 
-/** Laranja - FABs, ações secundárias */
-val AguiaBrancaOrange = Color(0xFFFF8F00)
-
-/** Laranja escuro */
-val AguiaBrancaOrangeDark = Color(0xFFE65100)
-
-/** Laranja claro - Container */
-val AguiaBrancaOrangeLight = Color(0xFFFFE0B2)
-
-/** Cor sobre laranja */
-val OnAguiaBrancaOrange = Color(0xFF000000)
-
-// =============================================================================
-// CORES TERCIÁRIAS - Verde Sustentabilidade
-// =============================================================================
-
-/** Verde - Ações sustentáveis, sucesso */
-val AguiaBrancaGreen = Color(0xFF2E7D32)
-
-/** Verde claro - Container */
-val AguiaBrancaGreenLight = Color(0xFFC8E6C9)
-
-/** Cor sobre verde */
-val OnAguiaBrancaGreen = Color(0xFFFFFFFF)
+val LightError = Color(0xFFBA1A1A)
+val LightOnError = Color(0xFFFFFFFF)
+val LightErrorContainer = Color(0xFFFFDAD6)
+val LightOnErrorContainer = Color(0xFF410002)
 
 // =============================================================================
-// CORES DE SUPERFÍCIE E BACKGROUND
+// DARK SCHEME - Electric Mint Theme
 // =============================================================================
 
-/** Background Light */
-val BackgroundLight = Color(0xFFF8F9FA)
+val DarkPrimary = Color(0xFF00D4B2)
+val DarkOnPrimary = Color(0xFF003B30)
+val DarkPrimaryContainer = Color(0xFF005244)
+val DarkOnPrimaryContainer = Color(0xFF6EFFD8)
 
-/** Surface Light - Cards */
-val SurfaceLight = Color(0xFFFFFFFF)
+val DarkSecondary = Color(0xFFFF7A00)
+val DarkOnSecondary = Color(0xFF3D1D00)
+val DarkSecondaryContainer = Color(0xFF5C2D00)
+val DarkOnSecondaryContainer = Color(0xFFFFDCC2)
 
-/** Surface Variant Light */
-val SurfaceVariantLight = Color(0xFFE7E8EC)
+val DarkTertiary = Color(0xFF36B37E)
+val DarkOnTertiary = Color(0xFF003921)
+val DarkTertiaryContainer = Color(0xFF005232)
+val DarkOnTertiaryContainer = Color(0xFFA3F5C8)
 
-/** Background Dark */
-val BackgroundDark = Color(0xFF121212)
+val DarkBackground = Color(0xFF0E0E10)
+val DarkOnBackground = Color(0xFFE5E5EA)
+val DarkSurface = Color(0xFF161618)
+val DarkOnSurface = Color(0xFFE5E5EA)
+val DarkSurfaceVariant = Color(0xFF1C1C1E)
+val DarkOnSurfaceVariant = Color(0xFFC4C6D0)
 
-/** Surface Dark */
-val SurfaceDark = Color(0xFF1E1E1E)
+val DarkOutline = Color(0xFF8E9099)
+val DarkOutlineVariant = Color(0xFF44474E)
 
-/** Surface Variant Dark */
-val SurfaceVariantDark = Color(0xFF2C2C2C)
-
-// =============================================================================
-// CORES SEMÂNTICAS
-// =============================================================================
-
-/** Erro */
-val ErrorColor = Color(0xFFB00020)
-val ErrorColorDark = Color(0xFFCF6679)
-
-/** Sucesso */
-val SuccessColor = Color(0xFF4CAF50)
-
-/** Warning */
-val WarningColor = Color(0xFFFFC107)
-
-/** Info */
-val InfoColor = Color(0xFF2196F3)
+val DarkError = Color(0xFFFFB4AB)
+val DarkOnError = Color(0xFF690005)
+val DarkErrorContainer = Color(0xFF93000A)
+val DarkOnErrorContainer = Color(0xFFFFDAD6)
 
 // =============================================================================
-// CORES DE STATUS (Ideias e Projetos)
+// CUSTOM COLORS - Glassmorphism & Semantic
 // =============================================================================
 
-/** Pendente - Cinza */
-val StatusPendente = Color(0xFF9E9E9E)
+val GlassBorder = Color(0x33FFFFFF)
+val GlassFill = Color(0x66161618)
 
-/** Em Análise - Azul */
-val StatusEmAnalise = Color(0xFF2196F3)
+val SuccessGreen = Color(0xFF36B37E)
+val WarningAmber = Color(0xFFFFAB00)
+val ErrorRed = Color(0xFFFF3B30)
 
-/** Aprovado - Verde */
-val StatusAprovado = Color(0xFF4CAF50)
+val AISpark = Color(0xFF00D4B2)
 
-/** Reprovado - Vermelho */
-val StatusReprovado = Color(0xFFF44336)
+// =============================================================================
+// STATUS COLORS - Semantic tokens for status indicators
+// =============================================================================
 
-/** Em Andamento - Laranja */
-val StatusEmAndamento = Color(0xFFFF9800)
+val NeutralGray = Color(0xFF8E9099)
+val InfoBlue = Color(0xFF3B82F6)
+val CompletedGreen = Color(0xFF059669)
 
-/** Concluído - Verde Escuro */
-val StatusConcluido = Color(0xFF2E7D32)
+// =============================================================================
+// GAMIFICATION COLORS - Level badges
+// =============================================================================
+
+val LevelIniciante = NeutralGray
+val LevelEngajado = AISpark
+val LevelVisionario = LightSecondary

@@ -16,159 +16,117 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-/**
- * Theme - Águia Branca Challenge
- *
- * ## Conceito FIAP - Material Design 3 Theme
- *
- * O tema Compose é configurado via `MaterialTheme`, que define:
- * - `colorScheme`: Paleta de cores (light/dark)
- * - `typography`: Estilos de texto
- * - `shapes`: Formas de componentes (arredondamentos)
- *
- * ### Estrutura Hierárquica
- *
- * ```
- * AguiaBrancaTheme
- *     │
- *     └── MaterialTheme
- *             │
- *             ├── colorScheme   → LightColors / DarkColors
- *             ├── typography    → AguiaBrancaTypography
- *             ├── shapes        → AguiaBrancaShapes
- *             └── content       → Telas do app
- * ```
- *
- * ### Uso nas Telas
- *
- * ```kotlin
- * @Composable
- * fun MinhaScreen() {
- *     // Acessa cores do tema
- *     val primaryColor = MaterialTheme.colorScheme.primary
- *
- *     // Acessa tipografia
- *     Text(
- *         text = "Título",
- *         style = MaterialTheme.typography.headlineMedium
- *     )
- * }
- * ```
- */
-
-/**
- * Esquema de cores para modo Light.
- */
 private val LightColorScheme = lightColorScheme(
-    // Cores primárias
-    primary = AguiaBrancaBlue,
-    onPrimary = OnAguiaBrancaBlue,
-    primaryContainer = AguiaBrancaBlueLight,
-    onPrimaryContainer = AguiaBrancaBlueDark,
+    primary = LightPrimary,
+    onPrimary = LightOnPrimary,
+    primaryContainer = LightPrimaryContainer,
+    onPrimaryContainer = LightOnPrimaryContainer,
 
-    // Cores secundárias
-    secondary = AguiaBrancaOrange,
-    onSecondary = OnAguiaBrancaOrange,
-    secondaryContainer = AguiaBrancaOrangeLight,
-    onSecondaryContainer = AguiaBrancaOrangeDark,
+    secondary = LightSecondary,
+    onSecondary = LightOnSecondary,
+    secondaryContainer = LightSecondaryContainer,
+    onSecondaryContainer = LightOnSecondaryContainer,
 
-    // Cores terciárias
-    tertiary = AguiaBrancaGreen,
-    onTertiary = OnAguiaBrancaGreen,
-    tertiaryContainer = AguiaBrancaGreenLight,
-    onTertiaryContainer = AguiaBrancaGreen,
+    tertiary = LightTertiary,
+    onTertiary = LightOnTertiary,
+    tertiaryContainer = LightTertiaryContainer,
+    onTertiaryContainer = LightOnTertiaryContainer,
 
-    // Background e Surface
-    background = BackgroundLight,
-    onBackground = AguiaBrancaBlueDark,
-    surface = SurfaceLight,
-    onSurface = AguiaBrancaBlueDark,
-    surfaceVariant = SurfaceVariantLight,
-    onSurfaceVariant = AguiaBrancaBlue,
+    background = LightBackground,
+    onBackground = LightOnBackground,
+    surface = LightSurface,
+    onSurface = LightOnSurface,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = LightOnSurfaceVariant,
 
-    // Erro
-    error = ErrorColor,
-    onError = OnAguiaBrancaBlue,
-    errorContainer = ErrorColor.copy(alpha = 0.1f),
-    onErrorContainer = ErrorColor,
+    error = LightError,
+    onError = LightOnError,
+    errorContainer = LightErrorContainer,
+    onErrorContainer = LightOnErrorContainer,
 
-    // Outline
-    outline = AguiaBrancaBlue.copy(alpha = 0.5f),
-    outlineVariant = AguiaBrancaBlue.copy(alpha = 0.2f)
+    outline = LightOutline,
+    outlineVariant = LightOutlineVariant
 )
 
-/**
- * Esquema de cores para modo Dark.
- */
 private val DarkColorScheme = darkColorScheme(
-    // Cores primárias
-    primary = AguiaBrancaBlueLight,
-    onPrimary = AguiaBrancaBlueDark,
-    primaryContainer = AguiaBrancaBlue,
-    onPrimaryContainer = AguiaBrancaBlueLight,
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
 
-    // Cores secundárias
-    secondary = AguiaBrancaOrangeLight,
-    onSecondary = AguiaBrancaOrangeDark,
-    secondaryContainer = AguiaBrancaOrangeDark,
-    onSecondaryContainer = AguiaBrancaOrangeLight,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnSecondary,
+    secondaryContainer = DarkSecondaryContainer,
+    onSecondaryContainer = DarkOnSecondaryContainer,
 
-    // Cores terciárias
-    tertiary = AguiaBrancaGreenLight,
-    onTertiary = AguiaBrancaGreen,
-    tertiaryContainer = AguiaBrancaGreen,
-    onTertiaryContainer = AguiaBrancaGreenLight,
+    tertiary = DarkTertiary,
+    onTertiary = DarkOnTertiary,
+    tertiaryContainer = DarkTertiaryContainer,
+    onTertiaryContainer = DarkOnTertiaryContainer,
 
-    // Background e Surface
-    background = BackgroundDark,
-    onBackground = SurfaceLight,
-    surface = SurfaceDark,
-    onSurface = SurfaceLight,
-    surfaceVariant = SurfaceVariantDark,
-    onSurfaceVariant = SurfaceVariantLight,
+    background = DarkBackground,
+    onBackground = DarkOnBackground,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
 
-    // Erro
-    error = ErrorColorDark,
-    onError = BackgroundDark,
-    errorContainer = ErrorColor,
-    onErrorContainer = ErrorColorDark,
+    error = DarkError,
+    onError = DarkOnError,
+    errorContainer = DarkErrorContainer,
+    onErrorContainer = DarkOnErrorContainer,
 
-    // Outline
-    outline = AguiaBrancaBlueLight.copy(alpha = 0.5f),
-    outlineVariant = AguiaBrancaBlueLight.copy(alpha = 0.2f)
+    outline = DarkOutline,
+    outlineVariant = DarkOutlineVariant
 )
 
-/**
- * Tema principal do Águia Branca Challenge.
- *
- * @param darkTheme Se true, usa tema escuro
- * @param dynamicColor Se true (Android 12+), usa cores dinâmicas do wallpaper
- * @param content Conteúdo do app
- */
 @Composable
-fun AguiaBrancaTheme(
+fun InovagabTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color está disponível no Android 12+
-    // Desabilitado por padrão para manter identidade visual
-    dynamicColor: Boolean = false,
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) 
-            else dynamicLightColorScheme(context)
+            val dynamicScheme = if (darkTheme) 
+                dynamicDarkColorScheme(context) 
+            else 
+                dynamicLightColorScheme(context)
+            
+            if (darkTheme) dynamicScheme.copy(
+                primary = DarkPrimary,
+                onPrimary = DarkOnPrimary,
+                secondary = DarkSecondary,
+                onSecondary = DarkOnSecondary,
+                tertiary = DarkTertiary,
+                onTertiary = DarkOnTertiary,
+                background = DarkBackground,
+                onBackground = DarkOnBackground,
+                surface = DarkSurface,
+                onSurface = DarkOnSurface
+            ) else dynamicScheme.copy(
+                primary = LightPrimary,
+                onPrimary = LightOnPrimary,
+                secondary = LightSecondary,
+                onSecondary = LightOnSecondary,
+                tertiary = LightTertiary,
+                onTertiary = LightOnTertiary,
+                background = LightBackground,
+                onBackground = LightOnBackground,
+                surface = LightSurface,
+                onSurface = LightOnSurface
+            )
         }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
-    // Configura a cor da status bar
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            window.statusBarColor = colorScheme.surface.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
@@ -176,8 +134,8 @@ fun AguiaBrancaTheme(
     CompositionLocalProvider(LocalSpacing provides Spacing()) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = AguiaBrancaTypography,
-            shapes = AguiaBrancaShapes,
+            typography = InovagabTypography,
+            shapes = InovagabShapes,
             content = content
         )
     }

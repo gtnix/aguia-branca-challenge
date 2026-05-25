@@ -57,7 +57,7 @@ import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 
 @Composable
 fun IdeiaDetalheScreen(
@@ -577,7 +577,7 @@ private fun StatusChip(status: StatusIdeia) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun IdeiaDetalheGestorPendentePreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         IdeiaDetalheScreenContent(
             uiState = IdeiaDetalheUiState(
                 ideia = Ideia(
@@ -607,7 +607,7 @@ private fun IdeiaDetalheGestorPendentePreview() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun IdeiaDetalheGestorEmAnalisePreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         IdeiaDetalheScreenContent(
             uiState = IdeiaDetalheUiState(
                 ideia = Ideia(
@@ -639,7 +639,7 @@ private fun IdeiaDetalheGestorEmAnalisePreview() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun IdeiaDetalheOperadorComFeedbackPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         IdeiaDetalheScreenContent(
             uiState = IdeiaDetalheUiState(
                 ideia = Ideia(

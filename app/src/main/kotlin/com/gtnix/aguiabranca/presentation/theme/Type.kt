@@ -8,174 +8,150 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.gtnix.aguiabranca.R
 
-/**
- * Tipografia - Águia Branca Challenge
- *
- * ## Conceito FIAP - Material Design 3 Typography
- *
- * O Material 3 define uma escala tipográfica com propósitos específicos:
- *
- * ### Display (displayLarge, displayMedium, displaySmall)
- * - Textos de destaque máximo
- * - Números grandes em dashboards
- *
- * ### Headline (headlineLarge, headlineMedium, headlineSmall)
- * - Títulos de seções
- * - Cabeçalhos de páginas
- *
- * ### Title (titleLarge, titleMedium, titleSmall)
- * - Títulos de cards
- * - Labels de formulários importantes
- *
- * ### Body (bodyLarge, bodyMedium, bodySmall)
- * - Texto principal de conteúdo
- * - Descrições
- *
- * ### Label (labelLarge, labelMedium, labelSmall)
- * - Botões
- * - Chips
- * - Elementos menores
- */
+// =============================================================================
+// FONT FAMILIES
+// =============================================================================
 
-// Para usar fonte customizada, adicione o arquivo .ttf em res/font/
-// e descomente as linhas abaixo:
-//
-// val Poppins = FontFamily(
-//     Font(R.font.poppins_regular, FontWeight.Normal),
-//     Font(R.font.poppins_medium, FontWeight.Medium),
-//     Font(R.font.poppins_semibold, FontWeight.SemiBold),
-//     Font(R.font.poppins_bold, FontWeight.Bold)
-// )
+val Inter = FontFamily(
+    Font(R.font.inter_regular, FontWeight.Normal),
+    Font(R.font.inter_medium, FontWeight.Medium),
+    Font(R.font.inter_semibold, FontWeight.SemiBold),
+    Font(R.font.inter_bold, FontWeight.Bold)
+)
 
-// Usando fonte padrão do sistema
-val AppFontFamily = FontFamily.Default
+val PlusJakartaSans = FontFamily(
+    Font(R.font.plus_jakarta_sans_medium, FontWeight.Medium),
+    Font(R.font.plus_jakarta_sans_semibold, FontWeight.SemiBold),
+    Font(R.font.plus_jakarta_sans_bold, FontWeight.Bold)
+)
 
-/**
- * Tipografia do app seguindo Material 3.
- */
-val AguiaBrancaTypography = Typography(
+// =============================================================================
+// TYPOGRAPHY SCALE - Premium Design System
+// =============================================================================
+
+val InovagabTypography = Typography(
     // =========================================================================
-    // DISPLAY - Textos de máximo destaque
+    // DISPLAY - Hero text, large numbers
     // =========================================================================
     displayLarge = TextStyle(
-        fontFamily = AppFontFamily,
+        fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.Bold,
-        fontSize = 57.sp,
-        lineHeight = 64.sp,
-        letterSpacing = (-0.25).sp
+        fontSize = 40.sp,
+        lineHeight = 48.sp,
+        letterSpacing = (-1).sp
     ),
     displayMedium = TextStyle(
-        fontFamily = AppFontFamily,
-        fontWeight = FontWeight.Bold,
-        fontSize = 45.sp,
-        lineHeight = 52.sp,
-        letterSpacing = 0.sp
-    ),
-    displaySmall = TextStyle(
-        fontFamily = AppFontFamily,
-        fontWeight = FontWeight.Bold,
-        fontSize = 36.sp,
-        lineHeight = 44.sp,
-        letterSpacing = 0.sp
-    ),
-
-    // =========================================================================
-    // HEADLINE - Títulos principais
-    // =========================================================================
-    headlineLarge = TextStyle(
-        fontFamily = AppFontFamily,
+        fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.SemiBold,
         fontSize = 32.sp,
         lineHeight = 40.sp,
-        letterSpacing = 0.sp
+        letterSpacing = (-0.5).sp
     ),
-    headlineMedium = TextStyle(
-        fontFamily = AppFontFamily,
+    displaySmall = TextStyle(
+        fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.SemiBold,
         fontSize = 28.sp,
         lineHeight = 36.sp,
         letterSpacing = 0.sp
     ),
-    headlineSmall = TextStyle(
-        fontFamily = AppFontFamily,
-        fontWeight = FontWeight.SemiBold,
+
+    // =========================================================================
+    // HEADLINE - Section titles, page headers
+    // =========================================================================
+    headlineLarge = TextStyle(
+        fontFamily = PlusJakartaSans,
+        fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
         lineHeight = 32.sp,
         letterSpacing = 0.sp
     ),
-
-    // =========================================================================
-    // TITLE - Títulos de cards e seções
-    // =========================================================================
-    titleLarge = TextStyle(
-        fontFamily = AppFontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 22.sp,
+    headlineMedium = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
-    titleMedium = TextStyle(
-        fontFamily = AppFontFamily,
+    headlineSmall = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = 26.sp,
+        letterSpacing = 0.sp
+    ),
+
+    // =========================================================================
+    // TITLE - Card titles, form labels
+    // =========================================================================
+    titleLarge = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.15.sp
+        letterSpacing = 0.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.Medium,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.sp
     ),
     titleSmall = TextStyle(
-        fontFamily = AppFontFamily,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp
+        fontSize = 12.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.sp
     ),
 
     // =========================================================================
-    // BODY - Texto de conteúdo
+    // BODY - Main content text
     // =========================================================================
     bodyLarge = TextStyle(
-        fontFamily = AppFontFamily,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 15.sp,
+        lineHeight = 22.sp,
+        letterSpacing = 0.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = AppFontFamily,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.25.sp
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.sp
     ),
     bodySmall = TextStyle(
-        fontFamily = AppFontFamily,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.4.sp
+        letterSpacing = 0.sp
     ),
 
     // =========================================================================
-    // LABEL - Botões, chips, elementos pequenos
+    // LABEL - Buttons, chips, smaller elements
     // =========================================================================
     labelLarge = TextStyle(
-        fontFamily = AppFontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp
+        fontFamily = Inter,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.5.sp
     ),
     labelMedium = TextStyle(
-        fontFamily = AppFontFamily,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = AppFontFamily,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.sp
     )
 )

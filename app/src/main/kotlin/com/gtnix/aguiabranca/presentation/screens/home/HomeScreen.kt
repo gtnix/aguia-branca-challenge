@@ -62,10 +62,8 @@ import com.gtnix.aguiabranca.presentation.components.ShimmerListPlaceholder
 import com.gtnix.aguiabranca.presentation.components.charts.DonutChart
 import com.gtnix.aguiabranca.presentation.components.charts.FunnelChart
 import com.gtnix.aguiabranca.presentation.components.charts.FunnelStep
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaBlue
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaGreen
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaOrange
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
 import com.gtnix.aguiabranca.presentation.util.bounceClick
 import com.gtnix.aguiabranca.presentation.util.formatCurrency
 import com.gtnix.aguiabranca.presentation.util.formatPercent
@@ -321,7 +319,7 @@ private fun DashboardExecutivo(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    val roiColor = if (roi >= 0) AguiaBrancaGreen else MaterialTheme.colorScheme.error
+                    val roiColor = if (roi >= 0) SuccessGreen else MaterialTheme.colorScheme.error
                     DonutChart(
                         percentage = (roi.toFloat() / 100f).coerceIn(0f, 1f),
                         centerText = formatPercent(roi),
@@ -352,9 +350,9 @@ private fun DashboardExecutivo(
                     Spacer(modifier = Modifier.height(8.dp))
                     FunnelChart(
                         steps = listOf(
-                            FunnelStep("Ideias", totalIdeias, AguiaBrancaBlue),
-                            FunnelStep("Aprovadas", ideiasAprovadas, AguiaBrancaGreen),
-                            FunnelStep("Projetos", projetosAtivos, AguiaBrancaOrange)
+                            FunnelStep("Ideias", totalIdeias, MaterialTheme.colorScheme.primary),
+                            FunnelStep("Aprovadas", ideiasAprovadas, MaterialTheme.colorScheme.tertiary),
+                            FunnelStep("Projetos", projetosAtivos, MaterialTheme.colorScheme.secondary)
                         )
                     )
                 }
@@ -607,7 +605,7 @@ private fun IdeiaResumoCard(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeScreenPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         HomeScreenContent(
             uiState = HomeUiState(
                 perfil = PerfilUsuario.GESTOR,
@@ -628,7 +626,7 @@ private fun HomeScreenPreview() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeScreenLiderPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         HomeScreenContent(
             uiState = HomeUiState(
                 perfil = PerfilUsuario.LIDER,

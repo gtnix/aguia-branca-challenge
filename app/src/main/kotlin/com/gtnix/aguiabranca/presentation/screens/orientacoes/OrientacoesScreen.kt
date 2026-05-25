@@ -53,7 +53,7 @@ import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
 import com.gtnix.aguiabranca.presentation.components.EmptyState
 import com.gtnix.aguiabranca.presentation.components.ShimmerListPlaceholder
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 
 @Composable
 fun OrientacoesScreen(
@@ -167,13 +167,10 @@ private fun OrientacaoCard(
     onDesativar: () -> Unit,
     onExcluir: () -> Unit
 ) {
-    val azulClaro = Color(0xFFBBDEFB)
-    val azulEscuro = Color(0xFF0D47A1)
-    
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (orientacao.ativa) azulClaro else MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (orientacao.ativa) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
         ),
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -195,7 +192,7 @@ private fun OrientacaoCard(
                     Icon(
                         imageVector = Icons.Default.Flag,
                         contentDescription = null,
-                        tint = if (orientacao.ativa) azulEscuro else MaterialTheme.colorScheme.outline,
+                        tint = if (orientacao.ativa) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                         modifier = Modifier.size(28.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -204,13 +201,13 @@ private fun OrientacaoCard(
                             text = orientacao.titulo,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = if (orientacao.ativa) azulEscuro else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (orientacao.ativa) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = orientacao.descricao,
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (orientacao.ativa) azulEscuro.copy(alpha = 0.7f) 
+                            color = if (orientacao.ativa) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f) 
                                    else MaterialTheme.colorScheme.outline,
                             maxLines = 2
                         )
@@ -281,9 +278,9 @@ private fun CategoriaChip(categoria: CategoriaOrientacao) {
 @Composable
 private fun PrioridadeChip(prioridade: Int) {
     val color = when (prioridade) {
-        1 -> Color(0xFFD32F2F)
-        2 -> Color(0xFFF57C00)
-        else -> Color(0xFF388E3C)
+        1 -> MaterialTheme.colorScheme.error
+        2 -> MaterialTheme.colorScheme.secondary
+        else -> MaterialTheme.colorScheme.tertiary
     }
     
     Card(
@@ -314,9 +311,9 @@ private fun PrioridadeChip(prioridade: Int) {
 
 @Composable
 private fun StatusChip(ativa: Boolean) {
-    val backgroundColor = if (ativa) Color(0xFF2E7D32).copy(alpha = 0.15f) 
+    val backgroundColor = if (ativa) MaterialTheme.colorScheme.tertiaryContainer
                          else MaterialTheme.colorScheme.errorContainer
-    val contentColor = if (ativa) Color(0xFF2E7D32) 
+    val contentColor = if (ativa) MaterialTheme.colorScheme.onTertiaryContainer
                        else MaterialTheme.colorScheme.error
     
     Card(
@@ -337,7 +334,7 @@ private fun StatusChip(ativa: Boolean) {
 @Preview(showBackground = true)
 @Composable
 private fun OrientacaoCardPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         OrientacaoCard(
             orientacao = OrientacaoEstrategica(
                 id = "1",

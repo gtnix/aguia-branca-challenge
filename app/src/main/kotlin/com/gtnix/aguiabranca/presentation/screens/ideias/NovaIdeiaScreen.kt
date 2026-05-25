@@ -53,7 +53,7 @@ import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 
 @Composable
 fun NovaIdeiaScreen(
@@ -272,15 +272,15 @@ private fun OrientacoesCard(
     expanded: Boolean,
     onToggle: () -> Unit
 ) {
-    val azulClaro = Color(0xFFBBDEFB)
-    val azulEscuro = Color(0xFF0D47A1)
-    val azulMedio = Color(0xFF1565C0)
+    val containerColor = MaterialTheme.colorScheme.primaryContainer
+    val contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+    val accentColor = MaterialTheme.colorScheme.primary
     
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         onClick = onToggle,
         colors = CardDefaults.elevatedCardColors(
-            containerColor = azulClaro
+            containerColor = containerColor
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -293,7 +293,7 @@ private fun OrientacoesCard(
                     Icon(
                         imageVector = Icons.Default.Flag,
                         contentDescription = "Foco estratégico",
-                        tint = azulEscuro,
+                        tint = contentColor,
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.padding(start = 8.dp))
@@ -302,13 +302,13 @@ private fun OrientacoesCard(
                             text = "Foco Estratégico Atual",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = azulEscuro
+                            color = contentColor
                         )
                         if (!expanded) {
                             Text(
                                 text = "${orientacoes.size} orientações ativas",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = azulMedio
+                                color = accentColor
                             )
                         }
                     }
@@ -316,7 +316,7 @@ private fun OrientacoesCard(
                 Icon(
                     imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = if (expanded) "Recolher orientações" else "Expandir orientações",
-                    tint = azulEscuro
+                    tint = contentColor
                 )
             }
 
@@ -330,7 +330,7 @@ private fun OrientacoesCard(
                         Text(
                             text = "- ${orientacao.titulo}",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = azulMedio,
+                            color = accentColor,
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
                     }
@@ -343,7 +343,7 @@ private fun OrientacoesCard(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun NovaIdeiaScreenPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         NovaIdeiaScreenContent(
             uiState = NovaIdeiaUiState(),
             onTituloChange = {},

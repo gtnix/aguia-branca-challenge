@@ -49,7 +49,7 @@ import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
 import com.gtnix.aguiabranca.presentation.components.EmptyState
 import com.gtnix.aguiabranca.presentation.components.IdeiaCard
 import com.gtnix.aguiabranca.presentation.components.ShimmerListPlaceholder
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.util.UiState
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -191,7 +191,7 @@ fun IdeiasScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun IdeiasScreenPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         Box(modifier = Modifier.fillMaxSize()) {
             Text("Preview - IdeiasScreen")
         }

@@ -38,7 +38,7 @@ import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
 import com.gtnix.aguiabranca.presentation.components.SectionHeader
 import com.gtnix.aguiabranca.presentation.components.ShimmerListPlaceholder
 import com.gtnix.aguiabranca.presentation.components.StatusBadge
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 
 @Composable
 fun RadarScreen(
@@ -204,7 +204,7 @@ private fun MatchScoreChip(score: Int) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun RadarScreenPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         RadarScreenContent(
             uiState = RadarUiState(
                 startups = listOf(
@@ -232,7 +232,7 @@ private fun RadarScreenPreview() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun RadarScreenLoadingPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         RadarScreenContent(
             uiState = RadarUiState(isLoading = true),
             onNavigateBack = {}

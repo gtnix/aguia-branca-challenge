@@ -13,12 +13,12 @@ import androidx.compose.ui.unit.dp
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.StatusProjeto
-import com.gtnix.aguiabranca.presentation.theme.StatusAprovado
-import com.gtnix.aguiabranca.presentation.theme.StatusConcluido
-import com.gtnix.aguiabranca.presentation.theme.StatusEmAnalise
-import com.gtnix.aguiabranca.presentation.theme.StatusEmAndamento
-import com.gtnix.aguiabranca.presentation.theme.StatusPendente
-import com.gtnix.aguiabranca.presentation.theme.StatusReprovado
+import com.gtnix.aguiabranca.presentation.theme.CompletedGreen
+import com.gtnix.aguiabranca.presentation.theme.ErrorRed
+import com.gtnix.aguiabranca.presentation.theme.InfoBlue
+import com.gtnix.aguiabranca.presentation.theme.NeutralGray
+import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
+import com.gtnix.aguiabranca.presentation.theme.WarningAmber
 
 @Composable
 fun StatusBadge(
@@ -44,11 +44,11 @@ fun StatusBadge(
 @Composable
 fun IdeiaStatusBadge(status: StatusIdeia, modifier: Modifier = Modifier) {
     val (color, text) = when (status) {
-        StatusIdeia.PENDENTE -> StatusPendente to stringResource(R.string.status_awaiting_evaluation)
-        StatusIdeia.EM_ANALISE -> StatusEmAnalise to stringResource(R.string.status_under_analysis)
-        StatusIdeia.APROVADA -> StatusAprovado to stringResource(R.string.status_idea_approved)
-        StatusIdeia.REPROVADA -> StatusReprovado to stringResource(R.string.status_not_prioritized)
-        StatusIdeia.CONVERTIDA_PROJETO -> StatusEmAndamento to stringResource(R.string.status_converted_project)
+        StatusIdeia.PENDENTE -> NeutralGray to stringResource(R.string.status_awaiting_evaluation)
+        StatusIdeia.EM_ANALISE -> InfoBlue to stringResource(R.string.status_under_analysis)
+        StatusIdeia.APROVADA -> SuccessGreen to stringResource(R.string.status_idea_approved)
+        StatusIdeia.REPROVADA -> ErrorRed to stringResource(R.string.status_not_prioritized)
+        StatusIdeia.CONVERTIDA_PROJETO -> WarningAmber to stringResource(R.string.status_converted_project)
     }
     StatusBadge(text = text, color = color, modifier = modifier)
 }
@@ -56,11 +56,11 @@ fun IdeiaStatusBadge(status: StatusIdeia, modifier: Modifier = Modifier) {
 @Composable
 fun ProjetoStatusBadge(status: StatusProjeto, modifier: Modifier = Modifier) {
     val (color, text) = when (status) {
-        StatusProjeto.PLANEJADO -> StatusPendente to "Planejado"
-        StatusProjeto.EM_ANDAMENTO -> StatusEmAndamento to "Em Andamento"
-        StatusProjeto.PAUSADO -> StatusReprovado to "Pausado"
-        StatusProjeto.CONCLUIDO -> StatusConcluido to "Concluído"
-        StatusProjeto.CANCELADO -> StatusReprovado to "Cancelado"
+        StatusProjeto.PLANEJADO -> NeutralGray to "Planejado"
+        StatusProjeto.EM_ANDAMENTO -> WarningAmber to "Em Andamento"
+        StatusProjeto.PAUSADO -> ErrorRed to "Pausado"
+        StatusProjeto.CONCLUIDO -> CompletedGreen to "Concluído"
+        StatusProjeto.CANCELADO -> ErrorRed to "Cancelado"
     }
     StatusBadge(text = text, color = color, modifier = modifier)
 }

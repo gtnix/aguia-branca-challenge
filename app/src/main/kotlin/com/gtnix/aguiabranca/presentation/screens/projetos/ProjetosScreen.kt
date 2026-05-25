@@ -44,7 +44,7 @@ import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
 import com.gtnix.aguiabranca.presentation.components.EmptyState
 import com.gtnix.aguiabranca.presentation.components.ProjetoCard
 import com.gtnix.aguiabranca.presentation.components.ShimmerListPlaceholder
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -192,7 +192,7 @@ fun ProjetosScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun ProjetosScreenPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         Scaffold(
             topBar = {
                 AguiaTopBar(title = "Projetos")

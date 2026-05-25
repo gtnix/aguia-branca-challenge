@@ -9,7 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.gtnix.aguiabranca.presentation.navigation.AppNavGraph
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -28,7 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
  * ```
  * MainActivity
  *   └── setContent { }        // Define o conteúdo Compose
- *       └── AguiaBrancaTheme  // Aplica o tema Material 3
+ *       └── InovagabTheme  // Aplica o tema Material 3
  *           └── Surface      // Background da aplicação
  *               └── AppNavGraph  // Gerencia navegação entre telas
  * ```
@@ -50,8 +50,8 @@ class MainActivity : ComponentActivity() {
         // setContent define o conteúdo Compose da Activity
         // Tudo dentro deste bloco é uma função @Composable
         setContent {
-            // AguiaBrancaTheme aplica cores, tipografia e shapes do Material 3
-            AguiaBrancaTheme {
+            // InovagabTheme aplica cores, tipografia e shapes do Material 3
+            InovagabTheme {
                 // Surface é o container base que aplica a cor de fundo do tema
                 Surface(
                     modifier = Modifier.fillMaxSize(),

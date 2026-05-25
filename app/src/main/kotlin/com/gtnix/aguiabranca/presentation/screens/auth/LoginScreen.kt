@@ -61,7 +61,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 
 /**
  * LoginScreen - Tela de Login
@@ -490,7 +490,7 @@ private fun DemoButton(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun LoginScreenPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         LoginScreenContent(
             uiState = LoginUiState(),
             onEmailChange = {},
@@ -504,7 +504,7 @@ private fun LoginScreenPreview() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun LoginScreenLoadingPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         LoginScreenContent(
             uiState = LoginUiState(
                 email = "operador@aguiabranca.com.br",
@@ -522,7 +522,7 @@ private fun LoginScreenLoadingPreview() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun LoginScreenErrorPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         LoginScreenContent(
             uiState = LoginUiState(
                 email = "teste@email.com",

@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.domain.model.CategoriaOrientacao
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import kotlin.math.roundToInt
 
 @Composable
@@ -265,11 +265,11 @@ private fun getPrioridadeLabel(prioridade: Int): String {
 @Composable
 private fun getPrioridadeColor(prioridade: Int): Color {
     return when (prioridade) {
-        1 -> Color(0xFFD32F2F)
-        2 -> Color(0xFFF57C00)
-        3 -> Color(0xFFFBC02D)
-        4 -> Color(0xFF388E3C)
-        5 -> Color(0xFF1976D2)
+        1 -> MaterialTheme.colorScheme.error
+        2 -> MaterialTheme.colorScheme.secondary
+        3 -> MaterialTheme.colorScheme.tertiary
+        4 -> MaterialTheme.colorScheme.tertiary
+        5 -> MaterialTheme.colorScheme.primary
         else -> MaterialTheme.colorScheme.primary
     }
 }
@@ -277,7 +277,7 @@ private fun getPrioridadeColor(prioridade: Int): Color {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun NovaOrientacaoScreenPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         NovaOrientacaoScreenContent(
             uiState = NovaOrientacaoUiState(),
             onTituloChange = {},

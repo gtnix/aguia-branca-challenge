@@ -58,10 +58,10 @@ import androidx.compose.ui.unit.sp
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.usecase.NivelUsuario
 import com.gtnix.aguiabranca.domain.usecase.Pontuacao
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaBlue
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaBlueDark
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaOrange
-import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaTheme
+import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import com.gtnix.aguiabranca.presentation.theme.LevelEngajado
+import com.gtnix.aguiabranca.presentation.theme.LevelIniciante
+import com.gtnix.aguiabranca.presentation.theme.LevelVisionario
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,9 +105,9 @@ private fun PerfilScreenContent(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AguiaBrancaBlueDark,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }
@@ -119,7 +119,7 @@ private fun PerfilScreenContent(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = AguiaBrancaBlue)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
             Column(
@@ -200,14 +200,17 @@ private fun ProfileHeader(
                     .clip(CircleShape)
                     .background(
                         brush = Brush.verticalGradient(
-                            listOf(AguiaBrancaBlue, AguiaBrancaBlueDark)
+                            listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primaryContainer
+                            )
                         )
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = inicialNome.toString(),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -268,7 +271,7 @@ private fun ConquistasSection(pontuacao: Pontuacao) {
                 text = "${pontuacao.total}",
                 fontSize = 48.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = AguiaBrancaOrange
+                color = MaterialTheme.colorScheme.secondary
             )
             Text(
                 text = "pontos",
@@ -288,7 +291,7 @@ private fun ConquistasSection(pontuacao: Pontuacao) {
                     .fillMaxWidth()
                     .height(10.dp)
                     .clip(RoundedCornerShape(5.dp)),
-                color = AguiaBrancaOrange,
+                color = MaterialTheme.colorScheme.secondary,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
 
@@ -305,7 +308,7 @@ private fun ConquistasSection(pontuacao: Pontuacao) {
                 Text(
                     text = "Nível máximo alcançado!",
                     style = MaterialTheme.typography.bodySmall,
-                    color = AguiaBrancaOrange,
+                    color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -351,9 +354,9 @@ private fun NivelBadge(nivel: NivelUsuario) {
 }
 
 private fun nivelIconAndColor(nivel: NivelUsuario): Pair<ImageVector, Color> = when (nivel) {
-    NivelUsuario.INICIANTE -> Icons.Filled.Star to Color(0xFF78909C)
-    NivelUsuario.ENGAJADO -> Icons.AutoMirrored.Filled.TrendingUp to Color(0xFF1565C0)
-    NivelUsuario.VISIONARIO -> Icons.Filled.EmojiEvents to Color(0xFFFF8F00)
+    NivelUsuario.INICIANTE -> Icons.Filled.Star to LevelIniciante
+    NivelUsuario.ENGAJADO -> Icons.AutoMirrored.Filled.TrendingUp to LevelEngajado
+    NivelUsuario.VISIONARIO -> Icons.Filled.EmojiEvents to LevelVisionario
 }
 
 private fun formatAreaLabel(area: String): String = when (area) {
@@ -378,7 +381,7 @@ private fun formatPerfilLabel(perfil: String): String = when (perfil) {
 @Preview(showBackground = true)
 @Composable
 private fun PerfilScreenPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         PerfilScreenContent(
             uiState = PerfilUiState(
                 isLoading = false,
@@ -402,7 +405,7 @@ private fun PerfilScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun PerfilScreenVisionarioPreview() {
-    AguiaBrancaTheme {
+    InovagabTheme {
         PerfilScreenContent(
             uiState = PerfilUiState(
                 isLoading = false,
