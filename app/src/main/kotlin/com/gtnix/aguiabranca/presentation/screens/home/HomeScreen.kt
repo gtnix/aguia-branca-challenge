@@ -146,7 +146,7 @@ private fun HomeScreenContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Adicionar nova ideia"
+                        contentDescription = stringResource(R.string.cd_add_idea)
                     )
                 }
             }

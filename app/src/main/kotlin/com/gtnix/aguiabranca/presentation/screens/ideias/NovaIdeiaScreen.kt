@@ -44,9 +44,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
@@ -100,7 +102,7 @@ private fun NovaIdeiaScreenContent(
     Scaffold(
         topBar = {
             AguiaTopBar(
-                title = "Nova Ideia",
+                title = stringResource(R.string.action_suggest_innovation),
                 onBackClick = onNavigateBack
             )
         },
@@ -120,14 +122,20 @@ private fun NovaIdeiaScreenContent(
                     expanded = orientacoesExpanded,
                     onToggle = { orientacoesExpanded = !orientacoesExpanded }
                 )
+            } else {
+                Text(
+                    text = stringResource(R.string.new_idea_helper_text),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             OutlinedTextField(
                 value = uiState.titulo,
                 onValueChange = onTituloChange,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Título da Ideia") },
-                placeholder = { Text("Descreva sua ideia em uma frase") },
+                label = { Text(stringResource(R.string.new_idea_title_label)) },
+                placeholder = { Text(stringResource(R.string.new_idea_title_placeholder)) },
                 singleLine = true,
                 shape = MaterialTheme.shapes.small,
                 isError = uiState.errorMessage != null && uiState.titulo.isBlank()
@@ -139,8 +147,8 @@ private fun NovaIdeiaScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp),
-                label = { Text("Descrição") },
-                placeholder = { Text("Detalhe sua ideia, problema identificado e solução proposta") },
+                label = { Text(stringResource(R.string.new_idea_desc_label)) },
+                placeholder = { Text(stringResource(R.string.new_idea_desc_placeholder)) },
                 shape = MaterialTheme.shapes.small,
                 isError = uiState.errorMessage != null && uiState.descricao.isBlank()
             )
@@ -244,7 +252,7 @@ private fun NovaIdeiaScreenContent(
                     disabledContentColor = MaterialTheme.colorScheme.outline
                 )
             ) {
-                Text(if (uiState.isLoading) "Salvando..." else "Submeter Ideia")
+                Text(if (uiState.isLoading) stringResource(R.string.loading) else stringResource(R.string.action_send_evaluation))
             }
 
             if (!isFormValid && !uiState.isLoading) {

@@ -7,8 +7,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.StatusProjeto
 import com.gtnix.aguiabranca.presentation.theme.StatusAprovado
@@ -42,11 +44,11 @@ fun StatusBadge(
 @Composable
 fun IdeiaStatusBadge(status: StatusIdeia, modifier: Modifier = Modifier) {
     val (color, text) = when (status) {
-        StatusIdeia.PENDENTE -> StatusPendente to "Pendente"
-        StatusIdeia.EM_ANALISE -> StatusEmAnalise to "Em Análise"
-        StatusIdeia.APROVADA -> StatusAprovado to "Aprovada"
-        StatusIdeia.REPROVADA -> StatusReprovado to "Reprovada"
-        StatusIdeia.CONVERTIDA_PROJETO -> StatusEmAndamento to "Projeto"
+        StatusIdeia.PENDENTE -> StatusPendente to stringResource(R.string.status_awaiting_evaluation)
+        StatusIdeia.EM_ANALISE -> StatusEmAnalise to stringResource(R.string.status_under_analysis)
+        StatusIdeia.APROVADA -> StatusAprovado to stringResource(R.string.status_idea_approved)
+        StatusIdeia.REPROVADA -> StatusReprovado to stringResource(R.string.status_not_prioritized)
+        StatusIdeia.CONVERTIDA_PROJETO -> StatusEmAndamento to stringResource(R.string.status_converted_project)
     }
     StatusBadge(text = text, color = color, modifier = modifier)
 }

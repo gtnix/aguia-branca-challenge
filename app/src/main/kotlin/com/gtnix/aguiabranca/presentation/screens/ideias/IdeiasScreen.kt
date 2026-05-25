@@ -35,9 +35,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
@@ -88,7 +90,7 @@ fun IdeiasScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Adicionar nova ideia"
+                        contentDescription = stringResource(R.string.cd_add_idea)
                     )
                 }
             }
@@ -143,8 +145,10 @@ fun IdeiasScreen(
                     ) {
                         EmptyState(
                             icon = Icons.Default.Lightbulb,
-                            title = "Nenhuma ideia ainda",
-                            subtitle = "Toque no + para adicionar sua primeira ideia"
+                            title = stringResource(R.string.empty_ideas_title),
+                            subtitle = stringResource(R.string.empty_ideas_desc),
+                            actionLabel = stringResource(R.string.action_create_first_idea),
+                            onActionClick = onNavigateToNovaIdeia
                         )
                     }
                 }

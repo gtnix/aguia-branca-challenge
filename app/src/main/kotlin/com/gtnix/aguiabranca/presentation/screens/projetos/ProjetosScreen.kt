@@ -30,9 +30,11 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import com.gtnix.aguiabranca.R
 import androidx.lifecycle.viewModelScope
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.Projeto
@@ -122,7 +124,7 @@ fun ProjetosScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Criar novo projeto"
+                        contentDescription = stringResource(R.string.cd_add_project)
                     )
                 }
             }
@@ -151,8 +153,8 @@ fun ProjetosScreen(
                     ) {
                         EmptyState(
                             icon = Icons.Default.Folder,
-                            title = "Nenhum projeto ainda",
-                            subtitle = "Projetos surgem de ideias aprovadas"
+                            title = stringResource(R.string.empty_projects_title),
+                            subtitle = stringResource(R.string.empty_projects_desc)
                         )
                     }
                 }

@@ -50,10 +50,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.usecase.NivelUsuario
 import com.gtnix.aguiabranca.domain.usecase.Pontuacao
 import com.gtnix.aguiabranca.presentation.theme.AguiaBrancaBlue
@@ -307,6 +309,15 @@ private fun ConquistasSection(pontuacao: Pontuacao) {
                     fontWeight = FontWeight.SemiBold
                 )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(R.string.gamification_explanation),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

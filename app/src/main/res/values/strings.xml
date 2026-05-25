@@ -122,4 +122,36 @@
     <string name="cd_menu">Menu de navegação</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_notifications">Notificações</string>
+    <string name="cd_add_idea">Adicionar nova ideia de inovação</string>
+    <string name="cd_add_project">Criar novo projeto</string>
+    
+    <!-- UX Writing - Ações -->
+    <string name="action_suggest_innovation">Sugerir Inovação</string>
+    <string name="action_send_evaluation">Enviar para Avaliação</string>
+    <string name="action_create_first_idea">Criar primeira ideia</string>
+    <string name="action_approve">Aprovar</string>
+    <string name="action_reject">Não Priorizar</string>
+    
+    <!-- UX Writing - Empty States -->
+    <string name="empty_ideas_title">Nenhuma inovação registrada</string>
+    <string name="empty_ideas_desc">Que tal compartilhar uma sugestão para melhorar nosso dia a dia? Toda grande mudança começa com uma ideia.</string>
+    <string name="empty_projects_title">Nenhum projeto ativo</string>
+    <string name="empty_projects_desc">Projetos nascem de ideias aprovadas que geram valor real para a Águia Branca.</string>
+    
+    <!-- UX Writing - Nova Ideia -->
+    <string name="new_idea_helper_text">Dica: Alinhe sua sugestão com as Orientações Estratégicas da empresa para aumentar as chances de aprovação.</string>
+    <string name="new_idea_title_label">Qual é a sua ideia?</string>
+    <string name="new_idea_title_placeholder">Ex: Redução de uso de papel na operação</string>
+    <string name="new_idea_desc_label">Descreva os detalhes e os benefícios esperados</string>
+    <string name="new_idea_desc_placeholder">Detalhe sua ideia, problema identificado e solução proposta</string>
+    
+    <!-- UX Writing - Status Humanizados -->
+    <string name="status_awaiting_evaluation">Aguardando Avaliação</string>
+    <string name="status_under_analysis">Em Análise</string>
+    <string name="status_idea_approved">Ideia Aprovada</string>
+    <string name="status_not_prioritized">Não Priorizada</string>
+    <string name="status_converted_project">Convertida em Projeto</string>
+    
+    <!-- UX Writing - Gamificação -->
+    <string name="gamification_explanation">Ganhe pontos enviando ideias, recebendo aprovações e participando de projetos.</string>
 </resources>

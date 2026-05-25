@@ -444,7 +444,7 @@ private fun AvaliacaoSection(
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Reprovar")
+                    Text(stringResource(R.string.action_reject))
                 }
                 Button(
                     onClick = onAprovar,
@@ -453,7 +453,7 @@ private fun AvaliacaoSection(
                         .height(48.dp),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Aprovar")
+                    Text(stringResource(R.string.action_approve))
                 }
             }
         }
@@ -552,11 +552,11 @@ private fun ScoreResumoCard(impacto: Int, esforco: Int, score: Int) {
 @Composable
 private fun StatusChip(status: StatusIdeia) {
     val (color, text) = when (status) {
-        StatusIdeia.PENDENTE -> MaterialTheme.colorScheme.outline to "Pendente"
-        StatusIdeia.EM_ANALISE -> MaterialTheme.colorScheme.tertiary to "Em Análise"
-        StatusIdeia.APROVADA -> MaterialTheme.colorScheme.primary to "Aprovada"
-        StatusIdeia.REPROVADA -> MaterialTheme.colorScheme.error to "Reprovada"
-        StatusIdeia.CONVERTIDA_PROJETO -> MaterialTheme.colorScheme.secondary to "Projeto"
+        StatusIdeia.PENDENTE -> MaterialTheme.colorScheme.outline to stringResource(R.string.status_awaiting_evaluation)
+        StatusIdeia.EM_ANALISE -> MaterialTheme.colorScheme.tertiary to stringResource(R.string.status_under_analysis)
+        StatusIdeia.APROVADA -> MaterialTheme.colorScheme.primary to stringResource(R.string.status_idea_approved)
+        StatusIdeia.REPROVADA -> MaterialTheme.colorScheme.error to stringResource(R.string.status_not_prioritized)
+        StatusIdeia.CONVERTIDA_PROJETO -> MaterialTheme.colorScheme.secondary to stringResource(R.string.status_converted_project)
     }
 
     Card(
