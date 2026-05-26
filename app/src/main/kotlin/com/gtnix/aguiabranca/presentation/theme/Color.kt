@@ -98,3 +98,13 @@ val CompletedGreen = Color(0xFF059669)
 val LevelIniciante = NeutralGray
 val LevelEngajado = AISpark
 val LevelVisionario = LightSecondary
+
+// =============================================================================
+// PREMIUM SURFACE TOKENS - Unified card system
+// =============================================================================
+
+val SurfaceElevatedLight = Color(0xFFFFFFFF)
+val SurfaceElevatedDark = Color(0xFF1C1C1E)
+
+val CardBorderLight = Color(0xFFE5E7EB)
+val CardBorderDark = Color(0x0FFFFFFF)

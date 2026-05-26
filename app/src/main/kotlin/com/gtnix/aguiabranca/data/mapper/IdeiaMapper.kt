@@ -28,7 +28,9 @@ class IdeiaMapper @Inject constructor() {
             dataCriacao = entity.dataCriacao,
             dataAvaliacao = entity.dataAvaliacao,
             impactoEstimado = entity.impactoEstimado,
-            esforcoEstimado = entity.esforcoEstimado
+            esforcoEstimado = entity.esforcoEstimado,
+            upvotes = entity.upvotes,
+            temSimilaridade = entity.temSimilaridade
         )
     }
 
@@ -48,7 +50,9 @@ class IdeiaMapper @Inject constructor() {
             dataCriacao = domain.dataCriacao,
             dataAvaliacao = domain.dataAvaliacao,
             impactoEstimado = domain.impactoEstimado,
-            esforcoEstimado = domain.esforcoEstimado
+            esforcoEstimado = domain.esforcoEstimado,
+            upvotes = domain.upvotes,
+            temSimilaridade = domain.temSimilaridade
         )
     }
 

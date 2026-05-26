@@ -21,3 +21,19 @@ val MaterialTheme.spacing: Spacing
     @Composable
     @ReadOnlyComposable
     get() = LocalSpacing.current
+
+object NavBarDimensions {
+    val PillHeight = 64.dp
+    val FabSize = 56.dp
+    val FabSpacing = 16.dp
+    val BottomPadding = 12.dp
+    
+    val ContentBottomPaddingWithFab = PillHeight + FabSize + FabSpacing + BottomPadding + 16.dp
+    val ContentBottomPaddingNoFab = PillHeight + BottomPadding + 16.dp
+}
+
+object ScreenPadding {
+    val Horizontal = 20.dp
+    val SectionSpacing = 24.dp
+    val CardCornerRadius = 16.dp
+}

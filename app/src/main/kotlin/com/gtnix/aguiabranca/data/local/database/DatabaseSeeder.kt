@@ -71,7 +71,34 @@ class DatabaseSeeder @Inject constructor(
         )
         orientacaoDao.inserir(orientacao)
 
-        // 3. Ideias
+        // 3. Projeto (inserido antes das ideias para respeitar FK constraint)
+        // ideiaOrigemId = null para evitar dependência circular (Projeto -> Ideia -> Projeto)
+        val projeto = ProjetoEntity(
+            id = "proj-1",
+            nome = "Monitoramento de Emissões",
+            objetivo = "Reduzir emissões de CO2 da frota em 30% com monitoramento em tempo real.",
+            descricao = "Projeto piloto para instalação de sensores IoT em 50 veículos da frota, com dashboard de acompanhamento de emissões.",
+            area = "OPERACOES",
+            status = "EM_ANDAMENTO",
+            ideiaOrigemId = null,
+            orientacaoId = "orient-1",
+            responsavelId = "user-gestor",
+            responsavelNome = "Ana Oliveira (Gerente Operações)",
+            membrosIds = "[\"user-operador\"]",
+            dataCriacao = agora - 86_400_000,
+            dataInicio = agora - 43_200_000,
+            dataPrevistaConclusao = agora + 7_776_000_000,
+            dataConclusao = null,
+            progresso = 45,
+            resultados = null,
+            investimentoEstimado = 150000.0,
+            investimentoRealizado = 85000.0,
+            retornoEstimadoMensal = 12000.0,
+            retornoRealizadoMensal = 8500.0
+        )
+        projetoDao.inserir(projeto)
+
+        // 4. Ideias (inseridas após o projeto para respeitar FK constraint)
         val ideias = listOf(
             IdeiaEntity(
                 id = "ideia-1",
@@ -109,31 +136,5 @@ class DatabaseSeeder @Inject constructor(
             )
         )
         ideiaDao.inserirTodas(ideias)
-
-        // 4. Projeto
-        val projeto = ProjetoEntity(
-            id = "proj-1",
-            nome = "Monitoramento de Emissões",
-            objetivo = "Reduzir emissões de CO2 da frota em 30% com monitoramento em tempo real.",
-            descricao = "Projeto piloto para instalação de sensores IoT em 50 veículos da frota, com dashboard de acompanhamento de emissões.",
-            area = "OPERACOES",
-            status = "EM_ANDAMENTO",
-            ideiaOrigemId = "ideia-2",
-            orientacaoId = "orient-1",
-            responsavelId = "user-gestor",
-            responsavelNome = "Ana Oliveira (Gerente Operações)",
-            membrosIds = "[\"user-operador\"]",
-            dataCriacao = agora - 86_400_000,
-            dataInicio = agora - 43_200_000,
-            dataPrevistaConclusao = agora + 7_776_000_000,
-            dataConclusao = null,
-            progresso = 45,
-            resultados = null,
-            investimentoEstimado = 150000.0,
-            investimentoRealizado = 85000.0,
-            retornoEstimadoMensal = 12000.0,
-            retornoRealizadoMensal = 8500.0
-        )
-        projetoDao.inserir(projeto)
     }
 }

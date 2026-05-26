@@ -137,14 +137,17 @@ class LoginViewModel @Inject constructor(
         val demoUser = Usuario(
             id = "demo-${perfil.name.lowercase()}",
             nome = "Demo ${perfil.name}",
-            email = "demo@aguiabranca.com.br",
+            email = "demo-${perfil.name.lowercase()}@aguiabranca.com.br",
             perfil = perfil,
             area = AreaAtuacao.OPERACOES
         )
         viewModelScope.launch {
+            try {
+                usuarioRepository.salvar(demoUser)
+            } catch (_: Exception) { }
             sessionManager.login(demoUser)
+            _uiState.update { it.copy(isLoading = false, loginSuccess = true, demoPerfil = perfil) }
         }
-        _uiState.update { it.copy(isLoading = false, loginSuccess = true, demoPerfil = perfil) }
     }
 
     fun onLoginHandled() {

@@ -628,6 +628,44 @@ Lista de IDs (`membrosIds`) é convertida para JSON String via TypeConverter par
 
 ---
 
+## 11. Iniciativa de Redesign UI/UX Premium
+
+### Objetivo
+
+Modernizar a aparência visual do app para atingir padrões de qualidade comparáveis a apps como **Revolut**, **Apple Wallet** e **Linear** — saindo de uma estética corporativa genérica para um design premium e sofisticado.
+
+### Documentação
+
+Ver [`docs/PROMPT_MANUS_UX_RESEARCH.md`](./PROMPT_MANUS_UX_RESEARCH.md) para o prompt completo de pesquisa de tendências e proposta de redesign.
+
+### Áreas de Modernização
+
+| Área | Estado Atual | Objetivo |
+|------|--------------|----------|
+| Paleta de Cores | Azul/laranja corporativo tradicional | Paleta sofisticada com gradientes sutis e dark mode |
+| Tipografia | Roboto padrão | Hierarquia clara com fonte moderna (Inter, SF Pro style) |
+| Cards | Bordas conservadoras, espaçamento denso | Glassmorphism sutil, whitespace generoso |
+| Microinterações | Mínimas | Transições fluidas, feedback visual elegante |
+| Iconografia | Material Icons padrão | Ícones customizados ou biblioteca moderna |
+| Layout | Enterprise software clássico | Bento grid, hierarchy-first design |
+
+### Incorporação de IA (Sprint 2+)
+
+| Feature | Perfil | Descrição |
+|---------|--------|-----------|
+| Voz-para-ideia | Operador | Captura de ideias por voz com transcrição automática |
+| Clustering de ideias | Gestor | Agrupar ideias similares automaticamente |
+| Insights automáticos | Líder | Alertas sobre tendências e anomalias |
+| Busca semântica | Todos | Encontrar ideias/projetos por conceito |
+
+### Priorização
+
+1. **Quick Wins**: Ajustes de cores, tipografia, spacing
+2. **Medium Effort**: Redesign de componentes, dark mode
+3. **High Effort**: Features AI, motion design avançado
+
+---
+
 ## 11. Como Executar
 
 ```bash
@@ -643,4 +681,4 @@ Lista de IDs (`membrosIds`) é convertida para JSON String via TypeConverter par
 
 ---
 
-*Última atualização: 22 de Maio de 2026 — Sprint 1*
+*Última atualização: 25 de Maio de 2026 — Sprint 1*

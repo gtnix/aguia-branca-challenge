@@ -50,10 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.domain.model.CategoriaOrientacao
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
 import com.gtnix.aguiabranca.presentation.components.EmptyState
-import com.gtnix.aguiabranca.presentation.components.ShimmerListPlaceholder
+import com.gtnix.aguiabranca.presentation.components.SkeletonListPlaceholder
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun OrientacoesScreen(
@@ -108,7 +110,7 @@ fun OrientacoesScreen(
     ) { paddingValues ->
         when {
             uiState.isLoading -> {
-                ShimmerListPlaceholder(
+                SkeletonListPlaceholder(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)

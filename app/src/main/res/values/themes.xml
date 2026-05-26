@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.AguiaBrancaChallenge" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/primary</item>
-        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        
+        <!-- Android 12+ Splash Screen -->
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_inovagab_logo</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/splash_icon_background</item>
     </style>
+    
+    <!-- Colors for splash screen - Águia Branca brand blue -->
+    <color name="splash_background">#FFFFFF</color>
+    <color name="splash_icon_background">#0A2540</color>
 </resources>

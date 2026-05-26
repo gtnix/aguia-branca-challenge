@@ -1,9 +1,14 @@
 package com.gtnix.aguiabranca.presentation.screens.ideias
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,25 +21,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -44,20 +51,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
+import com.gtnix.aguiabranca.presentation.components.GlassCard
+import com.gtnix.aguiabranca.presentation.components.IdeiaStatusBadge
+import com.gtnix.aguiabranca.presentation.components.InovagabButton
+import com.gtnix.aguiabranca.presentation.components.InovagabButtonVariant
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
 
 @Composable
 fun IdeiaDetalheScreen(
@@ -94,10 +110,12 @@ private fun IdeiaDetalheScreenContent(
     onCriarProjeto: (String) -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val isDarkTheme = isSystemInDarkTheme()
 
+    val actionSuccessMessage = stringResource(R.string.ideia_detalhe_acao_sucesso)
     LaunchedEffect(uiState.actionSuccess) {
         if (uiState.actionSuccess) {
-            snackbarHostState.showSnackbar("Ação realizada com sucesso!")
+            snackbarHostState.showSnackbar(actionSuccessMessage)
         }
     }
 
@@ -106,21 +124,31 @@ private fun IdeiaDetalheScreenContent(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Detalhe da Ideia") },
+                title = { },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (isDarkTheme) Color.White.copy(alpha = 0.1f)
+                                else Color.Black.copy(alpha = 0.05f)
+                            )
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar"
+                            contentDescription = stringResource(R.string.cd_back),
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = Color.Transparent
                 )
             )
         },
@@ -134,7 +162,9 @@ private fun IdeiaDetalheScreenContent(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
 
@@ -145,11 +175,22 @@ private fun IdeiaDetalheScreenContent(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Ideia não encontrada",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Lightbulb,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                        Text(
+                            text = stringResource(R.string.ideia_detalhe_nao_encontrada),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
 
@@ -160,91 +201,35 @@ private fun IdeiaDetalheScreenContent(
                         .fillMaxSize()
                         .padding(paddingValues)
                         .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = ideia.titulo,
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                text = ideia.descricao,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                            )
-
-                            Spacer(modifier = Modifier.height(4.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column {
-                                    Text(
-                                        text = "Autor",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.outline
-                                    )
-                                    Text(
-                                        text = ideia.autorNome,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-                                Column(horizontalAlignment = Alignment.End) {
-                                    Text(
-                                        text = "Área",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.outline
-                                    )
-                                    Text(
-                                        text = ideia.area.name.replace("_", " "),
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(4.dp))
-
-                            StatusChip(status = ideia.status)
-                        }
-                    }
+                    PremiumIdeiaHeader(ideia = ideia)
+                    
+                    PremiumIdeiaInfoCard(ideia = ideia, isDarkTheme = isDarkTheme)
 
                     if (uiState.perfil == PerfilUsuario.OPERADOR && ideia.feedback != null) {
-                        FeedbackCard(feedback = ideia.feedback)
+                        PremiumFeedbackCard(feedback = ideia.feedback, isDarkTheme = isDarkTheme)
                     }
 
                     if (uiState.perfil == PerfilUsuario.GESTOR || uiState.perfil == PerfilUsuario.LIDER) {
                         when (ideia.status) {
                             StatusIdeia.PENDENTE -> {
-                                Button(
+                                InovagabButton(
+                                    text = stringResource(R.string.ideia_detalhe_iniciar_analise),
                                     onClick = onIniciarAnalise,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(50.dp),
-                                    shape = RoundedCornerShape(8.dp)
-                                ) {
-                                    Text("Iniciar Análise")
-                                }
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             }
 
                             StatusIdeia.EM_ANALISE -> {
-                                AvaliacaoSection(
+                                PremiumAvaliacaoSection(
                                     impacto = uiState.impacto,
                                     esforco = uiState.esforco,
                                     score = uiState.scorePriorizacao,
                                     feedback = uiState.feedback,
                                     errorMessage = uiState.errorMessage,
+                                    isDarkTheme = isDarkTheme,
                                     onImpactoChange = onImpactoChange,
                                     onEsforcoChange = onEsforcoChange,
                                     onFeedbackChange = onFeedbackChange,
@@ -255,44 +240,37 @@ private fun IdeiaDetalheScreenContent(
 
                             StatusIdeia.APROVADA -> {
                                 if (ideia.impactoEstimado > 0 || ideia.esforcoEstimado > 0) {
-                                    ScoreResumoCard(
+                                    PremiumScoreCard(
                                         impacto = ideia.impactoEstimado,
                                         esforco = ideia.esforcoEstimado,
-                                        score = ideia.scorePriorizacao
+                                        score = ideia.scorePriorizacao,
+                                        isDarkTheme = isDarkTheme
                                     )
                                 }
                                 if (ideia.feedback != null) {
-                                    FeedbackCard(feedback = ideia.feedback)
+                                    PremiumFeedbackCard(feedback = ideia.feedback, isDarkTheme = isDarkTheme)
                                 }
                                 if (uiState.perfil == PerfilUsuario.GESTOR || uiState.perfil == PerfilUsuario.LIDER) {
-                                    Button(
+                                    InovagabButton(
+                                        text = stringResource(R.string.ideia_criar_projeto),
                                         onClick = { onCriarProjeto(ideia.id) },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(50.dp),
-                                        shape = RoundedCornerShape(8.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Folder,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(stringResource(R.string.ideia_criar_projeto))
-                                    }
+                                        leadingIcon = Icons.Default.Folder,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
                                 }
                             }
 
                             else -> {
                                 if (ideia.impactoEstimado > 0 || ideia.esforcoEstimado > 0) {
-                                    ScoreResumoCard(
+                                    PremiumScoreCard(
                                         impacto = ideia.impactoEstimado,
                                         esforco = ideia.esforcoEstimado,
-                                        score = ideia.scorePriorizacao
+                                        score = ideia.scorePriorizacao,
+                                        isDarkTheme = isDarkTheme
                                     )
                                 }
                                 if (ideia.feedback != null) {
-                                    FeedbackCard(feedback = ideia.feedback)
+                                    PremiumFeedbackCard(feedback = ideia.feedback, isDarkTheme = isDarkTheme)
                                 }
                             }
                         }
@@ -300,34 +278,13 @@ private fun IdeiaDetalheScreenContent(
 
                     AnimatedVisibility(
                         visible = uiState.actionSuccess,
-                        enter = fadeIn() + slideInVertically(),
-                        exit = fadeOut()
+                        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(),
+                        exit = fadeOut(animationSpec = tween(300))
                     ) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.CheckCircle,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "Ação realizada com sucesso!",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
-                        }
+                        SuccessCard()
                     }
+
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
             }
         }
@@ -335,81 +292,214 @@ private fun IdeiaDetalheScreenContent(
 }
 
 @Composable
-private fun AvaliacaoSection(
+private fun PremiumIdeiaHeader(ideia: Ideia) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IdeiaStatusBadge(status = ideia.status)
+        }
+        
+        Text(
+            text = ideia.titulo,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        
+        Text(
+            text = ideia.descricao,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun PremiumIdeiaInfoCard(
+    ideia: Ideia,
+    isDarkTheme: Boolean
+) {
+    GlassCard(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            InfoRow(
+                icon = Icons.Default.Person,
+                label = stringResource(R.string.ideia_detalhe_autor),
+                value = ideia.autorNome,
+                isDarkTheme = isDarkTheme
+            )
+            
+            InfoRow(
+                icon = Icons.Outlined.Category,
+                label = stringResource(R.string.ideia_detalhe_area),
+                value = ideia.area.name.replace("_", " "),
+                isDarkTheme = isDarkTheme
+            )
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    isDarkTheme: Boolean
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(
+                    MaterialTheme.colorScheme.primary.copy(alpha = if (isDarkTheme) 0.15f else 0.1f),
+                    CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Column {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+@Composable
+private fun PremiumFeedbackCard(
+    feedback: String,
+    isDarkTheme: Boolean
+) {
+    val borderColor = if (isDarkTheme) {
+        MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+    } else {
+        MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)
+    }
+    
+    val backgroundColor = if (isDarkTheme) {
+        MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+    } else {
+        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+    }
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+            .background(backgroundColor)
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(
+                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f),
+                        CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            Column {
+                Text(
+                    text = stringResource(R.string.ideia_detalhe_feedback_gestor),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = feedback,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumAvaliacaoSection(
     impacto: Float,
     esforco: Float,
     score: Int,
     feedback: String,
     errorMessage: String?,
+    isDarkTheme: Boolean,
     onImpactoChange: (Float) -> Unit,
     onEsforcoChange: (Float) -> Unit,
     onFeedbackChange: (String) -> Unit,
     onAprovar: () -> Unit,
     onReprovar: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    GlassCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = "Avaliação",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                text = stringResource(R.string.ideia_detalhe_avaliacao),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
-            Text(
-                text = "Impacto Estimado: ${impacto.toInt()}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Slider(
+            SliderSection(
+                label = stringResource(R.string.ideia_detalhe_impacto),
                 value = impacto,
-                onValueChange = onImpactoChange,
-                valueRange = 1f..5f,
-                steps = 3
+                onValueChange = onImpactoChange
             )
-
-            Text(
-                text = "Esforço Estimado: ${esforco.toInt()}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Slider(
+            
+            SliderSection(
+                label = stringResource(R.string.ideia_detalhe_esforco),
                 value = esforco,
-                onValueChange = onEsforcoChange,
-                valueRange = 1f..5f,
-                steps = 3
+                onValueChange = onEsforcoChange
             )
 
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Score de Priorização",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = "$score",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                }
-            }
+            ScoreDisplay(score = score, isDarkTheme = isDarkTheme)
 
             OutlinedTextField(
                 value = feedback,
@@ -417,9 +507,13 @@ private fun AvaliacaoSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
-                label = { Text("Feedback") },
-                placeholder = { Text("Deixe seu feedback para o autor da ideia") },
-                shape = RoundedCornerShape(8.dp)
+                label = { Text(stringResource(R.string.ideia_detalhe_feedback)) },
+                placeholder = { Text(stringResource(R.string.ideia_detalhe_feedback_placeholder)) },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
             )
 
             if (errorMessage != null) {
@@ -434,147 +528,241 @@ private fun AvaliacaoSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Button(
+                InovagabButton(
+                    text = stringResource(R.string.action_reject),
                     onClick = onReprovar,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(stringResource(R.string.action_reject))
-                }
-                Button(
+                    variant = InovagabButtonVariant.Ghost,
+                    modifier = Modifier.weight(1f)
+                )
+                InovagabButton(
+                    text = stringResource(R.string.action_approve),
                     onClick = onAprovar,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(stringResource(R.string.action_approve))
-                }
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
 }
 
 @Composable
-private fun FeedbackCard(feedback: String) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        ),
-        shape = RoundedCornerShape(12.dp)
-    ) {
+private fun SliderSection(
+    label: String,
+    value: Float,
+    onValueChange: (Float) -> Unit
+) {
+    Column {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            Icon(
-                imageVector = Icons.Default.Info,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text(
-                    text = "Feedback do Gestor",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = feedback,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ScoreResumoCard(impacto: Int, esforco: Int, score: Int) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-        ),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Priorização",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Impacto", style = MaterialTheme.typography.labelSmall)
-                    Text(
-                        "$impacto",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Esforço", style = MaterialTheme.typography.labelSmall)
-                    Text(
-                        "$esforco",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Score", style = MaterialTheme.typography.labelSmall)
-                    Text(
-                        "$score",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                }
-            }
+            Text(
+                text = "${value.toInt()}/5",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
-    }
-}
-
-@Composable
-private fun StatusChip(status: StatusIdeia) {
-    val (color, text) = when (status) {
-        StatusIdeia.PENDENTE -> MaterialTheme.colorScheme.outline to stringResource(R.string.status_awaiting_evaluation)
-        StatusIdeia.EM_ANALISE -> MaterialTheme.colorScheme.tertiary to stringResource(R.string.status_under_analysis)
-        StatusIdeia.APROVADA -> MaterialTheme.colorScheme.primary to stringResource(R.string.status_idea_approved)
-        StatusIdeia.REPROVADA -> MaterialTheme.colorScheme.error to stringResource(R.string.status_not_prioritized)
-        StatusIdeia.CONVERTIDA_PROJETO -> MaterialTheme.colorScheme.secondary to stringResource(R.string.status_converted_project)
-    }
-
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = color.copy(alpha = 0.1f)
-        ),
-        shape = RoundedCornerShape(4.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = color,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Slider(
+            value = value,
+            onValueChange = onValueChange,
+            valueRange = 1f..5f,
+            steps = 3,
+            colors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.primary,
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+            )
         )
     }
 }
 
+@Composable
+private fun ScoreDisplay(
+    score: Int,
+    isDarkTheme: Boolean
+) {
+    val backgroundColor = if (isDarkTheme) {
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+    } else {
+        MaterialTheme.colorScheme.primaryContainer
+    }
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(backgroundColor)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.ideia_detalhe_score_priorizacao),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "$score",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun PremiumScoreCard(
+    impacto: Int,
+    esforco: Int,
+    score: Int,
+    isDarkTheme: Boolean
+) {
+    GlassCard(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.ideia_detalhe_priorizacao),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ScoreMetric(
+                    label = stringResource(R.string.ideia_detalhe_impacto),
+                    value = impacto,
+                    color = MaterialTheme.colorScheme.primary,
+                    isDarkTheme = isDarkTheme
+                )
+                ScoreMetric(
+                    label = stringResource(R.string.ideia_detalhe_esforco),
+                    value = esforco,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    isDarkTheme = isDarkTheme
+                )
+                ScoreMetric(
+                    label = stringResource(R.string.ideia_detalhe_score),
+                    value = score,
+                    color = SuccessGreen,
+                    isDarkTheme = isDarkTheme,
+                    isHighlighted = true
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScoreMetric(
+    label: String,
+    value: Int,
+    color: Color,
+    isDarkTheme: Boolean,
+    isHighlighted: Boolean = false
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(if (isHighlighted) 64.dp else 56.dp)
+                .then(
+                    if (isHighlighted) {
+                        Modifier.shadow(
+                            elevation = 8.dp,
+                            shape = CircleShape,
+                            ambientColor = color.copy(alpha = 0.3f),
+                            spotColor = color.copy(alpha = 0.3f)
+                        )
+                    } else Modifier
+                )
+                .background(
+                    color.copy(alpha = if (isDarkTheme) 0.2f else 0.15f),
+                    CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "$value",
+                style = if (isHighlighted) MaterialTheme.typography.headlineSmall 
+                        else MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun SuccessCard() {
+    val isDarkTheme = isSystemInDarkTheme()
+    val backgroundColor = if (isDarkTheme) {
+        SuccessGreen.copy(alpha = 0.15f)
+    } else {
+        SuccessGreen.copy(alpha = 0.1f)
+    }
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(backgroundColor)
+            .border(1.dp, SuccessGreen.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = SuccessGreen,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = stringResource(R.string.ideia_detalhe_acao_sucesso),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = SuccessGreen
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun IdeiaDetalheGestorPendentePreview() {
     InovagabTheme {

@@ -57,7 +57,9 @@ data class Ideia(
     val dataCriacao: Long = System.currentTimeMillis(),
     val dataAvaliacao: Long? = null,
     val impactoEstimado: Int = 0,
-    val esforcoEstimado: Int = 0
+    val esforcoEstimado: Int = 0,
+    val upvotes: Int = 0,
+    val temSimilaridade: Boolean = false
 ) {
     val scorePriorizacao: Int
         get() = impactoEstimado - esforcoEstimado

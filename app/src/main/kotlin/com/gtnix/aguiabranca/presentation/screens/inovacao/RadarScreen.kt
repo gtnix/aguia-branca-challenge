@@ -1,6 +1,11 @@
 package com.gtnix.aguiabranca.presentation.screens.inovacao
 
+import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,30 +20,41 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Radar
-import androidx.compose.material.icons.filled.Rocket
+import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gtnix.aguiabranca.domain.model.StartupPartner
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.GlassCard
 import com.gtnix.aguiabranca.presentation.components.SectionHeader
-import com.gtnix.aguiabranca.presentation.components.ShimmerListPlaceholder
-import com.gtnix.aguiabranca.presentation.components.StatusBadge
+import com.gtnix.aguiabranca.presentation.components.SkeletonListPlaceholder
+import com.gtnix.aguiabranca.presentation.theme.CardBorderLight
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import com.gtnix.aguiabranca.presentation.theme.ScreenPadding
+import com.gtnix.aguiabranca.presentation.util.bounceClick
 
 @Composable
 fun RadarScreen(
@@ -62,14 +78,14 @@ private fun RadarScreenContent(
     Scaffold(
         topBar = {
             AguiaTopBar(
-                title = "Radar de Inovação",
+                title = stringResource(R.string.home_innovation_radar),
                 onBackClick = onNavigateBack
             )
         }
     ) { paddingValues ->
         when {
             uiState.isLoading -> {
-                ShimmerListPlaceholder(
+                SkeletonListPlaceholder(
                     itemCount = 4,
                     modifier = Modifier
                         .fillMaxSize()
@@ -106,7 +122,7 @@ private fun RadarScreenContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentPadding = PaddingValues(16.dp),
+                    contentPadding = PaddingValues(horizontal = ScreenPadding.Horizontal, vertical = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     item {
@@ -117,8 +133,12 @@ private fun RadarScreenContent(
                         Text(
                             text = "Parceiros de inovação aberta com maior aderência ao Grupo Águia Branca",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                    
+                    item {
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
 
                     items(
@@ -127,6 +147,7 @@ private fun RadarScreenContent(
                     ) { startup ->
                         StartupCard(
                             startup = startup,
+                            onClick = { },
                             modifier = Modifier.animateItemPlacement()
                         )
                     }
@@ -139,69 +160,138 @@ private fun RadarScreenContent(
 @Composable
 private fun StartupCard(
     startup: StartupPartner,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
+    val isDarkTheme = isSystemInDarkTheme()
+    val shape = RoundedCornerShape(16.dp)
+    
+    val cardContent = @Composable {
+        StartupCardContent(startup = startup)
+    }
+    
+    if (isDarkTheme) {
+        GlassCard(
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .bounceClick(onClick = onClick)
         ) {
-            Row(verticalAlignment = Alignment.Top) {
-                Icon(
-                    imageVector = Icons.Default.Rocket,
-                    contentDescription = "Startup parceira",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = startup.nome,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = startup.setor,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
-                MatchScoreChip(score = startup.matchScore)
+            cardContent()
+        }
+    } else {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .bounceClick(onClick = onClick),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = shape,
+            border = BorderStroke(1.dp, CardBorderLight),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            Box(modifier = Modifier.padding(16.dp)) {
+                cardContent()
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = startup.descricao,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                maxLines = 3
-            )
         }
     }
 }
 
 @Composable
-private fun MatchScoreChip(score: Int) {
-    val color = when {
-        score >= 90 -> MaterialTheme.colorScheme.primary
-        score >= 80 -> MaterialTheme.colorScheme.tertiary
-        else -> MaterialTheme.colorScheme.outline
-    }
+private fun StartupCardContent(startup: StartupPartner) {
+    val isDarkTheme = isSystemInDarkTheme()
+    
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.Top) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = if (isDarkTheme) 0.15f else 0.1f),
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.RocketLaunch,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = startup.nome,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = startup.setor,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+            PremiumMatchScoreChip(score = startup.matchScore)
+        }
 
-    StatusBadge(
-        text = "${score}% Match",
-        color = color
-    )
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Text(
+            text = startup.descricao,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 3,
+            lineHeight = MaterialTheme.typography.bodySmall.lineHeight
+        )
+    }
+}
+
+@Composable
+private fun PremiumMatchScoreChip(score: Int) {
+    val isDarkTheme = isSystemInDarkTheme()
+    
+    val (backgroundColor, textColor, borderColor) = when {
+        score >= 90 -> Triple(
+            MaterialTheme.colorScheme.primary,
+            Color.White,
+            MaterialTheme.colorScheme.primary
+        )
+        score >= 80 -> Triple(
+            MaterialTheme.colorScheme.tertiary,
+            Color.White,
+            MaterialTheme.colorScheme.tertiary
+        )
+        else -> Triple(
+            if (isDarkTheme) MaterialTheme.colorScheme.surfaceVariant 
+            else MaterialTheme.colorScheme.surface,
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        )
+    }
+    
+    val isHighScore = score >= 80
+    val shape = RoundedCornerShape(100)
+    
+    Surface(
+        color = backgroundColor,
+        shape = shape,
+        border = if (!isHighScore) BorderStroke(1.dp, borderColor) else null,
+        shadowElevation = if (isHighScore && !isDarkTheme) 2.dp else 0.dp
+    ) {
+        Text(
+            text = "${score}% MATCH",
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = textColor,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+        )
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark Mode")
 @Composable
 private fun RadarScreenPreview() {
     InovagabTheme {
@@ -212,15 +302,22 @@ private fun RadarScreenPreview() {
                         id = "1",
                         nome = "LogTech Solutions",
                         setor = "Logística Inteligente",
-                        descricao = "Plataforma de otimização de rotas com IA",
+                        descricao = "Plataforma de otimização de rotas com IA que reduz emissões de CO₂ em até 30% através de algoritmos de roteirização sustentável para frotas de transporte rodoviário.",
                         matchScore = 92
                     ),
                     StartupPartner(
                         id = "2",
                         nome = "GreenRoute",
                         setor = "Mobilidade Sustentável",
-                        descricao = "Sistema de monitoramento de pegada de carbono",
+                        descricao = "Sistema de monitoramento em tempo real de pegada de carbono por viagem, com dashboards ESG integrados e relatórios automáticos para compliance ambiental.",
                         matchScore = 87
+                    ),
+                    StartupPartner(
+                        id = "3",
+                        nome = "FleetAI",
+                        setor = "Gestão de Frotas",
+                        descricao = "Solução de manutenção preditiva para frotas utilizando sensores IoT e machine learning, reduzindo custos operacionais e aumentando a vida útil dos veículos.",
+                        matchScore = 78
                     )
                 )
             ),

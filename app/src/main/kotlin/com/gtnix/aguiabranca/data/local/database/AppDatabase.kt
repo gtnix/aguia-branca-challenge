@@ -64,7 +64,7 @@ import com.gtnix.aguiabranca.data.local.entity.UsuarioEntity
         IdeiaEntity::class,
         ProjetoEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(Converters::class)

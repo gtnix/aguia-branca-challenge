@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -14,18 +13,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gtnix.aguiabranca.domain.model.PerfilUsuario
+import com.gtnix.aguiabranca.presentation.screens.MainScreen
 import com.gtnix.aguiabranca.presentation.screens.auth.LoginScreen
-import com.gtnix.aguiabranca.presentation.screens.home.HomeScreen
-import com.gtnix.aguiabranca.presentation.screens.ideias.IdeiaDetalheScreen
-import com.gtnix.aguiabranca.presentation.screens.ideias.IdeiasScreen
-import com.gtnix.aguiabranca.presentation.screens.ideias.NovaIdeiaScreen
-import com.gtnix.aguiabranca.presentation.screens.inovacao.RadarScreen
-import com.gtnix.aguiabranca.presentation.screens.orientacoes.NovaOrientacaoScreen
-import com.gtnix.aguiabranca.presentation.screens.orientacoes.OrientacoesScreen
-import com.gtnix.aguiabranca.presentation.screens.perfil.PerfilScreen
-import com.gtnix.aguiabranca.presentation.screens.projetos.NovoProjetoScreen
-import com.gtnix.aguiabranca.presentation.screens.projetos.ProjetoDetalheScreen
-import com.gtnix.aguiabranca.presentation.screens.projetos.ProjetosScreen
 
 private const val TRANSITION_DURATION = 300
 
@@ -78,11 +68,6 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: String = Destination.Login.route
 ) {
-    // Guarda ações de navegação para passar às telas
-    val navigationActions = remember(navController) {
-        NavigationActions(navController)
-    }
-
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -123,7 +108,6 @@ fun AppNavGraph(
             LoginScreen(
                 viewModel = hiltViewModel(),
                 onLoginSuccess = { perfil ->
-                    // Navega para Home e remove Login da pilha
                     navController.navigate(Destination.Home.createRoute(perfil.name)) {
                         popUpTo(Destination.Login.route) { inclusive = true }
                     }
@@ -132,7 +116,7 @@ fun AppNavGraph(
         }
 
         // =====================================================================
-        // HOME
+        // MAIN — Contains FloatingNavBar with internal navigation
         // =====================================================================
         composable(
             route = Destination.Home.route,
@@ -144,154 +128,11 @@ fun AppNavGraph(
             enterTransition = { fadeIn(tween(TRANSITION_DURATION)) },
             popEnterTransition = { fadeIn(tween(TRANSITION_DURATION)) }
         ) { backStackEntry ->
-            val perfil = backStackEntry.arguments?.getString(Destination.Home.ARG_PERFIL) ?: "OPERADOR"
+            val perfilName = backStackEntry.arguments?.getString(Destination.Home.ARG_PERFIL) ?: "OPERADOR"
+            val perfil = PerfilUsuario.valueOf(perfilName)
 
-            HomeScreen(
-                viewModel = hiltViewModel(),
+            MainScreen(
                 perfil = perfil,
-                onNavigateToIdeias = {
-                    navController.navigate(Destination.Ideias.route)
-                },
-                onNavigateToProjetos = {
-                    navController.navigate(Destination.Projetos.route)
-                },
-                onNavigateToOrientacoes = {
-                    navController.navigate(Destination.Orientacoes.route)
-                },
-                onNavigateToPerfil = {
-                    navController.navigate(Destination.Perfil.route)
-                },
-                onNavigateToNovaIdeia = {
-                    navController.navigate(Destination.NovaIdeia.route)
-                },
-                onNavigateToRadar = {
-                    navController.navigate(Destination.Radar.route)
-                }
-            )
-        }
-
-        // =====================================================================
-        // IDEIAS
-        // =====================================================================
-        composable(route = Destination.Ideias.route) {
-            IdeiasScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToNovaIdeia = {
-                    navController.navigate(Destination.NovaIdeia.route)
-                },
-                onNavigateToDetalhe = { ideiaId ->
-                    navController.navigate(Destination.IdeiaDetalhe.createRoute(ideiaId))
-                }
-            )
-        }
-
-        composable(route = Destination.NovaIdeia.route) {
-            NovaIdeiaScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() },
-                onIdeiaCreated = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        composable(
-            route = Destination.IdeiaDetalhe.route,
-            arguments = listOf(
-                navArgument(Destination.IdeiaDetalhe.ARG_IDEIA_ID) {
-                    type = NavType.StringType
-                }
-            )
-        ) {
-            IdeiaDetalheScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToNovoProjeto = { ideiaId ->
-                    navController.navigate(Destination.NovoProjeto.createRoute(ideiaId))
-                }
-            )
-        }
-
-        // =====================================================================
-        // PROJETOS
-        // =====================================================================
-        composable(route = Destination.Projetos.route) {
-            ProjetosScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToNovoProjeto = {
-                    navController.navigate(Destination.NovoProjeto.createRoute())
-                },
-                onNavigateToDetalhe = { projetoId ->
-                    navController.navigate(Destination.ProjetoDetalhe.createRoute(projetoId))
-                }
-            )
-        }
-
-        composable(
-            route = Destination.ProjetoDetalhe.route,
-            arguments = listOf(
-                navArgument(Destination.ProjetoDetalhe.ARG_PROJETO_ID) {
-                    type = NavType.StringType
-                }
-            )
-        ) {
-            ProjetoDetalheScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(
-            route = Destination.NovoProjeto.route,
-            arguments = listOf(
-                navArgument(Destination.NovoProjeto.ARG_IDEIA_ID) {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ) {
-            NovoProjetoScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() },
-                onProjetoCreated = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // =====================================================================
-        // ORIENTAÇÕES ESTRATÉGICAS
-        // =====================================================================
-        composable(route = Destination.Orientacoes.route) {
-            OrientacoesScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToNova = {
-                    navController.navigate(Destination.NovaOrientacao.route)
-                }
-            )
-        }
-
-        composable(route = Destination.NovaOrientacao.route) {
-            NovaOrientacaoScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() },
-                onOrientacaoCreated = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // =====================================================================
-        // PERFIL
-        // =====================================================================
-        composable(route = Destination.Perfil.route) {
-            PerfilScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() },
                 onLogout = {
                     navController.navigate(Destination.Login.route) {
                         popUpTo(0) { inclusive = true }
@@ -299,39 +140,18 @@ fun AppNavGraph(
                 }
             )
         }
-
-        // =====================================================================
-        // RADAR DE INOVAÇÃO
-        // =====================================================================
-        composable(route = Destination.Radar.route) {
-            RadarScreen(
-                viewModel = hiltViewModel(),
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
     }
 }
 
-/**
- * Encapsula ações de navegação para facilitar uso nas telas.
- */
+@Suppress("unused")
 class NavigationActions(private val navController: NavHostController) {
-
     fun navigateToHome(perfil: String) {
         navController.navigate(Destination.Home.createRoute(perfil)) {
             popUpTo(Destination.Login.route) { inclusive = true }
         }
     }
 
-    fun navigateToIdeias() {
-        navController.navigate(Destination.Ideias.route)
-    }
-
-    fun navigateToProjetos() {
-        navController.navigate(Destination.Projetos.route)
-    }
-
-    fun navigateBack() {
-        navController.popBackStack()
-    }
+    fun navigateToIdeias() = navController.navigate(Destination.Ideias.route)
+    fun navigateToProjetos() = navController.navigate(Destination.Projetos.route)
+    fun navigateBack() = navController.popBackStack()
 }

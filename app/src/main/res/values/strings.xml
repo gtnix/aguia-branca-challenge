@@ -154,4 +154,216 @@
     
     <!-- UX Writing - Gamificação -->
     <string name="gamification_explanation">Ganhe pontos enviando ideias, recebendo aprovações e participando de projetos.</string>
+    
+    <!-- Status Projetos -->
+    <string name="status_planejado">Planejado</string>
+    <string name="status_pausado">Pausado</string>
+    <string name="status_cancelado">Cancelado</string>
+    <string name="status_em_projeto">Em Projeto</string>
+    
+    <!-- Form Validation -->
+    <string name="validation_required_field">Campo obrigatório</string>
+    
+    <!-- Actions -->
+    <string name="action_approve_short">Aprovar</string>
+    <string name="action_reject_short">Reprovar</string>
+    
+    <!-- Navigation Premium -->
+    <string name="nav_nova_ideia">Nova Ideia</string>
+    
+    <!-- Components -->
+    <string name="label_progresso">Progresso</string>
+    <string name="cd_back">Voltar à tela anterior</string>
+    <string name="funil_title">Funil de Inovação</string>
+    <string name="funil_ideias">Ideias</string>
+    <string name="funil_aprovadas">Aprovadas</string>
+    <string name="funil_em_projeto">Em Projeto</string>
+    <string name="funil_description">Funil de Inovação: %1$d ideias, %2$d aprovadas, %3$d em projeto</string>
+    
+    <!-- AI Components -->
+    <string name="cd_ai_suggestion">Sugestão de IA</string>
+    <string name="ai_similar">AI Similar</string>
+    
+    <!-- Premium IdeiasScreen -->
+    <string name="my_ideas_title">Minhas Ideias</string>
+    <string name="filter_all">Todas</string>
+    <string name="filter_pending">Pendentes</string>
+    <string name="filter_approved">Aprovadas</string>
+    <string name="filter_in_project">Em Projeto</string>
+    <string name="fab_new_idea">Nova Ideia</string>
+    <string name="cd_filter">Filtros avançados</string>
+    
+    <!-- Home Screen -->
+    <string name="home_subtitle">Bem-vindo à Plataforma de Inovação</string>
+    <string name="home_manage_strategy">Gerenciar Estratégia</string>
+    <string name="home_quick_actions">Ações Rápidas</string>
+    <string name="home_innovation_radar">Radar de Inovação</string>
+    <string name="cd_idea_icon">Ícone de ideia</string>
+    
+    <!-- Home Screen Premium -->
+    <string name="home_logo">INOVAGAB</string>
+    <string name="home_greeting_morning">Bom dia</string>
+    <string name="home_greeting_afternoon">Boa tarde</string>
+    <string name="home_greeting_evening">Boa noite</string>
+    <string name="home_metric_ideias_ativas">Ideias Ativas</string>
+    <string name="home_metric_projetos">Projetos</string>
+    <string name="home_metric_engajamento">Engajamento</string>
+    <string name="home_metric_minhas_ideias">Minhas Ideias</string>
+    <string name="home_metric_aprovadas">Aprovadas</string>
+    
+    <!-- Hero Card Operador -->
+    <string name="hero_headline_operador">Você viu algo que pode melhorar?</string>
+    <string name="hero_subheadline_operador">Sua experiência no dia a dia é valiosa. Compartilhe suas ideias e ajude a transformar a empresa.</string>
+    <string name="hero_cta_operador">Compartilhar Ideia</string>
+    <string name="home_trend_this_week">esta semana</string>
+    <string name="home_trend_this_month">este mês</string>
+    <string name="home_activity_title">Atividade Recente</string>
+    <string name="home_activity_see_all">Ver todas</string>
+    <string name="home_activity_new_idea">Nova ideia: %1$s</string>
+    <string name="home_activity_time_hours">%1$dh atrás</string>
+    <string name="home_activity_time_days">%1$dd atrás</string>
+    <string name="home_activity_time_minutes">%1$dmin atrás</string>
+    <string name="home_activity_time_just_now">Agora mesmo</string>
+    <string name="cd_status_online">Status online</string>
+    <string name="cd_activity_item">Item de atividade</string>
+    <string name="cd_view_all_activities">Ver todas as atividades</string>
+    
+    <!-- Perfil Screen -->
+    <string name="perfil_titulo">Meu Perfil</string>
+    <string name="perfil_logout">Sair</string>
+    <string name="perfil_conquistas">Minhas Conquistas</string>
+    <string name="perfil_pontos">pontos</string>
+    <string name="perfil_pontos_para_nivel">%1$d pontos para %2$s</string>
+    <string name="perfil_nivel_maximo">Nível máximo alcançado!</string>
+    <string name="perfil_nivel_atual">NÍVEL ATUAL</string>
+    <string name="perfil_conquistas_label">CONQUISTAS</string>
+    
+    <!-- Auth Screen -->
+    <string name="auth_email_label">E-mail</string>
+    <string name="auth_email_placeholder">seu.email@aguiabranca.com.br</string>
+    <string name="auth_password_label">Senha</string>
+    <string name="auth_password_placeholder">Digite sua senha</string>
+    <string name="auth_login_button">Entrar</string>
+    <string name="auth_forgot_password">Esqueci minha senha</string>
+    <string name="auth_demo_section">Demo</string>
+    <string name="auth_login_as">Entrar como:</string>
+    <string name="auth_title">Águia Branca</string>
+    <string name="auth_subtitle">Plataforma de Inovação</string>
+    <string name="cd_show_password">Mostrar senha</string>
+    <string name="cd_hide_password">Ocultar senha</string>
+    
+    <!-- Perfil Labels -->
+    <string name="perfil_operador">Operador</string>
+    <string name="perfil_gestor">Gestor</string>
+    <string name="perfil_lider">Líder</string>
+    
+    <!-- Area Labels -->
+    <string name="area_operacoes">Operações</string>
+    <string name="area_logistica">Logística</string>
+    <string name="area_comercial">Comercial</string>
+    <string name="area_financeiro">Financeiro</string>
+    <string name="area_rh">RH</string>
+    <string name="area_ti">TI</string>
+    <string name="area_marketing">Marketing</string>
+    <string name="area_qualidade">Qualidade</string>
+    
+    <!-- Nova Ideia Screen -->
+    <string name="nova_ideia_tipo_label">Tipo</string>
+    <string name="nova_ideia_area_label">Área de Atuação</string>
+    <string name="nova_ideia_tipo_ideia">Ideia de Melhoria</string>
+    <string name="nova_ideia_tipo_problema">Problema Identificado</string>
+    <string name="nova_ideia_foco_estrategico">Foco Estratégico Atual</string>
+    <string name="nova_ideia_orientacoes_ativas">%1$d orientações ativas</string>
+    <string name="nova_ideia_validation_hint">Preencha título e descrição para habilitar o envio</string>
+    <string name="cd_foco_estrategico">Foco estratégico</string>
+    <string name="cd_expand_orientacoes">Expandir orientações</string>
+    <string name="cd_collapse_orientacoes">Recolher orientações</string>
+    
+    <!-- Errors -->
+    <string name="error_load_ideias">Erro ao carregar ideias</string>
+    <string name="error_load_projetos">Erro ao carregar projetos</string>
+    
+    <!-- Ideia Detalhe -->
+    <string name="ideia_detalhe_titulo">Detalhe da Ideia</string>
+    <string name="ideia_detalhe_autor">Autor</string>
+    <string name="ideia_detalhe_area">Área</string>
+    <string name="ideia_detalhe_nao_encontrada">Ideia não encontrada</string>
+    <string name="ideia_detalhe_iniciar_analise">Iniciar Análise</string>
+    <string name="ideia_detalhe_avaliacao">Avaliação</string>
+    <string name="ideia_detalhe_impacto_estimado">Impacto Estimado: %1$d</string>
+    <string name="ideia_detalhe_esforco_estimado">Esforço Estimado: %1$d</string>
+    <string name="ideia_detalhe_score_priorizacao">Score de Priorização</string>
+    <string name="ideia_detalhe_feedback">Feedback</string>
+    <string name="ideia_detalhe_feedback_placeholder">Deixe seu feedback para o autor da ideia</string>
+    <string name="ideia_detalhe_feedback_gestor">Feedback do Gestor</string>
+    <string name="ideia_detalhe_priorizacao">Priorização</string>
+    <string name="ideia_detalhe_impacto">Impacto</string>
+    <string name="ideia_detalhe_esforco">Esforço</string>
+    <string name="ideia_detalhe_score">Score</string>
+    <string name="ideia_detalhe_acao_sucesso">Ação realizada com sucesso!</string>
+    
+    <!-- Orientacoes -->
+    <string name="orientacao_ativa">Ativa</string>
+    <string name="orientacao_inativa">Inativa</string>
+    <string name="orientacao_prioridade">Prioridade</string>
+    <string name="orientacao_prioridade_critica">Crítica</string>
+    <string name="orientacao_prioridade_baixa">Baixa</string>
+    <string name="orientacao_categoria_label">Categoria</string>
+    <string name="cd_toggle_orientacao">Alternar orientação</string>
+    <string name="cd_delete_orientacao">Excluir</string>
+    
+    <!-- Categorias Orientação -->
+    <string name="categoria_custos">Custos</string>
+    <string name="categoria_qualidade">Qualidade</string>
+    <string name="categoria_cliente">Cliente</string>
+    
+    <!-- Nova Ideia Voice-First -->
+    <string name="nova_ideia_title">Nova Ideia</string>
+    <string name="nova_ideia_recording">Gravando…</string>
+    <string name="nova_ideia_tap_to_speak">Toque para falar</string>
+    <string name="nova_ideia_ai_suggestions">Sugestões da IA</string>
+    <string name="nova_ideia_manual_form">Preencher manualmente</string>
+    <string name="nova_ideia_cancel">Cancelar</string>
+    <string name="nova_ideia_submit">Enviar Ideia</string>
+    <string name="nova_ideia_area_prefix">Área</string>
+    <string name="nova_ideia_impact_prefix">Impacto</string>
+    <string name="nova_ideia_impact_high">Alto</string>
+    <string name="nova_ideia_impact_medium">Médio</string>
+    <string name="nova_ideia_impact_low">Baixo</string>
+    <string name="cd_start_recording">Iniciar gravação de voz</string>
+    <string name="cd_stop_recording">Parar gravação</string>
+    <string name="cd_expand_manual_form">Expandir formulário manual</string>
+    <string name="cd_collapse_manual_form">Recolher formulário manual</string>
+    
+    <!-- Leader Dashboard (Fase 3) -->
+    <string name="leader_resumo_executivo">Resumo Executivo</string>
+    <string name="leader_desempenho_area">Desempenho por Área</string>
+    <string name="leader_desempenho_subtitle">% de ideias com impacto positivo</string>
+    <string name="leader_roi_medio">ROI Médio</string>
+    <string name="leader_tempo_medio">Tempo Médio</string>
+    <string name="leader_nps_interno">NPS Interno</string>
+    <string name="leader_ai_narrative">Análise IA</string>
+    
+    <!-- Gestor Home -->
+    <string name="home_gestor_hero_headline">%1$d ideias aguardam sua avaliação</string>
+    <string name="home_gestor_hero_headline_single">1 ideia aguarda sua avaliação</string>
+    <string name="home_gestor_hero_headline_empty">Todas as ideias foram avaliadas!</string>
+    <string name="home_gestor_hero_subheadline">Sua curadoria transforma ideias em projetos que geram valor real</string>
+    <string name="home_gestor_hero_subheadline_empty">Que tal criar um novo projeto para a próxima grande iniciativa?</string>
+    <string name="home_gestor_hero_cta">Avaliar Ideias</string>
+    <string name="home_gestor_hero_cta_empty">Criar Projeto</string>
+    <string name="home_gestor_metric_pendentes">Pendentes</string>
+    <string name="home_gestor_metric_taxa_conversao">Conversão</string>
+    <string name="home_gestor_avaliar_ideias">Avaliar Ideias</string>
+    <string name="home_gestor_meus_projetos">Meus Projetos</string>
+    <string name="home_gestor_ideias_recentes">Ideias Recentes</string>
+    <string name="home_gestor_ver_todas">Ver todas</string>
+
+    <!-- Projeto Detalhe Premium (Fase 3) -->
+    <string name="projeto_marcos">Marcos do Projeto</string>
+    <string name="projeto_ideias_vinculadas">Ideias Vinculadas</string>
+    <string name="projeto_atualizar_status">Atualizar Status</string>
+    <string name="projeto_prazo">Prazo</string>
+    <string name="projeto_equipe">Equipe</string>
+    <string name="projeto_membros">%1$d membros</string>
 </resources>

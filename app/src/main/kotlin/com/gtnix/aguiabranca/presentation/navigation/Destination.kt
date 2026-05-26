@@ -156,6 +156,16 @@ sealed class Destination(val route: String) {
      * Acessível apenas para LIDER e GESTOR.
      */
     data object Radar : Destination("radar")
+
+    // =========================================================================
+    // LEADER DASHBOARD
+    // =========================================================================
+
+    /**
+     * Dashboard Executivo do Líder - Resumo com IA, métricas e KPIs.
+     * Acessível apenas para LIDER.
+     */
+    data object LeaderDashboard : Destination("leader_dashboard")
 }
 
 /**

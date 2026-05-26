@@ -1,71 +1,101 @@
 package com.gtnix.aguiabranca.presentation.screens.projetos
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.gtnix.aguiabranca.R
+import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.Projeto
 import com.gtnix.aguiabranca.domain.model.StatusProjeto
 import com.gtnix.aguiabranca.domain.repository.ProjetoRepository
 import com.gtnix.aguiabranca.domain.session.UserSession
+import com.gtnix.aguiabranca.presentation.components.AvatarData
+import com.gtnix.aguiabranca.presentation.components.AvatarStack
+import com.gtnix.aguiabranca.presentation.components.GlassCard
+import com.gtnix.aguiabranca.presentation.components.GradientProgressBar
+import com.gtnix.aguiabranca.presentation.components.InovagabButton
+import com.gtnix.aguiabranca.presentation.components.MarcoTimeline
+import com.gtnix.aguiabranca.presentation.components.ProjectTimeline
+import com.gtnix.aguiabranca.presentation.components.ProjetoStatusBadge
+import com.gtnix.aguiabranca.presentation.components.SectionHeader
+import com.gtnix.aguiabranca.presentation.components.TimelineStatus
 import com.gtnix.aguiabranca.presentation.navigation.Destination
-import com.gtnix.aguiabranca.presentation.util.formatCurrency
-import com.gtnix.aguiabranca.presentation.util.formatPercent
+import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
+import com.gtnix.aguiabranca.presentation.util.bounceClick
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
-
-// =========================================================================
-// ViewModel
-// =========================================================================
 
 @HiltViewModel
 class ProjetoDetalheViewModel @Inject constructor(
@@ -93,7 +123,10 @@ class ProjetoDetalheViewModel @Inject constructor(
                         isLoading = false,
                         projeto = projeto,
                         perfil = userSession.perfil,
-                        progressoSlider = projeto?.progresso?.toFloat() ?: 0f
+                        progressoSlider = projeto?.progresso?.toFloat() ?: 0f,
+                        marcos = generateMockMarcos(projeto),
+                        ideiasVinculadas = generateMockIdeiasVinculadas(),
+                        membrosEquipe = generateMockMembros(projeto)
                     )
                 }
             } catch (e: Exception) {
@@ -136,7 +169,104 @@ class ProjetoDetalheViewModel @Inject constructor(
             }
         }
     }
+
+    fun atualizarStatus() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(actionSuccess = true) }
+            delay(2000)
+            _uiState.update { it.copy(actionSuccess = false) }
+        }
+    }
+
+    private fun generateMockMarcos(projeto: Projeto?): List<MarcoTimeline> {
+        if (projeto == null) return emptyList()
+        
+        val progresso = projeto.progresso
+        return listOf(
+            MarcoTimeline(
+                titulo = "Levantamento de Requisitos",
+                data = "10/05/2024",
+                status = if (progresso >= 20) TimelineStatus.COMPLETED else TimelineStatus.FUTURE
+            ),
+            MarcoTimeline(
+                titulo = "Desenvolvimento do MVP",
+                data = "05/06/2024",
+                status = if (progresso >= 40) TimelineStatus.COMPLETED 
+                        else if (progresso >= 20) TimelineStatus.CURRENT 
+                        else TimelineStatus.FUTURE
+            ),
+            MarcoTimeline(
+                titulo = "Testes e Validação",
+                data = "Em andamento",
+                status = if (progresso >= 60) TimelineStatus.COMPLETED 
+                        else if (progresso >= 40) TimelineStatus.CURRENT 
+                        else TimelineStatus.FUTURE
+            ),
+            MarcoTimeline(
+                titulo = "Implantação Piloto",
+                data = "20/06/2024",
+                status = if (progresso >= 80) TimelineStatus.COMPLETED 
+                        else if (progresso >= 60) TimelineStatus.CURRENT 
+                        else TimelineStatus.FUTURE
+            ),
+            MarcoTimeline(
+                titulo = "Lançamento Oficial",
+                data = "30/06/2024",
+                status = if (progresso >= 100) TimelineStatus.COMPLETED 
+                        else if (progresso >= 80) TimelineStatus.CURRENT 
+                        else TimelineStatus.FUTURE
+            )
+        )
+    }
+
+    private fun generateMockIdeiasVinculadas(): List<IdeiaVinculadaSimple> {
+        return listOf(
+            IdeiaVinculadaSimple(
+                id = "1",
+                titulo = "Alertas Inteligentes de Manutenção",
+                descricao = "Reduzir falhas e tempo de inatividade da frota.",
+                upvotes = 128
+            ),
+            IdeiaVinculadaSimple(
+                id = "2",
+                titulo = "Otimização de Rotas com IA",
+                descricao = "Reduzir custo de combustível e melhorar entregas.",
+                upvotes = 96
+            ),
+            IdeiaVinculadaSimple(
+                id = "3",
+                titulo = "Dashboard de Consumo",
+                descricao = "Visualização em tempo real do consumo.",
+                upvotes = 74
+            )
+        )
+    }
+
+    private fun generateMockMembros(projeto: Projeto?): List<AvatarData> {
+        if (projeto == null) return emptyList()
+        
+        val responsavelInitials = projeto.responsavelNome
+            .split(" ")
+            .take(2)
+            .mapNotNull { it.firstOrNull()?.uppercase() }
+            .joinToString("")
+        
+        return listOf(
+            AvatarData(responsavelInitials),
+            AvatarData("JC"),
+            AvatarData("MR"),
+            AvatarData("PL"),
+            AvatarData("TC")
+        )
+    }
 }
+
+data class IdeiaVinculadaSimple(
+    val id: String,
+    val titulo: String,
+    val descricao: String,
+    val upvotes: Int
+)
 
 data class ProjetoDetalheUiState(
     val isLoading: Boolean = false,
@@ -144,12 +274,11 @@ data class ProjetoDetalheUiState(
     val perfil: PerfilUsuario = PerfilUsuario.OPERADOR,
     val progressoSlider: Float = 0f,
     val errorMessage: String? = null,
-    val actionSuccess: Boolean = false
+    val actionSuccess: Boolean = false,
+    val marcos: List<MarcoTimeline> = emptyList(),
+    val ideiasVinculadas: List<IdeiaVinculadaSimple> = emptyList(),
+    val membrosEquipe: List<AvatarData> = emptyList()
 )
-
-// =========================================================================
-// Screen
-// =========================================================================
 
 @Composable
 fun ProjetoDetalheScreen(
@@ -161,9 +290,7 @@ fun ProjetoDetalheScreen(
     ProjetoDetalheContent(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
-        onProgressoChange = viewModel::onProgressoChange,
-        onSalvarProgresso = viewModel::salvarProgresso,
-        onConcluir = viewModel::concluirProjeto
+        onAtualizarStatus = viewModel::atualizarStatus
     )
 }
 
@@ -172,28 +299,47 @@ fun ProjetoDetalheScreen(
 private fun ProjetoDetalheContent(
     uiState: ProjetoDetalheUiState,
     onNavigateBack: () -> Unit,
-    onProgressoChange: (Float) -> Unit,
-    onSalvarProgresso: () -> Unit,
-    onConcluir: () -> Unit
+    onAtualizarStatus: () -> Unit
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
+    
     Scaffold(
+        modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.projeto_detalhe_titulo)) },
+                title = { },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.btn_voltar)
+                            contentDescription = stringResource(R.string.btn_voltar),
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
+        },
+        bottomBar = {
+            if (uiState.projeto != null && 
+                (uiState.perfil == PerfilUsuario.GESTOR || uiState.perfil == PerfilUsuario.LIDER)) {
+                Surface(
+                    color = MaterialTheme.colorScheme.background,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    InovagabButton(
+                        text = stringResource(R.string.projeto_atualizar_status),
+                        onClick = onAtualizarStatus,
+                        leadingIcon = Icons.Default.Refresh,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 16.dp)
+                    )
+                }
+            }
         }
     ) { paddingValues ->
         when {
@@ -204,7 +350,7 @@ private fun ProjetoDetalheContent(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             }
 
@@ -225,57 +371,69 @@ private fun ProjetoDetalheContent(
 
             else -> {
                 val projeto = uiState.projeto
+                var contentVisible by remember { mutableStateOf(false) }
+                
+                LaunchedEffect(Unit) {
+                    contentVisible = true
+                }
+                
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
                         .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    // Project info card
-                    InfoCard(projeto = projeto)
-
-                    // Financial card
-                    FinanceiroCard(projeto = projeto)
-
-                    // Progress section (GESTOR / LIDER only)
-                    if (uiState.perfil == PerfilUsuario.GESTOR || uiState.perfil == PerfilUsuario.LIDER) {
-                        ProgressoCard(
-                            progresso = uiState.progressoSlider,
-                            status = projeto.status,
-                            onProgressoChange = onProgressoChange,
-                            onSalvar = onSalvarProgresso,
-                            onConcluir = onConcluir
+                    AnimatedSection(
+                        visible = contentVisible,
+                        delayMillis = 0
+                    ) {
+                        HeaderSection(
+                            nome = projeto.nome,
+                            status = projeto.status
                         )
                     }
-
-                    if (uiState.actionSuccess) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer
-                            ),
-                            shape = RoundedCornerShape(8.dp)
+                    
+                    AnimatedSection(
+                        visible = contentVisible,
+                        delayMillis = 100
+                    ) {
+                        ProgressSection(
+                            progress = projeto.progresso / 100f
+                        )
+                    }
+                    
+                    AnimatedSection(
+                        visible = contentVisible,
+                        delayMillis = 200
+                    ) {
+                        InfoCardSection(
+                            responsavel = projeto.responsavelNome,
+                            prazo = formatDate(projeto.dataPrevistaConclusao),
+                            membros = uiState.membrosEquipe
+                        )
+                    }
+                    
+                    if (uiState.marcos.isNotEmpty()) {
+                        AnimatedSection(
+                            visible = contentVisible,
+                            delayMillis = 300
                         ) {
-                            Row(
-                                modifier = Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.CheckCircle,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = stringResource(R.string.projeto_detalhe_sucesso),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
+                            MarcosSection(marcos = uiState.marcos)
                         }
                     }
+                    
+                    if (uiState.ideiasVinculadas.isNotEmpty()) {
+                        AnimatedSection(
+                            visible = contentVisible,
+                            delayMillis = 400
+                        ) {
+                            IdeiasVinculadasSection(ideias = uiState.ideiasVinculadas)
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
             }
         }
@@ -283,251 +441,304 @@ private fun ProjetoDetalheContent(
 }
 
 @Composable
-private fun InfoCard(projeto: Projeto) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = projeto.nome,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = projeto.objetivo,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-            )
-            if (projeto.descricao.isNotBlank()) {
-                Text(
-                    text = projeto.descricao,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-            }
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                LabelValue(
-                    label = stringResource(R.string.projeto_detalhe_area),
-                    value = projeto.area.name.replace("_", " ")
-                )
-                LabelValue(
-                    label = stringResource(R.string.projeto_detalhe_responsavel),
-                    value = projeto.responsavelNome,
-                    alignEnd = true
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                LabelValue(
-                    label = stringResource(R.string.projeto_detalhe_status),
-                    value = formatStatus(projeto.status)
-                )
-                LabelValue(
-                    label = stringResource(R.string.projeto_detalhe_progresso),
-                    value = "${projeto.progresso}%",
-                    alignEnd = true
-                )
-            }
+private fun AnimatedSection(
+    visible: Boolean,
+    delayMillis: Int,
+    content: @Composable () -> Unit
+) {
+    var sectionVisible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(visible) {
+        if (visible) {
+            delay(delayMillis.toLong())
+            sectionVisible = true
         }
+    }
+    
+    AnimatedVisibility(
+        visible = sectionVisible,
+        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
+            initialOffsetY = { 40 },
+            animationSpec = tween(300)
+        )
+    ) {
+        content()
     }
 }
 
 @Composable
-private fun FinanceiroCard(projeto: Projeto) {
-    Card(
+private fun HeaderSection(
+    nome: String,
+    status: StatusProjeto
+) {
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        Text(
+            text = nome,
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.weight(1f),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        
+        Spacer(modifier = Modifier.width(12.dp))
+        
+        ProjetoStatusBadge(status = status)
+    }
+}
+
+@Composable
+private fun ProgressSection(progress: Float) {
+    GradientProgressBar(
+        progress = progress,
+        modifier = Modifier.fillMaxWidth(),
+        height = 8.dp,
+        showLabel = true,
+        gradientColors = listOf(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.tertiary
+        )
+    )
+}
+
+@Composable
+private fun InfoCardSection(
+    responsavel: String,
+    prazo: String,
+    membros: List<AvatarData>
+) {
+    GlassCard(modifier = Modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.AccountBalance,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.projeto_detalhe_financeiro),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
+            InfoRow(
+                icon = Icons.Default.Person,
+                label = stringResource(R.string.projeto_detalhe_responsavel),
+                value = responsavel
+            )
+            
+            InfoRow(
+                icon = Icons.Default.CalendarToday,
+                label = stringResource(R.string.projeto_prazo),
+                value = prazo
+            )
+            
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                LabelValue(
-                    label = stringResource(R.string.projeto_detalhe_investimento_estimado),
-                    value = formatCurrency(projeto.investimentoEstimado)
-                )
-                LabelValue(
-                    label = stringResource(R.string.projeto_detalhe_investimento_realizado),
-                    value = formatCurrency(projeto.investimentoRealizado),
-                    alignEnd = true
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                LabelValue(
-                    label = stringResource(R.string.projeto_detalhe_retorno_estimado),
-                    value = formatCurrency(projeto.retornoEstimadoMensal)
-                )
-                LabelValue(
-                    label = stringResource(R.string.projeto_detalhe_retorno_realizado),
-                    value = formatCurrency(projeto.retornoRealizadoMensal),
-                    alignEnd = true
-                )
-            }
-
-            HorizontalDivider()
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                    contentDescription = null,
-                    tint = if (projeto.roi >= 0) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "${stringResource(R.string.projeto_detalhe_roi)}: ${formatPercent(projeto.roi)}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = if (projeto.roi >= 0) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.error
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ProgressoCard(
-    progresso: Float,
-    status: StatusProjeto,
-    onProgressoChange: (Float) -> Unit,
-    onSalvar: () -> Unit,
-    onConcluir: () -> Unit
-) {
-    val canEdit = status == StatusProjeto.EM_ANDAMENTO || status == StatusProjeto.PLANEJADO
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.projeto_detalhe_progresso),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = "${progresso.toInt()}%",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            if (canEdit) {
-                Slider(
-                    value = progresso,
-                    onValueChange = onProgressoChange,
-                    valueRange = 0f..100f,
-                    steps = 19
-                )
-
-                OutlinedButton(
-                    onClick = onSalvar,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(stringResource(R.string.projeto_detalhe_salvar_progresso))
-                }
-
-                if (progresso.toInt() >= 100 && status == StatusProjeto.EM_ANDAMENTO) {
-                    Button(
-                        onClick = onConcluir,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Groups,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.width(12.dp))
+                    
+                    Column {
                         Text(
-                            text = stringResource(R.string.projeto_detalhe_concluir),
-                            fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.projeto_equipe),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                        Text(
+                            text = "${membros.size} membros",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
+                
+                AvatarStack(
+                    avatars = membros,
+                    maxVisible = 3,
+                    avatarSize = 36.dp
+                )
             }
         }
     }
 }
 
 @Composable
-private fun LabelValue(
+private fun InfoRow(
+    icon: ImageVector,
     label: String,
-    value: String,
-    alignEnd: Boolean = false
+    value: String
 ) {
-    Column(
-        horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start
+    Row(
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.outline
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(20.dp)
         )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium
+        
+        Spacer(modifier = Modifier.width(12.dp))
+        
+        Column {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+@Composable
+private fun MarcosSection(marcos: List<MarcoTimeline>) {
+    Column {
+        SectionHeader(
+            title = stringResource(R.string.projeto_marcos),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        
+        ProjectTimeline(
+            marcos = marcos,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
 
-private fun formatStatus(status: StatusProjeto): String = when (status) {
-    StatusProjeto.PLANEJADO -> "Planejado"
-    StatusProjeto.EM_ANDAMENTO -> "Em Andamento"
-    StatusProjeto.PAUSADO -> "Pausado"
-    StatusProjeto.CONCLUIDO -> "Concluído"
-    StatusProjeto.CANCELADO -> "Cancelado"
+@Composable
+private fun IdeiasVinculadasSection(ideias: List<IdeiaVinculadaSimple>) {
+    Column {
+        SectionHeader(
+            title = stringResource(R.string.projeto_ideias_vinculadas),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(end = 20.dp)
+        ) {
+            items(ideias, key = { it.id }) { ideia ->
+                LinkedIdeiaCard(ideia = ideia)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LinkedIdeiaCard(
+    ideia: IdeiaVinculadaSimple,
+    modifier: Modifier = Modifier
+) {
+    val isDarkTheme = isSystemInDarkTheme()
+    
+    Card(
+        modifier = modifier
+            .width(200.dp)
+            .bounceClick {},
+        colors = CardDefaults.cardColors(
+            containerColor = if (isDarkTheme) {
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
+        ),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isDarkTheme) 0.dp else 2.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lightbulb,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                Text(
+                    text = ideia.titulo,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = ideia.descricao,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.TrendingUp,
+                        contentDescription = null,
+                        tint = SuccessGreen,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${ideia.upvotes}",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                
+                Icon(
+                    imageVector = Icons.Default.Lightbulb,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+private fun formatDate(timestamp: Long?): String {
+    if (timestamp == null) return "A definir"
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
+    return sdf.format(Date(timestamp))
 }

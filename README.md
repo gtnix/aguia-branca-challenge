@@ -199,6 +199,7 @@ git clone https://github.com/gtnix/aguia-branca-challenge.git
 |-----------|-----------|
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitetura técnica detalhada |
 | [REQUISITOS.md](docs/REQUISITOS.md) | Levantamento completo de requisitos |
+| [PROMPT_MANUS_UX_RESEARCH.md](docs/PROMPT_MANUS_UX_RESEARCH.md) | Prompt para pesquisa de UI/UX e redesign premium |
 | [material-aula/](docs/material-aula/) | Material de referência FIAP |
 
 ---
@@ -209,4 +210,4 @@ Projeto acadêmico - Challenge FIAP 2026
 
 ---
 
-*Última atualização: 22 de Maio de 2026*
+*Última atualização: 25 de Maio de 2026*

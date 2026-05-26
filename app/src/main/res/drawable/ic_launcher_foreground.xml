@@ -4,37 +4,26 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    
-    <!-- Eagle/Bird silhouette representing "Aguia Branca" -->
+
+    <!-- 
+    INOVAGAB Adaptive Icon Foreground
+    Same concept: Abstract "i" + rising spark
+    Sized for adaptive icon safe zone
+    -->
+
+    <!-- Abstract "i" / upward motion -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M54,28
-            C54,28 42,35 38,42
-            C34,49 35,56 38,60
-            C41,64 46,66 54,68
-            C62,66 67,64 70,60
-            C73,56 74,49 70,42
-            C66,35 54,28 54,28
-            Z
-            M54,38
-            C58,38 62,42 62,48
-            C62,54 58,58 54,58
-            C50,58 46,54 46,48
-            C46,42 50,38 54,38
-            Z
-            M54,72
-            L54,80
-            M46,76
-            L54,72
-            L62,76" />
-    
-    <!-- Stylized "AB" letters -->
+        android:pathData="M49,36
+            L54,28
+            L59,36
+            L59,72
+            L49,72
+            Z" />
+
+    <!-- The spark/dot - orange accent -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M44,45 L54,35 L64,45 L59,45 L54,40 L49,45 Z" />
-    
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M47,52 L47,68 L51,68 L51,62 L57,62 L57,68 L61,68 L61,52 L57,52 L57,58 L51,58 L51,52 Z" />
+        android:fillColor="#FF5C00"
+        android:pathData="M54,22m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
 
 </vector>

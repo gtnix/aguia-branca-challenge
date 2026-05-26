@@ -91,5 +91,9 @@ data class IdeiaEntity(
     
     val impactoEstimado: Int = 0,
     
-    val esforcoEstimado: Int = 0
+    val esforcoEstimado: Int = 0,
+    
+    val upvotes: Int = 0,
+    
+    val temSimilaridade: Boolean = false
 )

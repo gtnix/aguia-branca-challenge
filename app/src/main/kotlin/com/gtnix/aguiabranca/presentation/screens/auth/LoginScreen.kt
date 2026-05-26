@@ -1,7 +1,14 @@
 package com.gtnix.aguiabranca.presentation.screens.auth
 
-import androidx.compose.foundation.Image
+import android.content.res.Configuration
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,20 +18,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.AdminPanelSettings
+import androidx.compose.material.icons.outlined.Engineering
+import androidx.compose.material.icons.outlined.SupervisorAccount
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,8 +45,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,11 +59,18 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -59,45 +78,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 
-/**
- * LoginScreen - Tela de Login
- *
- * ## Conceito FIAP - Material 04A (Telas Profissionais)
- *
- * ### Componentização
- *
- * A tela é dividida em componentes menores reutilizáveis:
- * - `LoginHeader`: Logo e título
- * - `LoginForm`: Campos de email e senha
- * - `DemoLoginSection`: Botões de demo
- *
- * ### Estrutura de Layout (Material 02A)
- *
- * ```
- * Box (container principal, fundo gradiente)
- *   └── Column (conteúdo vertical, centralizado)
- *         ├── LoginHeader
- *         ├── Card (formulário)
- *         │     └── Column
- *         │           ├── OutlinedTextField (email)
- *         │           ├── OutlinedTextField (senha)
- *         │           ├── Button (login)
- *         │           └── TextButton (esqueci senha)
- *         └── DemoLoginSection
- * ```
- *
- * ### State Hoisting
- *
- * O estado vive no ViewModel, não no Composable.
- * A Screen recebe estado e emite eventos.
- *
- * @param viewModel ViewModel injetado pelo Hilt
- * @param onLoginSuccess Callback quando login tem sucesso
- */
+// Águia Branca brand blue palette - inspired by Brazilian sky
+private val LoginGradient = listOf(
+    Color(0xFF0A2540),  // Deep navy - brand primary
+    Color(0xFF0F3460),  // Mid navy
+    Color(0xFF16537E)   // Lighter navy
+)
+
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
@@ -121,11 +113,6 @@ fun LoginScreen(
     )
 }
 
-/**
- * Conteúdo da tela de Login - Stateless.
- *
- * Separar content permite preview sem ViewModel.
- */
 @Composable
 private fun LoginScreenContent(
     uiState: LoginUiState,
@@ -135,20 +122,64 @@ private fun LoginScreenContent(
     onDemoLogin: (PerfilUsuario) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    
+    val infiniteTransition = rememberInfiniteTransition(label = "backgroundAnim")
+    val glowScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(4000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glowScale"
+    )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.primaryContainer
-                    )
-                )
+                brush = Brush.verticalGradient(colors = LoginGradient)
             )
             .imePadding()
     ) {
+        // Subtle orange glow - innovation accent (brand secondary color)
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = 100.dp, y = (-60).dp)
+                .size(300.dp)
+                .scale(glowScale)
+                .blur(180.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            Color(0xFFFF5C00).copy(alpha = 0.12f),
+                            Color.Transparent
+                        )
+                    ),
+                    shape = CircleShape
+                )
+        )
+        
+        // Subtle blue glow - brand reinforcement
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .offset(x = (-80).dp, y = 100.dp)
+                .size(260.dp)
+                .scale(glowScale * 0.9f)
+                .blur(160.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            Color(0xFF3B82F6).copy(alpha = 0.08f),
+                            Color.Transparent
+                        )
+                    ),
+                    shape = CircleShape
+                )
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -157,149 +188,177 @@ private fun LoginScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Header com logo e título
-            LoginHeader()
+            Spacer(modifier = Modifier.height(40.dp))
+            
+            PremiumLoginHeader()
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            GlassLoginCard(
+                email = uiState.email,
+                senha = uiState.senha,
+                isLoading = uiState.isLoading,
+                errorMessage = uiState.errorMessage,
+                onEmailChange = onEmailChange,
+                onSenhaChange = onSenhaChange,
+                onLoginClick = onLoginClick,
+                onMoveFocus = { focusManager.moveFocus(FocusDirection.Down) },
+                onClearFocus = { focusManager.clearFocus() }
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Card do formulário
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Campo de Email
-                    LoginTextField(
-                        value = uiState.email,
-                        onValueChange = onEmailChange,
-                        label = "E-mail",
-                        placeholder = "seu.email@aguiabranca.com.br",
-                        leadingIcon = Icons.Default.Email,
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next,
-                        onImeAction = { focusManager.moveFocus(FocusDirection.Down) }
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Campo de Senha
-                    PasswordTextField(
-                        value = uiState.senha,
-                        onValueChange = onSenhaChange,
-                        label = "Senha",
-                        onImeAction = { 
-                            focusManager.clearFocus()
-                            onLoginClick()
-                        }
-                    )
-
-                    // Mensagem de erro
-                    if (uiState.errorMessage != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = uiState.errorMessage,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Botão de Login
-                    Button(
-                        onClick = onLoginClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        enabled = !uiState.isLoading,
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        if (uiState.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        } else {
-                            Text(
-                                text = "Entrar",
-                                style = MaterialTheme.typography.labelLarge
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Link "Esqueci minha senha"
-                    TextButton(onClick = { /* TODO */ }) {
-                        Text(
-                            text = "Esqueci minha senha",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Seção de login demo (para testes)
-            DemoLoginSection(onDemoLogin = onDemoLogin)
+            PremiumDemoSection(onDemoLogin = onDemoLogin)
+            
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 }
 
-/**
- * Header da tela de login com logo e título.
- */
 @Composable
-private fun LoginHeader() {
+private fun PremiumLoginHeader() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Ícone representando o logo
         Icon(
-            imageVector = Icons.Default.Business,
-            contentDescription = "Logo Águia Branca",
+            painter = painterResource(id = R.drawable.ic_inovagab_logo),
+            contentDescription = stringResource(R.string.cd_logo),
             modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.onPrimary
+            tint = Color.Unspecified
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Águia Branca",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onPrimary
+            text = stringResource(R.string.auth_title),
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            letterSpacing = (-0.5).sp
         )
+        
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "Plataforma de Inovação",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+            text = stringResource(R.string.auth_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.White.copy(alpha = 0.6f)
         )
     }
 }
 
-/**
- * Campo de texto customizado para login.
- *
- * ## Conceito FIAP - Material 04A
- *
- * OutlinedTextField é um componente Material que:
- * - Mostra borda quando focado
- * - Suporta label, placeholder, ícones
- * - Configura teclado específico (email, número, etc.)
- */
 @Composable
-private fun LoginTextField(
+private fun GlassLoginCard(
+    email: String,
+    senha: String,
+    isLoading: Boolean,
+    errorMessage: String?,
+    onEmailChange: (String) -> Unit,
+    onSenhaChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
+    onMoveFocus: () -> Unit,
+    onClearFocus: () -> Unit
+) {
+    val shape = RoundedCornerShape(24.dp)
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                1.dp,
+                Color.White.copy(alpha = 0.15f),
+                shape
+            ),
+        shape = shape,
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.08f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            GlassTextField(
+                value = email,
+                onValueChange = onEmailChange,
+                label = stringResource(R.string.auth_email_label),
+                placeholder = stringResource(R.string.auth_email_placeholder),
+                leadingIcon = Icons.Default.Email,
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
+                onImeAction = onMoveFocus
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            GlassPasswordField(
+                value = senha,
+                onValueChange = onSenhaChange,
+                label = stringResource(R.string.auth_password_label),
+                onImeAction = {
+                    onClearFocus()
+                    onLoginClick()
+                }
+            )
+
+            if (errorMessage != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = errorMessage,
+                    color = Color(0xFFFF6B6B),
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = onLoginClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                enabled = !isLoading,
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = Color.White,
+                    disabledContainerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                )
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.auth_login_button),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            TextButton(onClick = { }) {
+                Text(
+                    text = stringResource(R.string.auth_forgot_password),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.7f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GlassTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -313,12 +372,13 @@ private fun LoginTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
+        label = { Text(label, color = Color.White.copy(alpha = 0.7f)) },
+        placeholder = { Text(placeholder, color = Color.White.copy(alpha = 0.4f)) },
         leadingIcon = {
             Icon(
                 imageVector = leadingIcon,
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.7f)
             )
         },
         keyboardOptions = KeyboardOptions(
@@ -330,71 +390,79 @@ private fun LoginTextField(
             onDone = { onImeAction() }
         ),
         singleLine = true,
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White.copy(alpha = 0.9f),
+            focusedBorderColor = Color.White.copy(alpha = 0.5f),
+            unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+            focusedLabelColor = Color.White,
+            unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
+            cursorColor = Color.White,
+            focusedContainerColor = Color.White.copy(alpha = 0.05f),
+            unfocusedContainerColor = Color.White.copy(alpha = 0.03f)
+        )
     )
 }
 
-/**
- * Campo de senha com toggle de visibilidade.
- */
 @Composable
-private fun PasswordTextField(
+private fun GlassPasswordField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
     onImeAction: () -> Unit
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
+    val passwordPlaceholder = stringResource(R.string.auth_password_placeholder)
+    val showPasswordDesc = stringResource(R.string.cd_show_password)
+    val hidePasswordDesc = stringResource(R.string.cd_hide_password)
 
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
-        label = { Text(label) },
-        placeholder = { Text("Digite sua senha") },
+        label = { Text(label, color = Color.White.copy(alpha = 0.7f)) },
+        placeholder = { Text(passwordPlaceholder, color = Color.White.copy(alpha = 0.4f)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Lock,
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.7f)
             )
         },
         trailingIcon = {
             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                 Icon(
-                    imageVector = if (passwordVisible) 
-                        Icons.Default.VisibilityOff 
-                    else 
-                        Icons.Default.Visibility,
-                    contentDescription = if (passwordVisible) 
-                        "Ocultar senha" 
-                    else 
-                        "Mostrar senha"
+                    imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    contentDescription = if (passwordVisible) hidePasswordDesc else showPasswordDesc,
+                    tint = Color.White.copy(alpha = 0.7f)
                 )
             }
         },
-        visualTransformation = if (passwordVisible) 
-            VisualTransformation.None 
-        else 
-            PasswordVisualTransformation(),
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
         ),
-        keyboardActions = KeyboardActions(
-            onDone = { onImeAction() }
-        ),
+        keyboardActions = KeyboardActions(onDone = { onImeAction() }),
         singleLine = true,
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White.copy(alpha = 0.9f),
+            focusedBorderColor = Color.White.copy(alpha = 0.5f),
+            unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+            focusedLabelColor = Color.White,
+            unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
+            cursorColor = Color.White,
+            focusedContainerColor = Color.White.copy(alpha = 0.05f),
+            unfocusedContainerColor = Color.White.copy(alpha = 0.03f)
+        )
     )
 }
 
-/**
- * Seção de login de demonstração.
- *
- * Permite testar o app sem ter dados no banco.
- */
 @Composable
-private fun DemoLoginSection(
+private fun PremiumDemoSection(
     onDemoLogin: (PerfilUsuario) -> Unit
 ) {
     Column(
@@ -407,46 +475,49 @@ private fun DemoLoginSection(
         ) {
             HorizontalDivider(
                 modifier = Modifier.weight(1f),
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+                color = Color.White.copy(alpha = 0.15f)
             )
             Text(
-                text = "  Demo  ",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                text = "  ${stringResource(R.string.auth_demo_section)}  ",
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.White.copy(alpha = 0.5f)
             )
             HorizontalDivider(
                 modifier = Modifier.weight(1f),
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+                color = Color.White.copy(alpha = 0.15f)
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Entrar como:",
+            text = stringResource(R.string.auth_login_as),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f)
+            color = Color.White.copy(alpha = 0.7f)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            DemoButton(
+            DemoProfileChip(
                 modifier = Modifier.weight(1f),
-                label = "Operador",
+                label = stringResource(R.string.perfil_operador),
+                icon = Icons.Outlined.Engineering,
                 onClick = { onDemoLogin(PerfilUsuario.OPERADOR) }
             )
-            DemoButton(
+            DemoProfileChip(
                 modifier = Modifier.weight(1f),
-                label = "Gestor",
+                label = stringResource(R.string.perfil_gestor),
+                icon = Icons.Outlined.SupervisorAccount,
                 onClick = { onDemoLogin(PerfilUsuario.GESTOR) }
             )
-            DemoButton(
+            DemoProfileChip(
                 modifier = Modifier.weight(1f),
-                label = "Líder",
+                label = stringResource(R.string.perfil_lider),
+                icon = Icons.Outlined.AdminPanelSettings,
                 onClick = { onDemoLogin(PerfilUsuario.LIDER) }
             )
         }
@@ -454,42 +525,78 @@ private fun DemoLoginSection(
 }
 
 @Composable
-private fun DemoButton(
+private fun DemoProfileChip(
     modifier: Modifier = Modifier,
     label: String,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = modifier,
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        )
+    val shape = RoundedCornerShape(16.dp)
+    
+    Surface(
+        modifier = modifier
+            .border(
+                1.dp,
+                Color.White.copy(alpha = 0.15f),
+                shape
+            ),
+        color = Color.White.copy(alpha = 0.08f),
+        shape = shape,
+        onClick = onClick
     ) {
-        Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp)
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(start = 4.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(
+                        Color.White.copy(alpha = 0.1f),
+                        CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium,
+                color = Color.White.copy(alpha = 0.9f),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun LoginScreenPreview() {
+    InovagabTheme {
+        LoginScreenContent(
+            uiState = LoginUiState(),
+            onEmailChange = {},
+            onSenhaChange = {},
+            onLoginClick = {},
+            onDemoLogin = {}
         )
     }
 }
 
-/**
- * Preview da tela de Login.
- *
- * ## Conceito FIAP - Preview
- *
- * O @Preview permite visualizar a UI no Android Studio
- * sem precisar rodar no emulador. Útil para desenvolvimento!
- */
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun LoginScreenPreview() {
+private fun LoginScreenDarkPreview() {
     InovagabTheme {
         LoginScreenContent(
             uiState = LoginUiState(),
