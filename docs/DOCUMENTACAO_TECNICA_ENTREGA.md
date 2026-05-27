@@ -25,6 +25,7 @@
 | **Solução entregue** | **Inovagab** — aplicativo Android nativo para gestão integrada de inovação corporativa |
 | **Sprint** | Sprint 1 — entrega 26/05/2026 |
 | **Repositório** | `gtnix/aguia-branca-challenge` |
+| **Vídeo demonstrativo** | https://youtu.be/9FJmqSRNSkQ (~7 min; ver §9.1) |
 
 Este documento descreve a implementação técnica do aplicativo móvel desenvolvido, atendendo ao entregável oficial de **Documentação Técnica** (PDF ou PPT) com tecnologias utilizadas, arquitetura da solução e fluxo da aplicação.
 
@@ -309,7 +310,18 @@ cd aguia-branca-challenge
 | 1 | Aplicativo móvel | APK Android | Em finalização |
 | 2 | Código-fonte | `.zip` do repositório | Repositório GitHub |
 | 3 | **Documentação técnica** | **PDF** (este documento) | ✅ |
-| 4 | Vídeo demonstrativo | Máx. 5 minutos | Pendente |
+| 4 | Vídeo demonstrativo | Máx. 5 minutos | ✅ (~7 min — ver §9.1) |
+
+### 9.1 Vídeo demonstrativo
+
+| Item | Detalhe |
+|------|---------|
+| **URL** | https://youtu.be/9FJmqSRNSkQ |
+| **Duração** | ~7 minutos |
+| **Conteúdo** | Demonstração das principais funcionalidades: três perfis (Operador, Gestor, Líder), fluxo de ideias e projetos, Radar de Inovação (integração REST), dashboard executivo |
+| **Autores na gravação** | Grupo 82 — André Luiz Oliveira da Silva (RM 565836) e Giuliana Abe Takara (RM 562736) |
+
+> **Nota:** O enunciado recomenda vídeo de até 5 minutos; esta gravação tem ~7 minutos para cobrir todos os requisitos funcionais do PDF GAB (priorização, CRUD orientações, detalhe de projetos, Radar e dashboard).
 
 Critérios de avaliação FIAP: adequação (20%), implementação (30%), qualidade de código (25%), documentação/apresentação (15%), criatividade (10%).
 

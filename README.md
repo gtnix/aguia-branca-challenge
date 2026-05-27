@@ -186,7 +186,7 @@ git clone https://github.com/gtnix/aguia-branca-challenge.git
 - [x] Testes unitários (UseCases + ViewModels)
 - [x] Gamificação (pontuação, conquistas, ranking)
 - [ ] APK release
-- [ ] Vídeo demonstrativo
+- [x] Vídeo demonstrativo — https://youtu.be/9FJmqSRNSkQ
 
 ### Sprint 2 (2º Semestre)
 - Backend Java/C#
@@ -204,6 +204,10 @@ git clone https://github.com/gtnix/aguia-branca-challenge.git
 | Giuliana Takara | - | - |
 
 ---
+
+## Entregas
+
+- Vídeo demonstrativo: https://youtu.be/9FJmqSRNSkQ
 
 ## Documentação
 

@@ -17,6 +17,7 @@ import markdown
 DOCS = Path(__file__).resolve().parent
 MD_FILE = DOCS / "DOCUMENTACAO_TECNICA_ENTREGA.md"
 PDF_FILE = DOCS / "DOCUMENTACAO_TECNICA_ENTREGA.pdf"
+VIDEO_URL = "https://youtu.be/9FJmqSRNSkQ"
 
 FIAP_CSS = """
 @page {
@@ -148,6 +149,12 @@ pre code { background: transparent; color: inherit; padding: 0; }
 
 a { color: #b5121b; text-decoration: none; }
 hr { border: 0; border-top: 1px solid #ddd; margin: 12pt 0; }
+
+.doc-footer {
+    margin-top: 24pt; padding-top: 8pt;
+    border-top: 1px solid #ddd;
+    font-size: 8pt; color: #666; text-align: center;
+}
 """
 
 COVER_PAGE = """
@@ -172,6 +179,12 @@ COVER_PAGE = """
     <div class="cover-footer">
         <div class="city-date">S&atilde;o Paulo &mdash; Maio de 2026</div>
     </div>
+</div>
+"""
+
+VIDEO_FOOTER = f"""
+<div class="doc-footer">
+    V&iacute;deo demonstrativo: <a href="{VIDEO_URL}">{VIDEO_URL}</a>
 </div>
 """
 
@@ -263,6 +276,7 @@ def main() -> int:
 <body>
 {COVER_PAGE}
 {body_html}
+{VIDEO_FOOTER}
 </body>
 </html>"""
 
