@@ -32,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -78,10 +80,13 @@ private fun NovaOrientacaoScreenContent(
 ) {
     var categoriaExpanded by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
     val isFormValid = uiState.titulo.isNotBlank() && uiState.descricao.isNotBlank()
 
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
+    LaunchedEffect(uiState.errorMessageRes) {
+        uiState.errorMessageRes?.let { messageRes ->
+            snackbarHostState.showSnackbar(context.getString(messageRes))
+        }
     }
 
     Scaffold(
@@ -109,7 +114,7 @@ private fun NovaOrientacaoScreenContent(
                 placeholder = { Text("Ex: Reduzir custos operacionais em 15%") },
                 singleLine = true,
                 shape = MaterialTheme.shapes.small,
-                isError = uiState.errorMessage != null && uiState.titulo.isBlank()
+                isError = uiState.errorMessageRes != null && uiState.titulo.isBlank()
             )
 
             OutlinedTextField(
@@ -121,7 +126,7 @@ private fun NovaOrientacaoScreenContent(
                 label = { Text("Descrição *") },
                 placeholder = { Text("Descreva a orientação estratégica e seus objetivos") },
                 shape = MaterialTheme.shapes.small,
-                isError = uiState.errorMessage != null && uiState.descricao.isBlank()
+                isError = uiState.errorMessageRes != null && uiState.descricao.isBlank()
             )
 
             ExposedDropdownMenuBox(
@@ -202,9 +207,9 @@ private fun NovaOrientacaoScreenContent(
                 }
             }
 
-            if (uiState.errorMessage != null) {
+            uiState.errorMessageRes?.let { messageRes ->
                 Text(
-                    text = uiState.errorMessage,
+                    text = stringResource(messageRes),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -221,11 +226,19 @@ private fun NovaOrientacaoScreenContent(
                 shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     disabledContainerColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                     disabledContentColor = MaterialTheme.colorScheme.outline
                 )
             ) {
-                Text(if (uiState.isLoading) "Salvando..." else "Criar Orientação")
+                Text(
+                    text = if (uiState.isLoading) "Salvando..." else "Criar Orientação",
+                    color = if (!uiState.isLoading && isFormValid) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        MaterialTheme.colorScheme.outline
+                    }
+                )
             }
 
             if (!isFormValid && !uiState.isLoading) {
@@ -244,7 +257,7 @@ private fun getCategoriaLabel(categoria: CategoriaOrientacao): String {
         CategoriaOrientacao.REDUCAO_CUSTOS -> "Redução de Custos"
         CategoriaOrientacao.QUALIDADE_SERVICO -> "Qualidade de Serviço"
         CategoriaOrientacao.INOVACAO_TECNOLOGICA -> "Inovação Tecnológica"
-        CategoriaOrientacao.SUSTENTABILIDADE -> "Sustentabilidade (ESG)"
+        CategoriaOrientacao.SUSTENTABILIDADE -> "Sustentabilidade"
         CategoriaOrientacao.SEGURANCA -> "Segurança do Trabalho"
         CategoriaOrientacao.EXPERIENCIA_CLIENTE -> "Experiência do Cliente"
         CategoriaOrientacao.EFICIENCIA_OPERACIONAL -> "Eficiência Operacional"

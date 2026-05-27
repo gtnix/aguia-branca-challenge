@@ -1,12 +1,6 @@
 package com.gtnix.aguiabranca.presentation.components
 
 import android.content.res.Configuration
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -23,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Button
@@ -33,12 +26,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -51,23 +41,12 @@ import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 fun InspirationHeroCard(
     headline: String,
     subheadline: String,
-    ctaText: String,
-    onCtaClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    ctaText: String? = null,
+    onCtaClick: (() -> Unit)? = null
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val shape = RoundedCornerShape(24.dp)
-    
-    val infiniteTransition = rememberInfiniteTransition(label = "glow")
-    val glowScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.15f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "glowScale"
-    )
     
     val gradientColors = if (isDarkTheme) {
         listOf(
@@ -98,25 +77,6 @@ fun InspirationHeroCard(
             )
             .border(1.dp, borderColor, shape)
     ) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 8.dp, end = 8.dp)
-                .size(120.dp)
-                .scale(glowScale)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
-                            Color.Transparent
-                        ),
-                        center = Offset.Unspecified,
-                        radius = 200f
-                    )
-                )
-        )
-        
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -125,7 +85,7 @@ fun InspirationHeroCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(56.dp)
                     .background(
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
                         CircleShape
@@ -135,11 +95,11 @@ fun InspirationHeroCard(
                 Icon(
                     imageVector = Icons.Default.Lightbulb,
                     contentDescription = null,
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(28.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(20.dp))
             
             Text(
@@ -159,30 +119,32 @@ fun InspirationHeroCard(
                 textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Button(
-                onClick = onCtaClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AutoAwesome,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = ctaText,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
+            if (ctaText != null && onCtaClick != null) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = onCtaClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = ctaText,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }

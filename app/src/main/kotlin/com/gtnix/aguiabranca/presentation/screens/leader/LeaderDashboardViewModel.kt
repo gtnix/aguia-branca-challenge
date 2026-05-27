@@ -1,17 +1,22 @@
 package com.gtnix.aguiabranca.presentation.screens.leader
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gtnix.aguiabranca.domain.model.AreaAtuacao
+import com.gtnix.aguiabranca.R
+import com.gtnix.aguiabranca.domain.usecase.dashboard.AreaDesempenhoMetric
 import com.gtnix.aguiabranca.domain.usecase.dashboard.GetDashboardUseCase
 import com.gtnix.aguiabranca.domain.util.Result
-import com.gtnix.aguiabranca.presentation.components.BarChartData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,108 +25,81 @@ class LeaderDashboardViewModel @Inject constructor(
     private val getDashboardUseCase: GetDashboardUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LeaderDashboardUiState())
-    val uiState: StateFlow<LeaderDashboardUiState> = _uiState.asStateFlow()
+    private val _refreshTrigger = MutableStateFlow(0)
+    private val _isRefreshing = MutableStateFlow(false)
 
-    init {
-        carregarDados()
-    }
+    private val dashboardResult = _refreshTrigger
+        .flatMapLatest {
+            getDashboardUseCase()
+                .onStart { emit(Result.Loading) }
+        }
+        .flowOn(Dispatchers.IO)
 
-    fun carregarDados() {
-        _uiState.value = _uiState.value.copy(isLoading = true)
-        
-        viewModelScope.launch {
-            getDashboardUseCase().collect { result ->
-                when (result) {
-                    is Result.Success -> {
-                        val data = result.data
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            isRefreshing = false,
-                            aiNarrative = generateAINarrative(data.totalIdeias, data.roiConsolidado),
-                            desempenhoAreas = generateDesempenhoAreas(),
-                            roiMedio = data.roiConsolidado,
-                            tempoMedio = 45,
-                            npsInterno = 87,
-                            totalIdeias = data.totalIdeias,
-                            ideiasAprovadas = data.ideiasAprovadas,
-                            projetosAtivos = data.totalProjetos,
-                            investimentoTotal = data.investimentoTotal,
-                            retornoTotal = data.retornoTotal,
-                            errorMessage = null
-                        )
-                    }
-                    is Result.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            isRefreshing = false,
-                            aiNarrative = generateMockAINarrative(),
-                            desempenhoAreas = generateDesempenhoAreas(),
-                            roiMedio = 22.0,
-                            tempoMedio = 45,
-                            npsInterno = 87,
-                            totalIdeias = 47,
-                            ideiasAprovadas = 18,
-                            projetosAtivos = 7,
-                            investimentoTotal = 350000.0,
-                            retornoTotal = 480000.0,
-                            errorMessage = null
-                        )
-                    }
-                    is Result.Loading -> {
-                        _uiState.value = _uiState.value.copy(isLoading = true)
-                    }
-                }
+    val uiState: StateFlow<LeaderDashboardUiState> = combine(
+        _isRefreshing,
+        dashboardResult
+    ) { isRefreshing, result ->
+        when (result) {
+            is Result.Success -> {
+                val data = result.data
+                LeaderDashboardUiState(
+                    isLoading = false,
+                    isRefreshing = isRefreshing,
+                    aiNarrative = generateAINarrative(data.totalIdeias, data.roiConsolidado),
+                    desempenhoAreas = data.desempenhoPorArea,
+                    roiMedio = data.roiConsolidado,
+                    tempoMedio = data.tempoMedioAprovacaoDias,
+                    totalIdeias = data.totalIdeias,
+                    ideiasAprovadas = data.ideiasAprovadas,
+                    ideiasEmProjeto = data.ideiasEmProjeto,
+                    projetosAtivos = data.totalProjetos,
+                    investimentoTotal = data.investimentoTotal,
+                    retornoTotal = data.retornoTotal,
+                    errorMessageRes = null
+                )
             }
+            is Result.Error -> LeaderDashboardUiState(
+                isLoading = false,
+                isRefreshing = isRefreshing,
+                errorMessageRes = R.string.error_load_dashboard
+            )
+            is Result.Loading -> LeaderDashboardUiState(
+                isLoading = true,
+                isRefreshing = isRefreshing
+            )
         }
     }
+        .flowOn(Dispatchers.Default)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = LeaderDashboardUiState(isLoading = true)
+        )
 
     fun refresh() {
-        if (_uiState.value.isRefreshing) return
-        
-        _uiState.value = _uiState.value.copy(isRefreshing = true)
-        
+        if (_isRefreshing.value) return
+
         viewModelScope.launch {
-            delay(500)
-            carregarDados()
+            _isRefreshing.value = true
+            _refreshTrigger.value += 1
+            delay(REFRESH_DEBOUNCE_MS)
+            _isRefreshing.value = false
         }
     }
 
     private fun generateAINarrative(totalIdeias: Int, roi: Double): String {
-        return "Esta semana, a divisão de Logística registrou um aumento de 40% em ideias " +
-               "voltadas para redução de custos. Três novos projetos foram iniciados, " +
-               "com previsão de ROI consolidado de ${String.format("%.0f", roi)}% a.a."
+        return when {
+            totalIdeias == 0 ->
+                "Ainda não há ideias registradas. Incentive a equipe a submeter propostas alinhadas às orientações estratégicas."
+            roi > 0 ->
+                "O portfólio de inovação conta com $totalIdeias ideias ativas, com ROI consolidado de ${String.format("%.0f", roi)}% a.a."
+            else ->
+                "O portfólio de inovação conta com $totalIdeias ideias ativas. Acompanhe a conversão em projetos para elevar o retorno."
+        }
     }
 
-    private fun generateMockAINarrative(): String {
-        return "Esta semana, a divisão de Logística registrou um aumento de 40% em ideias " +
-               "voltadas para redução de custos. Três novos projetos foram iniciados, " +
-               "com previsão de ROI consolidado de 22% a.a."
-    }
-
-    private fun generateDesempenhoAreas(): List<BarChartData> {
-        return listOf(
-            BarChartData(
-                label = "Logística",
-                value = 40f,
-                color = Color(0xFF00D4B2)
-            ),
-            BarChartData(
-                label = "Qualidade",
-                value = 32f,
-                color = Color(0xFF00D4B2)
-            ),
-            BarChartData(
-                label = "RH",
-                value = 18f,
-                color = Color(0xFFFF7A00)
-            ),
-            BarChartData(
-                label = "TI",
-                value = 12f,
-                color = Color(0xFFFF7A00)
-            )
-        )
+    companion object {
+        private const val REFRESH_DEBOUNCE_MS = 400L
     }
 }
 
@@ -129,14 +107,14 @@ data class LeaderDashboardUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val aiNarrative: String = "",
-    val desempenhoAreas: List<BarChartData> = emptyList(),
+    val desempenhoAreas: List<AreaDesempenhoMetric> = emptyList(),
     val roiMedio: Double = 0.0,
     val tempoMedio: Int = 0,
-    val npsInterno: Int = 0,
     val totalIdeias: Int = 0,
     val ideiasAprovadas: Int = 0,
+    val ideiasEmProjeto: Int = 0,
     val projetosAtivos: Int = 0,
     val investimentoTotal: Double = 0.0,
     val retornoTotal: Double = 0.0,
-    val errorMessage: String? = null
+    val errorMessageRes: Int? = null
 )

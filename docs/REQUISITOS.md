@@ -371,14 +371,18 @@ O documento convida a implementar melhorias para promover engajamento:
 | Atualizar progresso do projeto | ✅ Implementado | Campo progresso 0-100% |
 | Diferenciação por perfil | ✅ Implementado | Home e ações por perfil |
 | Radar de Inovação | ✅ Implementado | Startups parceiras |
+| CRUD de Orientações (Líder) | ✅ Implementado | Criar, listar, editar, excluir, detalhe |
+| Dashboard executivo (Líder) | ✅ Implementado | ROI, investimento, retorno, funil de inovação |
+| Testes unitários | ✅ Implementado | UseCases e ViewModels com fakes |
+| Gamificação | ✅ Implementado | Pontuação, níveis, conquistas, ranking |
+| Captura por voz | ✅ Implementado | SpeechRecognizer para ideias |
 
 ### Requisitos Pendentes
 
 | Gap | Gravidade | Descrição |
 |-----|-----------|-----------|
-| CRUD de Orientações | **ALTA** | Telas de criar/editar orientações para Líder |
-| Dashboard executivo | **ALTA** | Métricas consolidadas (ROI total, investimento, retorno) |
-| Testes unitários | MÉDIA | Cobertura de testes para ViewModels e UseCases |
+| APK release | **ALTA** | Gerar APK assinado para entrega |
+| Vídeo demonstrativo | **ALTA** | Gravar vídeo de até 5 minutos |
 | Notificações | BAIXA | Avisos de mudança de status |
 
 ---

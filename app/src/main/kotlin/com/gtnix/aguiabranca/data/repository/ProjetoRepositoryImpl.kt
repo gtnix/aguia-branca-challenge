@@ -12,9 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-/**
- * Implementação do ProjetoRepository
- */
 class ProjetoRepositoryImpl @Inject constructor(
     private val dao: ProjetoDao,
     private val mapper: ProjetoMapper

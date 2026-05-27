@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,10 +37,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
 
 enum class InovagabButtonVariant {
     Primary,
     Secondary,
+    Success,
     Ghost,
     Neutral
 }
@@ -67,7 +70,9 @@ fun InovagabButton(
     
     val buttonShape = RoundedCornerShape(16.dp)
     
-    val buttonModifier = modifier.scale(scale)
+    val buttonModifier = modifier
+        .defaultMinSize(minHeight = 48.dp)
+        .scale(scale)
     
     when (variant) {
         InovagabButtonVariant.Primary -> {
@@ -79,8 +84,8 @@ fun InovagabButton(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary,
-                    disabledContainerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f),
-                    disabledContentColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.38f)
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
                 interactionSource = interactionSource
@@ -106,6 +111,25 @@ fun InovagabButton(
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = MaterialTheme.colorScheme.secondary,
                     disabledContentColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.38f)
+                ),
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
+                interactionSource = interactionSource
+            ) {
+                ButtonContent(text = text, leadingIcon = leadingIcon)
+            }
+        }
+
+        InovagabButtonVariant.Success -> {
+            Button(
+                onClick = onClick,
+                modifier = buttonModifier,
+                enabled = enabled,
+                shape = buttonShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = SuccessGreen,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = SuccessGreen.copy(alpha = 0.38f),
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.38f)
                 ),
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
                 interactionSource = interactionSource

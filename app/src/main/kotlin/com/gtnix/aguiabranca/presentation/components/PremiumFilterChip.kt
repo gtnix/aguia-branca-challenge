@@ -49,7 +49,9 @@ fun PremiumFilterChip(
     )
 
     Surface(
-        modifier = modifier.bounceClick(onClick = onClick),
+        modifier = modifier
+            .padding(vertical = 4.dp)
+            .bounceClick(onClick = onClick),
         shape = RoundedCornerShape(100),
         color = containerColor
     ) {

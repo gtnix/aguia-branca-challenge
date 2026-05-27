@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,12 +16,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
@@ -35,11 +35,8 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,6 +50,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,6 +76,7 @@ fun FloatingNavBar(
 ) {
     val effectiveLabel = centerActionLabel ?: stringResource(R.string.nav_nova_ideia)
     val isDarkTheme = isSystemInDarkTheme()
+    val haptic = LocalHapticFeedback.current
     val pillShape = RoundedCornerShape(32.dp)
     
     val backgroundColor = if (isDarkTheme) {
@@ -93,14 +93,14 @@ fun FloatingNavBar(
     
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .wrapContentWidth()
             .navigationBarsPadding()
             .padding(bottom = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (centerAction != null) {
-            FloatingActionButton(
-                onClick = centerAction,
+            val fabInteractionSource = remember { MutableInteractionSource() }
+            Box(
                 modifier = Modifier
                     .size(56.dp)
                     .shadow(
@@ -108,22 +108,27 @@ fun FloatingNavBar(
                         shape = CircleShape,
                         ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
                         spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                    )
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .clickable(
+                        interactionSource = fabInteractionSource,
+                        indication = null,
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            centerAction()
+                        }
                     ),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp
-                )
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = effectiveLabel,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(28.dp),
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
         }
         
@@ -170,7 +175,7 @@ private fun NavBarItem(
     val isDarkTheme = isSystemInDarkTheme()
     val itemPillShape = RoundedCornerShape(24.dp)
     
-    var isPressed by remember { mutableStateOf(false) }
+    val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.92f else 1f,
         animationSpec = spring(
@@ -196,6 +201,7 @@ private fun NavBarItem(
     Column(
         modifier = modifier
             .scale(scale)
+            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
             .clip(itemPillShape)
             .clickable(
                 interactionSource = interactionSource,

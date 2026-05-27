@@ -22,10 +22,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.WorkspacePremium
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -36,14 +46,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,11 +74,14 @@ import androidx.compose.ui.res.stringResource
 fun OrientacoesScreen(
     viewModel: OrientacoesViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToNova: () -> Unit
+    onNavigateToNova: () -> Unit,
+    onNavigateToEditar: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
     val listState = rememberLazyListState()
+    var orientacaoParaExcluir by remember { mutableStateOf<OrientacaoEstrategica?>(null) }
 
     val isFabVisible by remember {
         derivedStateOf {
@@ -75,9 +91,9 @@ fun OrientacoesScreen(
         }
     }
 
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
+    LaunchedEffect(uiState.errorMessageRes) {
+        uiState.errorMessageRes?.let { messageRes ->
+            snackbarHostState.showSnackbar(context.getString(messageRes))
             viewModel.clearError()
         }
     }
@@ -85,25 +101,27 @@ fun OrientacoesScreen(
     Scaffold(
         topBar = {
             AguiaTopBar(
-                title = "Orientações Estratégicas",
+                title = stringResource(R.string.orientacoes_title),
                 onBackClick = onNavigateBack
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            AnimatedVisibility(
-                visible = isFabVisible,
-                enter = scaleIn(),
-                exit = scaleOut()
-            ) {
-                FloatingActionButton(
-                    onClick = onNavigateToNova,
-                    containerColor = MaterialTheme.colorScheme.primary
+            if (uiState.isLider) {
+                AnimatedVisibility(
+                    visible = isFabVisible,
+                    enter = scaleIn(),
+                    exit = scaleOut()
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Nova orientação"
-                    )
+                    FloatingActionButton(
+                        onClick = onNavigateToNova,
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.orientacoes_nova)
+                        )
+                    }
                 }
             }
         }
@@ -126,8 +144,12 @@ fun OrientacoesScreen(
                 ) {
                     EmptyState(
                         icon = Icons.Default.Flag,
-                        title = "Nenhuma orientação",
-                        subtitle = "Toque no + para criar a primeira orientação estratégica"
+                        title = stringResource(R.string.orientacoes_empty_title),
+                        subtitle = if (uiState.isLider) {
+                            stringResource(R.string.orientacoes_empty_subtitle_lider)
+                        } else {
+                            stringResource(R.string.orientacoes_empty_subtitle_readonly)
+                        }
                     )
                 }
             }
@@ -152,13 +174,50 @@ fun OrientacoesScreen(
                         ) { orientacao ->
                             OrientacaoCard(
                                 orientacao = orientacao,
-                                onDesativar = { viewModel.desativarOrientacao(orientacao.id) },
-                                onExcluir = { viewModel.excluirOrientacao(orientacao.id) }
+                                showActions = uiState.isLider,
+                                onEditar = { onNavigateToEditar(orientacao.id) },
+                                onToggleAtivacao = {
+                                    viewModel.toggleAtivacao(orientacao.id, orientacao.ativa)
+                                },
+                                onExcluir = { orientacaoParaExcluir = orientacao }
                             )
                         }
                     }
                 }
             }
+        }
+
+        orientacaoParaExcluir?.let { orientacao ->
+            AlertDialog(
+                onDismissRequest = { orientacaoParaExcluir = null },
+                title = { Text(stringResource(R.string.orientacao_excluir_titulo)) },
+                text = {
+                    Text(
+                        stringResource(
+                            R.string.orientacao_excluir_mensagem,
+                            orientacao.titulo
+                        )
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            viewModel.excluirOrientacao(orientacao.id)
+                            orientacaoParaExcluir = null
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.orientacao_excluir_confirmar),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { orientacaoParaExcluir = null }) {
+                        Text(stringResource(R.string.btn_cancelar))
+                    }
+                }
+            )
         }
     }
 }
@@ -166,16 +225,24 @@ fun OrientacoesScreen(
 @Composable
 private fun OrientacaoCard(
     orientacao: OrientacaoEstrategica,
-    onDesativar: () -> Unit,
+    showActions: Boolean,
+    onEditar: () -> Unit,
+    onToggleAtivacao: () -> Unit,
     onExcluir: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (orientacao.ativa) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (orientacao.ativa) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            }
         ),
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (orientacao.ativa) 4.dp else 1.dp
+        )
     ) {
         Column(
             modifier = Modifier
@@ -192,7 +259,7 @@ private fun OrientacaoCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Flag,
+                        imageVector = categoriaIcon(orientacao.categoria),
                         contentDescription = null,
                         tint = if (orientacao.ativa) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                         modifier = Modifier.size(28.dp)
@@ -215,22 +282,31 @@ private fun OrientacaoCard(
                         )
                     }
                 }
-                
-                Row {
-                    IconButton(onClick = onDesativar) {
-                        Icon(
-                            imageVector = Icons.Default.PowerSettingsNew,
-                            contentDescription = if (orientacao.ativa) "Desativar" else "Ativar",
-                            tint = if (orientacao.ativa) MaterialTheme.colorScheme.secondary 
-                                   else MaterialTheme.colorScheme.outline
-                        )
-                    }
-                    IconButton(onClick = onExcluir) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Excluir",
-                            tint = MaterialTheme.colorScheme.error
-                        )
+
+                if (showActions) {
+                    Row {
+                        IconButton(onClick = onEditar) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.cd_edit_orientacao),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        IconButton(onClick = onToggleAtivacao) {
+                            Icon(
+                                imageVector = Icons.Default.PowerSettingsNew,
+                                contentDescription = if (orientacao.ativa) "Desativar" else "Ativar",
+                                tint = if (orientacao.ativa) MaterialTheme.colorScheme.secondary 
+                                       else MaterialTheme.colorScheme.outline
+                            )
+                        }
+                        IconButton(onClick = onExcluir) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = stringResource(R.string.cd_delete_orientacao),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
             }
@@ -250,13 +326,23 @@ private fun OrientacaoCard(
     }
 }
 
+private fun categoriaIcon(categoria: CategoriaOrientacao): ImageVector = when (categoria) {
+    CategoriaOrientacao.REDUCAO_CUSTOS -> Icons.Default.Savings
+    CategoriaOrientacao.QUALIDADE_SERVICO -> Icons.Default.WorkspacePremium
+    CategoriaOrientacao.INOVACAO_TECNOLOGICA -> Icons.Default.Bolt
+    CategoriaOrientacao.SUSTENTABILIDADE -> Icons.Default.Eco
+    CategoriaOrientacao.SEGURANCA -> Icons.Default.Shield
+    CategoriaOrientacao.EXPERIENCIA_CLIENTE -> Icons.Default.People
+    CategoriaOrientacao.EFICIENCIA_OPERACIONAL -> Icons.Default.Speed
+}
+
 @Composable
 private fun CategoriaChip(categoria: CategoriaOrientacao) {
     val label = when (categoria) {
         CategoriaOrientacao.REDUCAO_CUSTOS -> "Custos"
         CategoriaOrientacao.QUALIDADE_SERVICO -> "Qualidade"
         CategoriaOrientacao.INOVACAO_TECNOLOGICA -> "Inovação"
-        CategoriaOrientacao.SUSTENTABILIDADE -> "ESG"
+        CategoriaOrientacao.SUSTENTABILIDADE -> "Sustentabilidade"
         CategoriaOrientacao.SEGURANCA -> "Segurança"
         CategoriaOrientacao.EXPERIENCIA_CLIENTE -> "Cliente"
         CategoriaOrientacao.EFICIENCIA_OPERACIONAL -> "Eficiência"
@@ -333,9 +419,9 @@ private fun StatusChip(ativa: Boolean) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Card LIDER")
 @Composable
-private fun OrientacaoCardPreview() {
+private fun OrientacaoCardLiderPreview() {
     InovagabTheme {
         OrientacaoCard(
             orientacao = OrientacaoEstrategica(
@@ -347,7 +433,31 @@ private fun OrientacaoCardPreview() {
                 ativa = true,
                 criadoPor = "demo-lider"
             ),
-            onDesativar = {},
+            showActions = true,
+            onEditar = {},
+            onToggleAtivacao = {},
+            onExcluir = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Card Read-Only")
+@Composable
+private fun OrientacaoCardReadOnlyPreview() {
+    InovagabTheme {
+        OrientacaoCard(
+            orientacao = OrientacaoEstrategica(
+                id = "1",
+                titulo = "Reduzir custos operacionais",
+                descricao = "Meta de redução de 15% nos custos de operação até dezembro",
+                categoria = CategoriaOrientacao.REDUCAO_CUSTOS,
+                prioridade = 1,
+                ativa = true,
+                criadoPor = "demo-lider"
+            ),
+            showActions = false,
+            onEditar = {},
+            onToggleAtivacao = {},
             onExcluir = {}
         )
     }

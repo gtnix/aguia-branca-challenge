@@ -2,11 +2,13 @@ package com.gtnix.aguiabranca.presentation.screens.ideias
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.Ideia
+import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.Usuario
-import com.gtnix.aguiabranca.domain.repository.IdeiaRepository
 import com.gtnix.aguiabranca.domain.session.SessionManager
+import com.gtnix.aguiabranca.domain.usecase.ideia.AprovarIdeiaUseCase
 import com.gtnix.aguiabranca.domain.usecase.ideia.GetIdeiasUseCase
 import com.gtnix.aguiabranca.domain.util.Result
 import com.gtnix.aguiabranca.presentation.util.UiState
@@ -30,7 +32,7 @@ enum class FiltroIdeia {
 @HiltViewModel
 class IdeiasViewModel @Inject constructor(
     private val getIdeiasUseCase: GetIdeiasUseCase,
-    private val ideiaRepository: IdeiaRepository,
+    private val aprovarIdeiaUseCase: AprovarIdeiaUseCase,
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
@@ -39,6 +41,9 @@ class IdeiasViewModel @Inject constructor(
     
     private val _filtroSelecionado = MutableStateFlow(FiltroIdeia.TODAS)
     val filtroSelecionado: StateFlow<FiltroIdeia> = _filtroSelecionado.asStateFlow()
+
+    private val _actionMessageRes = MutableStateFlow<Int?>(null)
+    val actionMessageRes: StateFlow<Int?> = _actionMessageRes.asStateFlow()
     
     val ideiasFiltradas: StateFlow<UiState<List<Ideia>>> = combine(
         _uiState,
@@ -71,6 +76,12 @@ class IdeiasViewModel @Inject constructor(
     val currentUser: Usuario?
         get() = sessionManager.getCurrentUser()
 
+    val canEvaluateIdeias: Boolean
+        get() {
+            val perfil = currentUser?.perfil ?: return false
+            return perfil == PerfilUsuario.GESTOR || perfil == PerfilUsuario.LIDER
+        }
+
     init {
         loadIdeias()
     }
@@ -81,7 +92,7 @@ class IdeiasViewModel @Inject constructor(
             getIdeiasUseCase().collect { result ->
                 _uiState.value = when (result) {
                     is Result.Success -> UiState.Success(result.data)
-                    is Result.Error -> UiState.Error(result.message ?: "Erro desconhecido")
+                    is Result.Error -> UiState.Error(result.message.orEmpty())
                     is Result.Loading -> UiState.Loading
                 }
             }
@@ -91,24 +102,34 @@ class IdeiasViewModel @Inject constructor(
     fun selecionarFiltro(filtro: FiltroIdeia) {
         _filtroSelecionado.value = filtro
     }
+
+    fun clearActionMessage() {
+        _actionMessageRes.value = null
+    }
     
     fun aprovarIdeia(ideia: Ideia) {
         viewModelScope.launch {
-            ideiaRepository.atualizarStatus(
-                id = ideia.id,
-                novoStatus = StatusIdeia.APROVADA,
-                feedback = null
-            )
+            when (val result = aprovarIdeiaUseCase(ideiaId = ideia.id, aprovada = true)) {
+                is Result.Success -> _actionMessageRes.value = R.string.ideia_detalhe_acao_sucesso
+                is Result.Error -> _actionMessageRes.value = R.string.error_approve_idea
+                is Result.Loading -> Unit
+            }
         }
     }
     
-    fun reprovarIdeia(ideia: Ideia) {
+    fun reprovarIdeia(ideia: Ideia, feedback: String) {
         viewModelScope.launch {
-            ideiaRepository.atualizarStatus(
-                id = ideia.id,
-                novoStatus = StatusIdeia.REPROVADA,
-                feedback = "Reprovada via ação rápida"
-            )
+            when (
+                val result = aprovarIdeiaUseCase(
+                    ideiaId = ideia.id,
+                    aprovada = false,
+                    feedback = feedback
+                )
+            ) {
+                is Result.Success -> _actionMessageRes.value = R.string.ideia_detalhe_acao_sucesso
+                is Result.Error -> _actionMessageRes.value = R.string.error_reject_idea
+                is Result.Loading -> Unit
+            }
         }
     }
 }

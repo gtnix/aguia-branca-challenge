@@ -4,9 +4,13 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -19,55 +23,25 @@ import com.gtnix.aguiabranca.presentation.screens.auth.LoginScreen
 
 private const val TRANSITION_DURATION = 300
 
-/**
- * AppNavGraph - Configuração de Navegação
- *
- * ## Conceito FIAP - Material 05A (Navegação)
- *
- * O NavHost é o container que gerencia a pilha de navegação.
- * Cada `composable` define uma tela e sua rota.
- *
- * ### Estrutura
- *
- * ```
- * NavHost
- *     │
- *     ├── composable("login") → LoginScreen
- *     │
- *     ├── composable("home/{perfil}") → HomeScreen
- *     │       │
- *     │       └── navArgument("perfil") - Argumento obrigatório
- *     │
- *     ├── composable("ideias") → IdeiasScreen
- *     │
- *     └── composable("projetos") → ProjetosScreen
- * ```
- *
- * ### NavController
- *
- * Controla a navegação entre telas:
- * - `navigate(route)`: Vai para uma tela
- * - `popBackStack()`: Volta para tela anterior
- * - `currentBackStackEntry`: Tela atual
- *
- * ### Exemplo de navegação
- *
- * ```kotlin
- * // Na LoginScreen
- * Button(onClick = {
- *     navController.navigate(Destination.Home.createRoute("GESTOR")) {
- *         // Remove Login da pilha (não volta com back)
- *         popUpTo(Destination.Login.route) { inclusive = true }
- *     }
- * })
- * ```
- */
 @Composable
 fun AppNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Destination.Login.route
+    appViewModel: AppViewModel = hiltViewModel()
 ) {
+    val startState by appViewModel.startState.collectAsStateWithLifecycle()
+
+    if (startState is AppStartState.Loading) {
+        Box(modifier = modifier.fillMaxSize())
+        return
+    }
+
+    val startDestination = when (val state = startState) {
+        is AppStartState.Authenticated -> Destination.Home.createRoute(state.perfil.name)
+        AppStartState.Unauthenticated -> Destination.Login.route
+        AppStartState.Loading -> Destination.Login.route
+    }
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -97,9 +71,6 @@ fun AppNavGraph(
             )
         }
     ) {
-        // =====================================================================
-        // LOGIN — uses fade instead of slide
-        // =====================================================================
         composable(
             route = Destination.Login.route,
             enterTransition = { fadeIn(tween(TRANSITION_DURATION)) },
@@ -115,9 +86,6 @@ fun AppNavGraph(
             )
         }
 
-        // =====================================================================
-        // MAIN — Contains FloatingNavBar with internal navigation
-        // =====================================================================
         composable(
             route = Destination.Home.route,
             arguments = listOf(
@@ -141,17 +109,4 @@ fun AppNavGraph(
             )
         }
     }
-}
-
-@Suppress("unused")
-class NavigationActions(private val navController: NavHostController) {
-    fun navigateToHome(perfil: String) {
-        navController.navigate(Destination.Home.createRoute(perfil)) {
-            popUpTo(Destination.Login.route) { inclusive = true }
-        }
-    }
-
-    fun navigateToIdeias() = navController.navigate(Destination.Ideias.route)
-    fun navigateToProjetos() = navController.navigate(Destination.Projetos.route)
-    fun navigateBack() = navController.popBackStack()
 }

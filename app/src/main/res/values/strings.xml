@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 
-    Material FIAP 04A - Telas Profissionais:
-    Sempre extraia strings para resources para facilitar:
-    - Internacionalização (i18n)
-    - Manutenção centralizada
-    - Acessibilidade
-    -->
-    
     <!-- App -->
     <string name="app_name">Águia Branca - Inovação</string>
     
@@ -18,38 +10,19 @@
     <string name="nav_perfil">Perfil</string>
     
     <!-- Auth -->
-    <string name="login_title">Bem-vindo!</string>
-    <string name="login_subtitle">Plataforma de Inovação Corporativa</string>
-    <string name="login_email_label">E-mail</string>
-    <string name="login_email_placeholder">seu.email@aguiabranca.com.br</string>
-    <string name="login_password_label">Senha</string>
-    <string name="login_password_placeholder">Digite sua senha</string>
-    <string name="login_button">Entrar</string>
-    <string name="login_forgot_password">Esqueci minha senha</string>
     <string name="login_error_invalid_credentials">E-mail ou senha inválidos</string>
     <string name="login_error_empty_fields">Preencha todos os campos</string>
     
     <!-- Home -->
-    <string name="home_welcome">Olá, %1$s!</string>
     <string name="home_section_orientacoes">Orientações Estratégicas</string>
     <string name="home_section_minhas_ideias">Minhas Ideias</string>
     <string name="home_section_projetos">Projetos em Andamento</string>
     
     <!-- Ideias -->
-    <string name="ideias_title">Ideias</string>
-    <string name="ideias_nova">Nova Ideia</string>
-    <string name="ideias_titulo_label">Título da Ideia</string>
-    <string name="ideias_descricao_label">Descrição</string>
-    <string name="ideias_area_label">Área de Atuação</string>
-    <string name="ideias_submit">Submeter Ideia</string>
+    <string name="ideia_card_autor">Por %1$s</string>
     
     <!-- Projetos -->
     <string name="projetos_title">Projetos</string>
-    <string name="projetos_novo">Novo Projeto</string>
-    <string name="projetos_nome_label">Nome do Projeto</string>
-    <string name="projetos_objetivo_label">Objetivo</string>
-    <string name="projetos_equipe_label">Equipe</string>
-    <string name="projetos_criar">Criar Projeto</string>
     
     <!-- Status -->
     <string name="status_pendente">Pendente</string>
@@ -104,9 +77,20 @@
     <string name="novo_projeto_origem_ideia">Origem: Ideia #%1$s</string>
     <string name="novo_projeto_erro_campos">Preencha todos os campos obrigatórios</string>
     <string name="novo_projeto_erro_salvar">Erro ao salvar projeto</string>
+    <string name="novo_projeto_descricao">Descrição</string>
+    <string name="novo_projeto_descricao_placeholder">Descreva o projeto em detalhes</string>
+    <string name="novo_projeto_orientacao">Orientação Estratégica</string>
+    <string name="novo_projeto_orientacao_nenhuma">Nenhuma orientação</string>
+    <string name="novo_projeto_equipe">Equipe</string>
+    <string name="novo_projeto_equipe_hint">Selecione os membros da equipe</string>
+    <string name="novo_projeto_prazo">Prazo Previsto</string>
+    <string name="novo_projeto_prazo_placeholder">Selecione a data</string>
+    <string name="novo_projeto_prazo_limpar">Limpar data</string>
+    <string name="cd_select_date">Selecionar data</string>
     
     <!-- Ideia -> Projeto -->
     <string name="ideia_criar_projeto">Criar Projeto</string>
+    <string name="ideia_converter_projeto">Converter em Projeto</string>
     
     <!-- Common -->
     <string name="btn_salvar">Salvar</string>
@@ -124,6 +108,14 @@
     <string name="cd_notifications">Notificações</string>
     <string name="cd_add_idea">Adicionar nova ideia de inovação</string>
     <string name="cd_add_project">Criar novo projeto</string>
+    <string name="cd_email_field">Campo de e-mail</string>
+    <string name="cd_password_field">Campo de senha</string>
+    <string name="cd_upvote">Apoiar ideia</string>
+    <string name="cd_idea_date">Data de criação</string>
+    <string name="cd_project_icon">Ícone do projeto</string>
+    <string name="cd_demo_profile">Perfil de demonstração: %1$s</string>
+    <string name="cd_slider_value">%1$s: %2$d de 5</string>
+    <string name="feature_under_development">Funcionalidade em desenvolvimento</string>
     
     <!-- UX Writing - Ações -->
     <string name="action_suggest_innovation">Sugerir Inovação</string>
@@ -190,6 +182,11 @@
     <string name="filter_pending">Pendentes</string>
     <string name="filter_approved">Aprovadas</string>
     <string name="filter_in_project">Em Projeto</string>
+    <string name="filter_projects_all">Todos</string>
+    <string name="filter_projects_planned">Planejados</string>
+    <string name="filter_projects_in_progress">Em Andamento</string>
+    <string name="filter_projects_paused">Pausados</string>
+    <string name="filter_projects_completed">Concluídos</string>
     <string name="fab_new_idea">Nova Ideia</string>
     <string name="cd_filter">Filtros avançados</string>
     
@@ -197,26 +194,53 @@
     <string name="home_subtitle">Bem-vindo à Plataforma de Inovação</string>
     <string name="home_manage_strategy">Gerenciar Estratégia</string>
     <string name="home_quick_actions">Ações Rápidas</string>
+    <string name="home_quick_actions_complement">Explorar</string>
+    <string name="home_operador_empty_ideias_hint">Toque no botão + na barra inferior para enviar sua primeira ideia.</string>
     <string name="home_innovation_radar">Radar de Inovação</string>
     <string name="cd_idea_icon">Ícone de ideia</string>
     
     <!-- Home Screen Premium -->
-    <string name="home_logo">INOVAGAB</string>
+    <string name="home_logo">Águia Branca</string>
+    <string name="cd_user_avatar">Perfil do usuário</string>
     <string name="home_greeting_morning">Bom dia</string>
     <string name="home_greeting_afternoon">Boa tarde</string>
     <string name="home_greeting_evening">Boa noite</string>
+    <string name="home_greeting_operador_pendentes_plural">%1$d ideias suas aguardando avaliação</string>
+    <string name="home_greeting_operador_pendentes_single">1 ideia sua aguardando avaliação</string>
+    <string name="home_greeting_operador_empty">Compartilhe sua próxima ideia de inovação</string>
+    <string name="home_greeting_lider_pendentes_plural">%1$d ideias aguardam curadoria do gestor na divisão</string>
+    <string name="home_greeting_lider_pendentes_single">1 ideia aguarda curadoria do gestor na divisão</string>
+    <string name="home_greeting_lider_empty">Sua divisão está em dia com a curadoria</string>
+    <string name="home_recap_title">Recapitulação Semanal</string>
+    <string name="home_recap_prefix">Esta semana:</string>
+    <plurals name="home_recap_novas_ideias">
+        <item quantity="one">%d nova ideia</item>
+        <item quantity="other">%d novas ideias</item>
+    </plurals>
+    <plurals name="home_recap_avaliacoes">
+        <item quantity="one">%d avaliação</item>
+        <item quantity="other">%d avaliações</item>
+    </plurals>
+    <plurals name="home_projetos_atualizados">
+        <item quantity="one">%d projeto atualizado</item>
+        <item quantity="other">%d projetos atualizados</item>
+    </plurals>
     <string name="home_metric_ideias_ativas">Ideias Ativas</string>
     <string name="home_metric_projetos">Projetos</string>
-    <string name="home_metric_engajamento">Engajamento</string>
+    <!-- L-13: "Engajamento" → "Taxa de aprovação do portfólio". Versão curta usada
+         no KPI strip de 3 colunas; a longa fica disponível para screen readers/títulos. -->
+    <string name="home_metric_engajamento">Taxa de aprovação do portfólio</string>
+    <string name="home_metric_engajamento_short">Aprov. portfólio</string>
     <string name="home_metric_minhas_ideias">Minhas Ideias</string>
     <string name="home_metric_aprovadas">Aprovadas</string>
+    <string name="home_ideia_convertida_titulo">Sua ideia virou projeto!</string>
+    <string name="home_ideia_convertida_subtitulo">%1$s agora é o projeto \"%2$s\"</string>
+    <string name="home_ideia_convertida_roi">ROI do projeto: %1$s</string>
     
     <!-- Hero Card Operador -->
     <string name="hero_headline_operador">Você viu algo que pode melhorar?</string>
     <string name="hero_subheadline_operador">Sua experiência no dia a dia é valiosa. Compartilhe suas ideias e ajude a transformar a empresa.</string>
     <string name="hero_cta_operador">Compartilhar Ideia</string>
-    <string name="home_trend_this_week">esta semana</string>
-    <string name="home_trend_this_month">este mês</string>
     <string name="home_activity_title">Atividade Recente</string>
     <string name="home_activity_see_all">Ver todas</string>
     <string name="home_activity_new_idea">Nova ideia: %1$s</string>
@@ -233,10 +257,62 @@
     <string name="perfil_logout">Sair</string>
     <string name="perfil_conquistas">Minhas Conquistas</string>
     <string name="perfil_pontos">pontos</string>
-    <string name="perfil_pontos_para_nivel">%1$d pontos para %2$s</string>
+    <string name="perfil_pontos_para_nivel">Faltam %1$d pts para %2$s</string>
+    <string name="perfil_ideias_para_nivel">Você está a %1$d ideias do próximo nível</string>
     <string name="perfil_nivel_maximo">Nível máximo alcançado!</string>
     <string name="perfil_nivel_atual">NÍVEL ATUAL</string>
     <string name="perfil_conquistas_label">CONQUISTAS</string>
+    <string name="perfil_stat_ideias_enviadas">Ideias enviadas</string>
+    <string name="perfil_stat_aprovadas">Aprovadas</string>
+    <string name="perfil_stat_ranking">Ranking</string>
+    <string name="perfil_gestor_stat_ideias_avaliadas">Ideias avaliadas</string>
+    <string name="perfil_gestor_stat_taxa_aprovacao">Taxa de aprovação do portfólio</string>
+    <string name="perfil_gestor_stat_projetos_area">Projetos da área</string>
+    <string name="perfil_gestor_taxa_aprovacao_indisponivel">—</string>
+    <string name="nivel_motivacional_curadoria">Sua curadoria faz diferença</string>
+    <string name="nivel_motivacional_lider">Direcione e inspire sua equipe</string>
+
+    <!-- Stats grid Líder (perfil) -->
+    <string name="perfil_lider_stat_orientacoes_ativas">Orientações ativas</string>
+    <string name="perfil_lider_stat_ideias_alinhadas">Ideias alinhadas</string>
+    <string name="perfil_lider_stat_projetos_direcionados">Projetos direcionados</string>
+    <string name="perfil_ver_ranking">Ver Ranking</string>
+    <string name="ranking_titulo">Ranking</string>
+    <string name="ranking_subtitulo">Top 10 inovadores por pontuação</string>
+    <string name="ranking_subtitulo_operador">Quem mais contribui com ideias de inovação</string>
+    <string name="ranking_subtitulo_gestor">Quem mais avalia ideias e impulsiona projetos</string>
+    <string name="ranking_subtitulo_lider">Quem mais define a direção estratégica</string>
+    <string name="ranking_tab_inovadores">Inovadores</string>
+    <string name="ranking_tab_curadores">Curadores</string>
+    <string name="ranking_tab_estrategistas">Estrategistas</string>
+    <string name="ranking_empty">Ainda não há participantes nesta categoria. Seja o primeiro!</string>
+    <string name="ranking_sua_posicao">Sua posição: #%1$d</string>
+    <string name="ranking_voce_em_lugar">Você está em %1$d° lugar</string>
+    <string name="ranking_pontos">%1$d pts</string>
+    <string name="ranking_pts_proxima_posicao">Faltam %1$d pts para subir uma posição</string>
+    <string name="ranking_pts_proximo_nivel">Faltam %1$d pts para %2$s</string>
+    <string name="ranking_demais_participantes">Demais participantes</string>
+    <string name="ranking_fora_top10">Você está na posição #%1$d</string>
+    <string name="ranking_conquistas_titulo">CONQUISTAS</string>
+    <string name="ranking_badge_desbloqueada">Desbloqueada</string>
+    <string name="ranking_badge_bloqueada">Bloqueada</string>
+    <string name="ranking_desafio_semanal">Desafio da Semana</string>
+    <string name="ranking_desafio_operador">Envie 2 ideias esta semana para ganhar 20 pts bônus</string>
+    <string name="ranking_desafio_gestor">Avalie 3 ideias esta semana para manter seu ritmo</string>
+    <string name="ranking_desafio_lider">Publique 1 orientação para inspirar a equipe</string>
+    <string name="ranking_desafio_progresso_ideias">%1$d/%2$d ideias enviadas</string>
+    <string name="ranking_desafio_progresso_avaliacoes">%1$d/%2$d avaliações feitas</string>
+    <string name="ranking_desafio_progresso_orientacoes">%1$d/%2$d orientações publicadas</string>
+    <string name="ranking_acoes_count">%1$d %2$s</string>
+    <string name="ranking_filtro_minha_divisao">Minha Divisão</string>
+    <string name="ranking_filtro_grupo_completo">Grupo Águia Branca</string>
+    <string name="ranking_team_insight_titulo_operadores">Visão da equipe — Operadores</string>
+    <string name="ranking_team_insight_titulo_gestores">Visão da equipe — Gestores</string>
+    <string name="ranking_team_insight_titulo_estrategistas">Visão da equipe — Estrategistas</string>
+    <string name="ranking_team_insight_media">Média: %1$d pts</string>
+    <string name="ranking_team_insight_top">Top: %1$s</string>
+    <string name="ranking_team_insight_total_ideias">Total ideias: %1$d</string>
+    <string name="error_load_ranking">Erro ao carregar ranking</string>
     
     <!-- Auth Screen -->
     <string name="auth_email_label">E-mail</string>
@@ -282,6 +358,74 @@
     <!-- Errors -->
     <string name="error_load_ideias">Erro ao carregar ideias</string>
     <string name="error_load_projetos">Erro ao carregar projetos</string>
+    <string name="error_load_dashboard">Erro ao carregar dashboard</string>
+    <string name="error_load_profile">Erro ao carregar perfil</string>
+    <string name="error_login">Erro ao fazer login. Tente novamente.</string>
+    <string name="error_user_not_logged">Usuário não logado</string>
+    <string name="error_save_idea">Erro ao salvar ideia</string>
+    <string name="error_nova_ideia_fields">Preencha todos os campos ou grave uma ideia por voz</string>
+    <string name="error_approve_idea">Erro ao aprovar ideia</string>
+    <string name="error_reject_idea">Erro ao reprovar ideia</string>
+    <string name="error_load_idea">Erro ao carregar ideia</string>
+    <string name="error_upvote_idea">Erro ao registrar voto na ideia</string>
+    <string name="error_start_analysis">Erro ao iniciar análise</string>
+    <string name="error_feedback_required_reject">Feedback é obrigatório para reprovar</string>
+    <string name="ideias_reject_quick_feedback">Reprovada via ação rápida</string>
+    <string name="error_load_orientacoes">Erro ao carregar orientações</string>
+    <string name="error_deactivate_orientacao">Erro ao desativar orientação</string>
+    <string name="error_activate_orientacao">Erro ao ativar orientação</string>
+    <string name="error_delete_orientacao">Erro ao excluir orientação</string>
+    <string name="error_only_leader_orientacoes">Apenas líderes podem gerenciar orientações</string>
+    <string name="error_only_leader_create_orientacao">Apenas líderes podem criar orientações</string>
+    <string name="error_save_orientacao">Erro ao salvar orientação</string>
+    <string name="error_radar_startups">Erro ao buscar startups parceiras</string>
+    <string name="error_unknown">Erro desconhecido</string>
+    <string name="cd_radar_error">Erro no radar de inovação</string>
+    <string name="novo_projeto_ideia_banner_title">Projeto baseado em ideia</string>
+    <string name="novo_projeto_ideia_id">ID: %1$s…</string>
+    
+    <!-- Conquistas -->
+    <string name="achievement_bem_vindo_titulo">Boas-vindas</string>
+    <string name="achievement_bem_vindo_desc">Entrou na plataforma de inovação</string>
+    <string name="conquista_primeira_ideia_titulo">Primeira Ideia</string>
+    <string name="conquista_primeira_ideia_desc">Submeteu sua primeira ideia</string>
+    <string name="conquista_inovador_titulo">Inovador</string>
+    <string name="conquista_inovador_desc">Submeteu 5 ideias</string>
+    <string name="conquista_visionario_ideias_titulo">Visionário</string>
+    <string name="conquista_visionario_ideias_desc">Submeteu 10+ ideias</string>
+    <string name="conquista_primeira_aprovacao_titulo">Primeira Aprovação</string>
+    <string name="conquista_primeira_aprovacao_desc">Teve uma ideia aprovada</string>
+    <string name="conquista_influenciador_titulo">Influenciador</string>
+    <string name="conquista_influenciador_desc">5 ideias aprovadas</string>
+    <string name="conquista_em_projeto_titulo">Em Ação</string>
+    <string name="conquista_em_projeto_desc">Ideia virou projeto</string>
+    <string name="conquista_transformador_titulo">Transformador</string>
+    <string name="conquista_transformador_desc">3 ideias em projeto</string>
+    <string name="conquista_lider_inovacao_titulo">Líder de Inovação</string>
+    <string name="conquista_lider_inovacao_desc">15+ ideias, 10+ aprovadas</string>
+    <string name="conquista_curador_titulo">Curador</string>
+    <string name="conquista_curador_desc">Avaliou 5 ideias</string>
+    <string name="conquista_mentor_titulo">Mentor</string>
+    <string name="conquista_mentor_desc">Avaliou 10 ideias</string>
+    <string name="conquista_executor_titulo">Maestro de Projetos</string>
+    <string name="conquista_executor_desc">Criou 3 projetos</string>
+    <string name="conquista_lider_resultados_titulo">Multiplicador de Valor</string>
+    <string name="conquista_lider_resultados_desc">Projeto com ROI positivo</string>
+    <string name="conquista_estrategista_titulo">Estrategista</string>
+    <string name="conquista_estrategista_desc">Publicou sua primeira orientação estratégica</string>
+    <string name="conquista_visionario_estrategico_titulo">Visionário</string>
+    <string name="conquista_visionario_estrategico_desc">10 ideias alinhadas</string>
+    <string name="conquista_transformador_estrategico_titulo">Transformador</string>
+    <string name="conquista_transformador_estrategico_desc">5 projetos concluídos</string>
+    <string name="conquista_desbloqueada_em">Conquistado em %1$s</string>
+    <string name="conquista_como_desbloquear">Como desbloquear:</string>
+    <string name="conquista_compartilhar">Compartilhar</string>
+    <string name="conquista_compartilhar_em_breve">Em breve!</string>
+    <string name="conquista_tier_bronze">Bronze</string>
+    <string name="conquista_tier_prata">Prata</string>
+    <string name="conquista_tier_ouro">Ouro</string>
+    <string name="conquista_tier_platina">Platina</string>
+    <string name="ranking_posicao_celebracao">Você subiu para %1$dº lugar!</string>
     
     <!-- Ideia Detalhe -->
     <string name="ideia_detalhe_titulo">Detalhe da Ideia</string>
@@ -301,8 +445,20 @@
     <string name="ideia_detalhe_esforco">Esforço</string>
     <string name="ideia_detalhe_score">Score</string>
     <string name="ideia_detalhe_acao_sucesso">Ação realizada com sucesso!</string>
+    <string name="ideia_detalhe_tipo">Tipo</string>
+    <string name="ideia_detalhe_data_criacao">Criada em</string>
+    <string name="ideia_detalhe_data_avaliacao">Avaliada em</string>
+    <string name="ideia_detalhe_upvotes">Apoios</string>
+    <string name="ideia_detalhe_orientacao">Orientação Estratégica</string>
+    <string name="ideia_detalhe_orientacao_nenhuma">Sem orientação vinculada</string>
+    <string name="ideia_detalhe_apoiar">Apoiar ideia</string>
     
     <!-- Orientacoes -->
+    <string name="orientacoes_title">Orientações Estratégicas</string>
+    <string name="orientacoes_nova">Nova orientação</string>
+    <string name="orientacoes_empty_title">Nenhuma orientação</string>
+    <string name="orientacoes_empty_subtitle_lider">Toque no + para criar a primeira orientação estratégica</string>
+    <string name="orientacoes_empty_subtitle_readonly">Nenhuma orientação estratégica definida ainda. Aguarde as diretrizes da liderança.</string>
     <string name="orientacao_ativa">Ativa</string>
     <string name="orientacao_inativa">Inativa</string>
     <string name="orientacao_prioridade">Prioridade</string>
@@ -311,6 +467,20 @@
     <string name="orientacao_categoria_label">Categoria</string>
     <string name="cd_toggle_orientacao">Alternar orientação</string>
     <string name="cd_delete_orientacao">Excluir</string>
+    <string name="cd_edit_orientacao">Editar orientação</string>
+    <string name="editar_orientacao_title">Editar Orientação</string>
+    <string name="error_orientacao_not_found">Orientação não encontrada</string>
+    <string name="error_load_orientacao">Erro ao carregar orientação</string>
+    <string name="orientacao_titulo_label">Título da Orientação *</string>
+    <string name="orientacao_titulo_placeholder">Ex: Reduzir custos operacionais em 15%</string>
+    <string name="orientacao_descricao_label">Descrição *</string>
+    <string name="orientacao_descricao_placeholder">Descreva a orientação estratégica e seus objetivos</string>
+    <string name="orientacao_prioridade_label">Prioridade</string>
+    <string name="prioridade_critica">Crítica</string>
+    <string name="prioridade_baixa">Baixa</string>
+    <string name="saving">Salvando…</string>
+    <string name="salvar_alteracoes">Salvar Alterações</string>
+    <string name="campos_obrigatorios">* Campos obrigatórios</string>
     
     <!-- Categorias Orientação -->
     <string name="categoria_custos">Custos</string>
@@ -330,6 +500,9 @@
     <string name="nova_ideia_impact_high">Alto</string>
     <string name="nova_ideia_impact_medium">Médio</string>
     <string name="nova_ideia_impact_low">Baixo</string>
+    <string name="error_speech_permission_denied">Permissão do microfone necessária para gravar ideias por voz</string>
+    <string name="error_speech_no_match">Nenhuma fala reconhecida. Tente novamente.</string>
+    <string name="error_speech_not_available">Reconhecimento de voz indisponível neste dispositivo</string>
     <string name="cd_start_recording">Iniciar gravação de voz</string>
     <string name="cd_stop_recording">Parar gravação</string>
     <string name="cd_expand_manual_form">Expandir formulário manual</string>
@@ -337,13 +510,41 @@
     
     <!-- Leader Dashboard (Fase 3) -->
     <string name="leader_resumo_executivo">Resumo Executivo</string>
+    <string name="home_leader_ver_analise_completa">Ver análise completa →</string>
     <string name="leader_desempenho_area">Desempenho por Área</string>
     <string name="leader_desempenho_subtitle">% de ideias com impacto positivo</string>
     <string name="leader_roi_medio">ROI Médio</string>
     <string name="leader_tempo_medio">Tempo Médio</string>
-    <string name="leader_nps_interno">NPS Interno</string>
     <string name="leader_ai_narrative">Análise IA</string>
     
+    <!-- Líder Home -->
+    <string name="home_lider_hero_headline_plural">%1$d orientações ativas direcionam sua equipe</string>
+    <string name="home_lider_hero_headline_single">1 orientação ativa direciona sua equipe</string>
+    <string name="home_lider_hero_headline_empty">Defina o próximo foco estratégico da divisão</string>
+    <string name="home_lider_hero_subheadline">Publique uma orientação para alinhar ideias e projetos com o rumo do Grupo</string>
+    <string name="home_lider_hero_subheadline_empty">Sua próxima orientação dá clareza para operadores e gestores agirem</string>
+    <string name="home_lider_hero_cta_publicar">Publicar orientação</string>
+    <string name="home_lider_hero_cta_ver">Ver orientações (%1$d)</string>
+    <string name="home_lider_hero_cta_ver_empty">Ver orientações</string>
+    <string name="home_lider_funil_inline">Ideias %1$d · Aprovadas %2$d · Em projeto %3$d</string>
+    <string name="home_lider_chip_nivel">Nível %1$s · #%2$d</string>
+    <string name="home_lider_chip_nivel_sem_ranking">Nível %1$s</string>
+    <string name="cd_publicar_orientacao">Publicar nova orientação estratégica</string>
+    <string name="cd_lider_kpi_ideias">Ver lista completa de ideias</string>
+    <string name="cd_lider_kpi_projetos">Ver lista completa de projetos</string>
+    <string name="cd_lider_kpi_engajamento">Ver dashboard executivo da liderança</string>
+
+    <!-- Notificações (placeholder) -->
+    <string name="notifications_titulo">Notificações</string>
+    <string name="notifications_em_breve">Em breve</string>
+    <string name="notifications_subtitulo_em_breve">Esta área concentrará alertas de ideias, projetos e orientações.</string>
+
+    <!-- Ranking — link conquistas -->
+    <string name="ranking_ver_conquistas_no_perfil">Ver conquistas no perfil</string>
+
+    <!-- Divisão (toggle ranking) -->
+    <string name="ranking_filtro_minha_divisao_subtitulo">Sua divisão de negócio</string>
+
     <!-- Gestor Home -->
     <string name="home_gestor_hero_headline">%1$d ideias aguardam sua avaliação</string>
     <string name="home_gestor_hero_headline_single">1 ideia aguarda sua avaliação</string>
@@ -354,9 +555,6 @@
     <string name="home_gestor_hero_cta_empty">Criar Projeto</string>
     <string name="home_gestor_metric_pendentes">Pendentes</string>
     <string name="home_gestor_metric_taxa_conversao">Conversão</string>
-    <string name="home_gestor_avaliar_ideias">Avaliar Ideias</string>
-    <string name="home_gestor_meus_projetos">Meus Projetos</string>
-    <string name="home_gestor_ideias_recentes">Ideias Recentes</string>
     <string name="home_gestor_ver_todas">Ver todas</string>
 
     <!-- Projeto Detalhe Premium (Fase 3) -->
@@ -364,6 +562,33 @@
     <string name="projeto_ideias_vinculadas">Ideias Vinculadas</string>
     <string name="projeto_atualizar_status">Atualizar Status</string>
     <string name="projeto_prazo">Prazo</string>
+    <string name="projeto_prazo_previsto">Prazo Previsto</string>
+    <string name="projeto_prazo_realizado">Realizado</string>
+    <string name="projeto_prazo_indefinido">A definir</string>
+    <string name="projeto_prazo_no_prazo">No prazo</string>
+    <string name="projeto_prazo_proximo">Próximo do prazo</string>
+    <string name="projeto_prazo_atrasado">Atrasado</string>
+    <string name="projeto_prazo_concluido_prazo">Concluído no prazo</string>
+    <string name="projeto_prazo_concluido_atraso">Concluído com atraso</string>
     <string name="projeto_equipe">Equipe</string>
     <string name="projeto_membros">%1$d membros</string>
+
+    <!-- Orientação Detalhe -->
+    <string name="orientacao_detalhe_title">Orientação Estratégica</string>
+    <string name="orientacao_detalhe_descricao">Descrição</string>
+    <string name="orientacao_detalhe_prioridade">Prioridade</string>
+    <string name="orientacao_detalhe_categoria">Categoria</string>
+    <string name="orientacao_detalhe_status">Status</string>
+    <string name="orientacao_detalhe_criado_em">Criada em</string>
+    <string name="orientacao_detalhe_expira_em">Expira em</string>
+    <string name="orientacao_detalhe_not_found">Orientação não encontrada</string>
+    <string name="orientacao_detalhe_ideias_alinhadas">%1$d ideias alinhadas</string>
+    <string name="orientacao_detalhe_ideia_alinhada">1 ideia alinhada</string>
+    <string name="orientacao_detalhe_projetos_andamento">%1$d projetos em andamento</string>
+    <string name="orientacao_detalhe_projeto_andamento">1 projeto em andamento</string>
+    <string name="orientacao_detalhe_impacto">Impacto Estratégico</string>
+    <string name="orientacao_excluir_titulo">Excluir Orientação</string>
+    <string name="orientacao_excluir_mensagem">Tem certeza que deseja excluir \'%1$s\'? Esta ação não pode ser desfeita.</string>
+    <string name="orientacao_excluir_confirmar">Excluir</string>
+    <string name="orientacao_ver_todas">Ver todas</string>
 </resources>

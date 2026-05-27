@@ -9,9 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-/**
- * Implementação do OrientacaoRepository
- */
 class OrientacaoRepositoryImpl @Inject constructor(
     private val dao: OrientacaoDao,
     private val mapper: OrientacaoMapper
@@ -39,6 +36,10 @@ class OrientacaoRepositoryImpl @Inject constructor(
 
     override suspend fun desativar(id: String) {
         dao.desativar(id)
+    }
+
+    override suspend fun ativar(id: String) {
+        dao.ativar(id)
     }
 
     override suspend fun excluir(id: String) {

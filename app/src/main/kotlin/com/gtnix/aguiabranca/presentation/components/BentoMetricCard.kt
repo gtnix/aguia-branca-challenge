@@ -1,7 +1,6 @@
 package com.gtnix.aguiabranca.presentation.components
 
 import android.content.res.Configuration
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -13,11 +12,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -25,9 +22,6 @@ import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -53,197 +47,18 @@ import androidx.compose.ui.unit.sp
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
 
-@Composable
-fun BentoMetricCard(
-    title: String,
-    value: String,
-    subtitle: String,
-    accentColor: Color,
-    icon: ImageVector,
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null
-) {
-    var isPressed by remember { mutableStateOf(false) }
-    
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.97f else 1f,
-        animationSpec = spring(
-            dampingRatio = 0.6f,
-            stiffness = 400f
-        ),
-        label = "scale"
-    )
-    
-    val isDarkTheme = isSystemInDarkTheme()
-    
-    val cardModifier = modifier
-        .scale(scale)
-        .then(
-            if (onClick != null) {
-                Modifier.pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            isPressed = true
-                            tryAwaitRelease()
-                            isPressed = false
-                        },
-                        onTap = { onClick() }
-                    )
-                }
-            } else {
-                Modifier
-            }
-        )
-    
-    if (isDarkTheme) {
-        GlassCard(modifier = cardModifier) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                BentoMetricContent(
-                    title = title,
-                    value = value,
-                    subtitle = subtitle,
-                    accentColor = accentColor,
-                    icon = icon
-                )
-            }
-        }
-    } else {
-        Card(
-            modifier = cardModifier,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            shape = MaterialTheme.shapes.medium,
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                BentoMetricContent(
-                    title = title,
-                    value = value,
-                    subtitle = subtitle,
-                    accentColor = accentColor,
-                    icon = icon
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun BentoMetricContent(
-    title: String,
-    value: String,
-    subtitle: String,
-    accentColor: Color,
-    icon: ImageVector
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .background(
-                    color = accentColor.copy(alpha = 0.15f),
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = accentColor,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-        
-        Spacer(modifier = Modifier.height(4.dp))
-        
-        Text(
-            text = value,
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.tertiary
-        )
-    }
-}
-
-@Preview(name = "Light Mode")
-@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun BentoMetricCardPreview() {
-    InovagabTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                BentoMetricCard(
-                    title = "Ideias Enviadas",
-                    value = "24",
-                    subtitle = "+3 este mês",
-                    accentColor = MaterialTheme.colorScheme.primary,
-                    icon = Icons.Default.Lightbulb,
-                    modifier = Modifier.weight(1f),
-                    onClick = {}
-                )
-                
-                BentoMetricCard(
-                    title = "Taxa de Aprovação",
-                    value = "87%",
-                    subtitle = "Acima da média",
-                    accentColor = SuccessGreen,
-                    icon = Icons.Default.TrendingUp,
-                    modifier = Modifier.weight(1f),
-                    onClick = {}
-                )
-            }
-        }
-    }
-}
-
-// =============================================================================
-// GRADIENT METRIC CARD - Premium fintech-style card with gradient background
-// =============================================================================
-
 object GradientMetricCardDefaults {
-    // Unified neutral palette - premium fintech style
     val UnifiedGradientDark = listOf(Color(0xFF1C1C1E), Color(0xFF141416))
     val UnifiedGradientLight = listOf(Color(0xFFFFFFFF), Color(0xFFFAFBFC))
-    
-    // Legacy aliases for backwards compatibility - all point to unified
-    val IdeiasGradientDark = UnifiedGradientDark
-    val IdeiasGradientLight = UnifiedGradientLight
-    
-    val ProjetosGradientDark = UnifiedGradientDark
-    val ProjetosGradientLight = UnifiedGradientLight
-    
-    val EngajamentoGradientDark = UnifiedGradientDark
-    val EngajamentoGradientLight = UnifiedGradientLight
 }
 
 @Composable
 fun GradientMetricCard(
     title: String,
     value: String,
-    trend: String,
-    trendPositive: Boolean,
     icon: ImageVector,
+    trend: String? = null,
+    trendPositive: Boolean = true,
     gradientColors: List<Color>,
     modifier: Modifier = Modifier,
     accentColor: Color? = null,
@@ -349,27 +164,29 @@ fun GradientMetricCard(
                 maxLines = 1
             )
             
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                    contentDescription = null,
-                    tint = if (trendPositive) SuccessGreen else MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(12.dp)
-                )
-                Text(
-                    text = trend,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (trendPositive) SuccessGreen else MaterialTheme.colorScheme.error,
-                    fontSize = 10.sp,
-                    maxLines = 2,
-                    lineHeight = 12.sp
-                )
+            if (!trend.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.TrendingUp,
+                        contentDescription = null,
+                        tint = if (trendPositive) SuccessGreen else MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Text(
+                        text = trend,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (trendPositive) SuccessGreen else MaterialTheme.colorScheme.error,
+                        fontSize = 10.sp,
+                        maxLines = 2,
+                        lineHeight = 12.sp
+                    )
+                }
             }
         }
     }
@@ -390,7 +207,7 @@ private fun GradientMetricCardDarkPreview() {
                     trend = "+12 esta semana",
                     trendPositive = true,
                     icon = Icons.Default.Lightbulb,
-                    gradientColors = GradientMetricCardDefaults.IdeiasGradientDark,
+                    gradientColors = GradientMetricCardDefaults.UnifiedGradientDark,
                     modifier = Modifier.weight(1f)
                 )
                 
@@ -400,7 +217,7 @@ private fun GradientMetricCardDarkPreview() {
                     trend = "+3 este mês",
                     trendPositive = true,
                     icon = Icons.Default.Folder,
-                    gradientColors = GradientMetricCardDefaults.ProjetosGradientDark,
+                    gradientColors = GradientMetricCardDefaults.UnifiedGradientDark,
                     modifier = Modifier.weight(1f)
                 )
                 
@@ -410,7 +227,7 @@ private fun GradientMetricCardDarkPreview() {
                     trend = "+8% este mês",
                     trendPositive = true,
                     icon = Icons.Default.Groups,
-                    gradientColors = GradientMetricCardDefaults.EngajamentoGradientDark,
+                    gradientColors = GradientMetricCardDefaults.UnifiedGradientDark,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -433,7 +250,7 @@ private fun GradientMetricCardLightPreview() {
                     trend = "+12 esta semana",
                     trendPositive = true,
                     icon = Icons.Default.Lightbulb,
-                    gradientColors = GradientMetricCardDefaults.IdeiasGradientLight,
+                    gradientColors = GradientMetricCardDefaults.UnifiedGradientLight,
                     modifier = Modifier.weight(1f)
                 )
                 
@@ -443,7 +260,7 @@ private fun GradientMetricCardLightPreview() {
                     trend = "+3 este mês",
                     trendPositive = true,
                     icon = Icons.Default.Folder,
-                    gradientColors = GradientMetricCardDefaults.ProjetosGradientLight,
+                    gradientColors = GradientMetricCardDefaults.UnifiedGradientLight,
                     modifier = Modifier.weight(1f)
                 )
                 
@@ -453,7 +270,7 @@ private fun GradientMetricCardLightPreview() {
                     trend = "+8% este mês",
                     trendPositive = true,
                     icon = Icons.Default.Groups,
-                    gradientColors = GradientMetricCardDefaults.EngajamentoGradientLight,
+                    gradientColors = GradientMetricCardDefaults.UnifiedGradientLight,
                     modifier = Modifier.weight(1f)
                 )
             }

@@ -2,6 +2,7 @@ package com.gtnix.aguiabranca.presentation.screens.inovacao
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.StartupPartner
 import com.gtnix.aguiabranca.domain.repository.InovacaoAbertaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +33,7 @@ class RadarViewModel @Inject constructor(
                 val startups = repository.buscarStartupsRecomendadas()
                 _uiState.update { it.copy(isLoading = false, startups = startups) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "Erro ao buscar startups parceiras") }
+                _uiState.update { it.copy(isLoading = false, errorMessageRes = R.string.error_radar_startups) }
             }
         }
     }
@@ -41,5 +42,5 @@ class RadarViewModel @Inject constructor(
 data class RadarUiState(
     val isLoading: Boolean = false,
     val startups: List<StartupPartner> = emptyList(),
-    val errorMessage: String? = null
+    val errorMessageRes: Int? = null
 )

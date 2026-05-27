@@ -5,21 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/**
- * Entity Room: Projeto
- *
- * ## Conceito FIAP - Material 07A
- *
- * ### Armazenando Listas
- *
- * O Room não suporta listas diretamente. Para `membrosIds` temos opções:
- *
- * 1. **TypeConverter**: Converte List<String> para String JSON
- * 2. **Tabela de junção**: Cria tabela projeto_membros (mais correto)
- *
- * Optamos por TypeConverter para simplificar o Sprint 1.
- * Em produção, recomenda-se tabela de junção para integridade.
- */
 @Entity(
     tableName = "projetos",
     foreignKeys = [
@@ -72,7 +57,6 @@ data class ProjetoEntity(
     
     val responsavelNome: String,
     
-    /** Lista de IDs serializada como JSON */
     val membrosIds: String,
     
     val dataCriacao: Long,

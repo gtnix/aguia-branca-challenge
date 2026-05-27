@@ -1,6 +1,10 @@
 package com.gtnix.aguiabranca.presentation.screens.ideias
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
@@ -27,6 +31,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,26 +39,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -62,17 +60,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
+import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
+import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
 import com.gtnix.aguiabranca.presentation.components.AIChip
 import com.gtnix.aguiabranca.presentation.components.InovagabButton
 import com.gtnix.aguiabranca.presentation.components.InovagabButtonVariant
@@ -88,13 +90,40 @@ fun NovaIdeiaScreen(
     onIdeiaCreated: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.toggleRecording()
+        } else {
+            viewModel.onMicrophonePermissionDenied()
+        }
+    }
+
+    val onToggleRecording = {
+        when {
+            uiState.isRecording -> viewModel.toggleRecording()
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                viewModel.toggleRecording()
+            }
+            else -> {
+                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+        }
+    }
 
     NovaIdeiaScreenContent(
         uiState = uiState,
         onTituloChange = viewModel::onTituloChange,
         onDescricaoChange = viewModel::onDescricaoChange,
         onAreaChange = viewModel::onAreaChange,
-        onToggleRecording = viewModel::toggleRecording,
+        onOrientacaoChange = viewModel::onOrientacaoChange,
+        onToggleRecording = onToggleRecording,
         onToggleManualForm = viewModel::toggleManualForm,
         onSalvar = {
             viewModel.salvar {
@@ -112,40 +141,29 @@ private fun NovaIdeiaScreenContent(
     onTituloChange: (String) -> Unit,
     onDescricaoChange: (String) -> Unit,
     onAreaChange: (AreaAtuacao) -> Unit,
+    onOrientacaoChange: (String?) -> Unit,
     onToggleRecording: () -> Unit,
     onToggleManualForm: () -> Unit,
     onSalvar: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
     val isFormValid = uiState.titulo.isNotBlank() && uiState.descricao.isNotBlank()
     val hasTranscription = uiState.transcribedText.isNotBlank()
 
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
+    LaunchedEffect(uiState.errorMessageRes) {
+        uiState.errorMessageRes?.let { messageRes ->
+            snackbarHostState.showSnackbar(context.getString(messageRes))
+        }
     }
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.nova_ideia_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.cd_back)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            AguiaTopBar(
+                title = stringResource(R.string.nova_ideia_title),
+                onBackClick = onNavigateBack
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -189,10 +207,13 @@ private fun NovaIdeiaScreenContent(
                 titulo = uiState.titulo,
                 descricao = uiState.descricao,
                 area = uiState.area,
+                orientacoes = uiState.orientacoes,
+                orientacaoId = uiState.orientacaoId,
                 onToggle = onToggleManualForm,
                 onTituloChange = onTituloChange,
                 onDescricaoChange = onDescricaoChange,
                 onAreaChange = onAreaChange,
+                onOrientacaoChange = onOrientacaoChange,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
@@ -206,7 +227,10 @@ private fun NovaIdeiaScreenContent(
                 isFormValid = isFormValid || hasTranscription,
                 isLoading = uiState.isLoading,
                 onCancel = onNavigateBack,
-                onSubmit = onSalvar,
+                onSubmit = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onSalvar()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
@@ -283,8 +307,11 @@ private fun TranscriptionCard(
     isRecording: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val scrollState = rememberScrollState()
+
     Box(
         modifier = modifier
+            .heightIn(max = 160.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
             .border(
@@ -293,12 +320,14 @@ private fun TranscriptionCard(
                 shape = RoundedCornerShape(16.dp)
             )
             .padding(16.dp)
+            .verticalScroll(scrollState)
     ) {
         Row {
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f, fill = false)
             )
             if (isRecording) {
                 BlinkingCursorInline(
@@ -402,10 +431,13 @@ private fun ManualFormSection(
     titulo: String,
     descricao: String,
     area: AreaAtuacao,
+    orientacoes: List<OrientacaoEstrategica>,
+    orientacaoId: String?,
     onToggle: () -> Unit,
     onTituloChange: (String) -> Unit,
     onDescricaoChange: (String) -> Unit,
     onAreaChange: (AreaAtuacao) -> Unit,
+    onOrientacaoChange: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val rotationAngle by animateFloatAsState(
@@ -468,7 +500,7 @@ private fun ManualFormSection(
                     onValueChange = onDescricaoChange,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp),
+                        .heightIn(min = 120.dp, max = 200.dp),
                     label = stringResource(R.string.new_idea_desc_label),
                     placeholder = stringResource(R.string.new_idea_desc_placeholder),
                     singleLine = false
@@ -479,6 +511,15 @@ private fun ManualFormSection(
                     onAreaSelected = onAreaChange,
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                if (orientacoes.isNotEmpty()) {
+                    OrientacaoDropdown(
+                        orientacoes = orientacoes,
+                        selectedId = orientacaoId,
+                        onOrientacaoSelected = onOrientacaoChange,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
     }
@@ -569,6 +610,116 @@ private fun AreaDropdown(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun OrientacaoDropdown(
+    orientacoes: List<OrientacaoEstrategica>,
+    selectedId: String?,
+    onOrientacaoSelected: (String?) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val rotationAngle by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        label = "orientacaoDropdownRotation"
+    )
+    val selectedOrientacao = orientacoes.find { it.id == selectedId }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier
+    ) {
+        Box(
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable { expanded = !expanded }
+                .padding(16.dp)
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.nova_ideia_foco_estrategico),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
+                Text(
+                    text = stringResource(R.string.nova_ideia_orientacoes_ativas, orientacoes.size),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedOrientacao?.titulo ?: "—",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = stringResource(R.string.cd_foco_estrategico),
+                        modifier = Modifier
+                            .size(24.dp)
+                            .rotate(rotationAngle),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "—",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                onClick = {
+                    onOrientacaoSelected(null)
+                    expanded = false
+                },
+                modifier = Modifier.background(
+                    if (selectedId == null)
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                    else
+                        Color.Transparent
+                )
+            )
+            orientacoes.forEach { orientacao ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = orientacao.titulo,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
+                    onClick = {
+                        onOrientacaoSelected(orientacao.id)
+                        expanded = false
+                    },
+                    modifier = Modifier.background(
+                        if (orientacao.id == selectedId)
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                        else
+                            Color.Transparent
+                    )
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun ActionButtons(
     isFormValid: Boolean,
@@ -617,6 +768,7 @@ private fun NovaIdeiaScreenPreview() {
             onTituloChange = {},
             onDescricaoChange = {},
             onAreaChange = {},
+            onOrientacaoChange = {},
             onToggleRecording = {},
             onToggleManualForm = {},
             onSalvar = {},
@@ -644,6 +796,7 @@ private fun NovaIdeiaScreenRecordingPreview() {
             onTituloChange = {},
             onDescricaoChange = {},
             onAreaChange = {},
+            onOrientacaoChange = {},
             onToggleRecording = {},
             onToggleManualForm = {},
             onSalvar = {},
@@ -670,6 +823,7 @@ private fun NovaIdeiaScreenFormExpandedPreview() {
             onTituloChange = {},
             onDescricaoChange = {},
             onAreaChange = {},
+            onOrientacaoChange = {},
             onToggleRecording = {},
             onToggleManualForm = {},
             onSalvar = {},

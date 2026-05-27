@@ -10,14 +10,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
-/**
- * Obtém a lista de ideias filtrada pelo perfil do usuário logado.
- *
- * Regras de visibilidade por perfil (RBAC):
- * - OPERADOR: vê apenas suas próprias ideias
- * - GESTOR: vê ideias da sua área de atuação
- * - LIDER: vê todas as ideias (visão consolidada)
- */
 class GetIdeiasUseCase @Inject constructor(
     private val ideiaRepository: IdeiaRepository,
     private val sessionManager: SessionManager

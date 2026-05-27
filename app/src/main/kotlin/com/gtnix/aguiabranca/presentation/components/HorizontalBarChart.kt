@@ -40,17 +40,30 @@ data class BarChartData(
     val color: Color
 )
 
+/**
+ * Calcula o valor máximo do eixo X arredondando para cima em intervalos legíveis (25%, 50%, 75%, etc.).
+ */
+fun computeBarChartMaxValue(values: List<Float>): Float {
+    if (values.isEmpty()) return 100f
+    val max = values.max()
+    if (max <= 0f) return 25f
+    val step = 25f
+    val rounded = ((max / step).toInt() + 1) * step
+    return rounded.coerceAtLeast(max).coerceAtMost(100f)
+}
+
 @Composable
 fun HorizontalBarChart(
     data: List<BarChartData>,
     modifier: Modifier = Modifier,
     barHeight: Dp = 24.dp,
-    maxValue: Float = 100f,
+    maxValue: Float? = null,
     showPercentageLabels: Boolean = true,
     showAxisLabels: Boolean = true,
     animationDuration: Int = 800,
     emptyStateMessage: String = "Nenhum dado disponível"
 ) {
+    val effectiveMaxValue = maxValue ?: computeBarChartMaxValue(data.map { it.value })
     val isDarkTheme = isSystemInDarkTheme()
     val backgroundColor = if (isDarkTheme) {
         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
@@ -79,7 +92,7 @@ fun HorizontalBarChart(
             data.forEach { item ->
                 BarChartRow(
                     item = item,
-                    maxValue = maxValue,
+                    maxValue = effectiveMaxValue,
                     barHeight = barHeight,
                     backgroundColor = backgroundColor,
                     showPercentageLabel = showPercentageLabels,
@@ -89,7 +102,7 @@ fun HorizontalBarChart(
             
             if (showAxisLabels) {
                 Spacer(modifier = Modifier.height(4.dp))
-                AxisLabels(maxValue = maxValue)
+                AxisLabels(maxValue = effectiveMaxValue)
             }
         }
     }
@@ -206,12 +219,12 @@ private fun HorizontalBarChartPreview() {
                     data = listOf(
                         BarChartData(
                             label = "Logística",
-                            value = 40f,
+                            value = 66f,
                             color = Color(0xFF00D4B2)
                         ),
                         BarChartData(
                             label = "Qualidade",
-                            value = 32f,
+                            value = 33f,
                             color = Color(0xFF00D4B2)
                         ),
                         BarChartData(
@@ -224,8 +237,7 @@ private fun HorizontalBarChartPreview() {
                             value = 12f,
                             color = Color(0xFFFF7A00)
                         )
-                    ),
-                    maxValue = 50f
+                    )
                 )
             }
         }

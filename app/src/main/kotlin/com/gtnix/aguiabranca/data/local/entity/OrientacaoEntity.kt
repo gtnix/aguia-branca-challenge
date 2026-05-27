@@ -5,21 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/**
- * Entity Room: Orientação Estratégica
- *
- * ## Conceito FIAP - Material 07A
- *
- * ### @ForeignKey
- *
- * Define relacionamento com outra tabela. Aqui vinculamos
- * `criadoPor` à tabela de usuários, garantindo integridade referencial.
- *
- * ### @Index
- *
- * Índices aceleram buscas. Como frequentemente filtramos por
- * `ativa` e `categoria`, criamos índices para essas colunas.
- */
 @Entity(
     tableName = "orientacoes",
     foreignKeys = [

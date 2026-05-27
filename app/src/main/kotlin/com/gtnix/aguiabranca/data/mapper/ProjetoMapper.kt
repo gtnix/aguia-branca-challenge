@@ -1,5 +1,6 @@
 package com.gtnix.aguiabranca.data.mapper
 
+import com.gtnix.aguiabranca.data.util.safeValueOf
 import com.gtnix.aguiabranca.data.local.entity.ProjetoEntity
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.Projeto
@@ -8,14 +9,6 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import javax.inject.Inject
 
-/**
- * Mapper de Projeto
- *
- * ## Nota sobre membrosIds
- *
- * A lista de membros é serializada como JSON no banco.
- * O mapper converte entre List<String> e String JSON.
- */
 class ProjetoMapper @Inject constructor() {
 
     private val gson = Gson()
@@ -26,8 +19,8 @@ class ProjetoMapper @Inject constructor() {
             nome = entity.nome,
             objetivo = entity.objetivo,
             descricao = entity.descricao,
-            area = AreaAtuacao.valueOf(entity.area),
-            status = StatusProjeto.valueOf(entity.status),
+            area = safeValueOf(entity.area, AreaAtuacao.OPERACOES),
+            status = safeValueOf(entity.status, StatusProjeto.PLANEJADO),
             ideiaOrigemId = entity.ideiaOrigemId,
             orientacaoId = entity.orientacaoId,
             responsavelId = entity.responsavelId ?: "",

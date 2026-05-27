@@ -21,21 +21,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -59,16 +56,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.R
-import com.gtnix.aguiabranca.presentation.components.AIChip
+import com.gtnix.aguiabranca.domain.usecase.dashboard.AreaDesempenhoMetric
+import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
 import com.gtnix.aguiabranca.presentation.components.AIInsightCard
 import com.gtnix.aguiabranca.presentation.components.BarChartData
-import com.gtnix.aguiabranca.presentation.components.BentoMetricCard
+import com.gtnix.aguiabranca.presentation.components.FinanceiroMiniCard
 import com.gtnix.aguiabranca.presentation.components.GlassCard
 import com.gtnix.aguiabranca.presentation.components.HorizontalBarChart
 import com.gtnix.aguiabranca.presentation.components.TypewriterText
+import com.gtnix.aguiabranca.presentation.components.charts.FunnelChartHorizontal
+import com.gtnix.aguiabranca.presentation.components.charts.FunnelStep
+import com.gtnix.aguiabranca.presentation.theme.AISpark
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
+import com.gtnix.aguiabranca.presentation.util.formatPercent
 import kotlinx.coroutines.delay
 
+/**
+ * Dashboard executivo do perfil LÍDER.
+ *
+ * Tela de detalhe acessada a partir da Home via atalho "Resumo Executivo".
+ * Usa [AguiaTopBar] com voltar e não exibe a bottom bar do [MainScreen].
+ */
 @Composable
 fun LeaderDashboardScreen(
     viewModel: LeaderDashboardViewModel,
@@ -115,10 +124,31 @@ private fun LeaderDashboardContent(
             ) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
+        } else if (uiState.errorMessageRes != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = stringResource(R.string.error_load_dashboard),
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(uiState.errorMessageRes!!),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         } else {
             LeaderDashboardBody(
                 uiState = uiState,
-                isDarkTheme = isDarkTheme
+                isDarkTheme = isDarkTheme,
+                onNavigateToHome = onNavigateToHome
             )
         }
     }
@@ -127,32 +157,26 @@ private fun LeaderDashboardContent(
 @Composable
 private fun LeaderDashboardBody(
     uiState: LeaderDashboardUiState,
-    isDarkTheme: Boolean
+    isDarkTheme: Boolean,
+    onNavigateToHome: () -> Unit
 ) {
     var contentVisible by remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(Unit) {
         contentVisible = true
     }
-    
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 100.dp)
+        contentPadding = PaddingValues(bottom = 32.dp)
     ) {
         item {
-            PremiumLeaderTopBar()
+            AguiaTopBar(
+                title = stringResource(R.string.leader_resumo_executivo),
+                onBackClick = onNavigateToHome
+            )
         }
-        
-        item {
-            AnimatedSection(visible = contentVisible, delayMillis = 0) {
-                TitleWithAIChip(modifier = Modifier.padding(horizontal = 20.dp))
-            }
-        }
-        
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-        
+
         item {
             AnimatedSection(visible = contentVisible, delayMillis = 100) {
                 AIInsightSection(
@@ -161,31 +185,63 @@ private fun LeaderDashboardBody(
                 )
             }
         }
-        
+
         item {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
-        
+
+        item {
+            AnimatedSection(visible = contentVisible, delayMillis = 150) {
+                FunnelSection(
+                    totalIdeias = uiState.totalIdeias,
+                    ideiasAprovadas = uiState.ideiasAprovadas,
+                    ideiasEmProjeto = uiState.ideiasEmProjeto,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
         item {
             AnimatedSection(visible = contentVisible, delayMillis = 200) {
-                DesempenhoAreaSection(
-                    data = uiState.desempenhoAreas,
+                FinancialSection(
+                    investimentoTotal = uiState.investimentoTotal,
+                    retornoTotal = uiState.retornoTotal,
+                    roiConsolidado = uiState.roiMedio,
                     isDarkTheme = isDarkTheme,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
         }
-        
+
         item {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
-        
+
         item {
-            AnimatedSection(visible = contentVisible, delayMillis = 300) {
+            AnimatedSection(visible = contentVisible, delayMillis = 250) {
                 KPICardsSection(
                     roiMedio = uiState.roiMedio,
                     tempoMedio = uiState.tempoMedio,
-                    npsInterno = uiState.npsInterno,
+                    ideiasAprovadas = uiState.ideiasAprovadas,
+                    projetosAtivos = uiState.projetosAtivos,
+                    isDarkTheme = isDarkTheme,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        item {
+            AnimatedSection(visible = contentVisible, delayMillis = 300) {
+                DesempenhoAreaSection(
+                    data = uiState.desempenhoAreas.toBarChartData(),
                     isDarkTheme = isDarkTheme,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
@@ -221,70 +277,99 @@ private fun AnimatedSection(
 }
 
 @Composable
-private fun PremiumLeaderTopBar(
+private fun FunnelSection(
+    totalIdeias: Int,
+    ideiasAprovadas: Int,
+    ideiasEmProjeto: Int,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { }) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            
-            Spacer(modifier = Modifier.width(8.dp))
-            
+    GlassCard(modifier = modifier.fillMaxWidth()) {
+        Column {
             Text(
-                text = stringResource(R.string.home_logo),
-                style = MaterialTheme.typography.headlineMedium,
+                text = stringResource(R.string.funil_title),
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
-        }
-        
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(24.dp)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            val ideiasLabel = stringResource(R.string.funil_ideias)
+            val aprovadasLabel = stringResource(R.string.funil_aprovadas)
+            val projetosLabel = stringResource(R.string.funil_em_projeto)
+
+            FunnelChartHorizontal(
+                steps = listOf(
+                    FunnelStep(ideiasLabel, totalIdeias, MaterialTheme.colorScheme.primary),
+                    FunnelStep(aprovadasLabel, ideiasAprovadas, SuccessGreen),
+                    FunnelStep(projetosLabel, ideiasEmProjeto, MaterialTheme.colorScheme.tertiary)
+                )
             )
         }
     }
 }
 
 @Composable
-private fun TitleWithAIChip(
+private fun FinancialSection(
+    investimentoTotal: Double,
+    retornoTotal: Double,
+    roiConsolidado: Double,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    Column(modifier = modifier) {
         Text(
-            text = stringResource(R.string.leader_resumo_executivo),
-            style = MaterialTheme.typography.headlineLarge,
+            text = stringResource(R.string.dashboard_financeiro),
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onSurface
         )
-        
-        Spacer(modifier = Modifier.width(12.dp))
-        
-        AIChip(text = "IA")
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            FinanceiroMiniCard(
+                label = stringResource(R.string.dashboard_investimento),
+                value = investimentoTotal,
+                isNegative = true,
+                isDarkTheme = isDarkTheme,
+                modifier = Modifier.weight(1f)
+            )
+            FinanceiroMiniCard(
+                label = stringResource(R.string.dashboard_retorno),
+                value = retornoTotal,
+                isNegative = false,
+                isDarkTheme = isDarkTheme,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        val roiColor = if (roiConsolidado >= 0) SuccessGreen else MaterialTheme.colorScheme.error
+        GlassCard(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.dashboard_roi),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = formatPercent(roiConsolidado),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = roiColor
+                )
+            }
+        }
     }
 }
 
@@ -319,30 +404,12 @@ private fun DesempenhoAreaSection(
 ) {
     GlassCard(modifier = modifier.fillMaxWidth()) {
         Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.leader_desempenho_area),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = "Info",
-                        tint = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
+            Text(
+                text = stringResource(R.string.leader_desempenho_area),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
             
             Spacer(modifier = Modifier.height(4.dp))
             
@@ -356,7 +423,6 @@ private fun DesempenhoAreaSection(
             
             HorizontalBarChart(
                 data = data,
-                maxValue = 50f,
                 showAxisLabels = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -368,58 +434,73 @@ private fun DesempenhoAreaSection(
 private fun KPICardsSection(
     roiMedio: Double,
     tempoMedio: Int,
-    npsInterno: Int,
+    ideiasAprovadas: Int,
+    projetosAtivos: Int,
     isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val cardShape = RoundedCornerShape(20.dp)
-    val borderColor = if (isDarkTheme) {
-        Color.White.copy(alpha = 0.06f)
-    } else {
-        Color(0xFFE5E7EB)
-    }
-    
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Max),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        PremiumKPICard(
-            title = stringResource(R.string.leader_roi_medio),
-            value = "${roiMedio.toInt()}%",
-            subtitle = "+5% vs mês anterior",
-            accentColor = MaterialTheme.colorScheme.primary,
-            icon = Icons.Default.TrendingUp,
-            isDarkTheme = isDarkTheme,
+        Row(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        )
-        
-        PremiumKPICard(
-            title = stringResource(R.string.leader_tempo_medio),
-            value = "$tempoMedio",
-            subtitle = "dias para aprovação",
-            accentColor = MaterialTheme.colorScheme.tertiary,
-            icon = Icons.Default.Schedule,
-            isDarkTheme = isDarkTheme,
+                .fillMaxWidth()
+                .height(IntrinsicSize.Max),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            PremiumKPICard(
+                title = stringResource(R.string.leader_roi_medio),
+                value = "${roiMedio.toInt()}%",
+                accentColor = MaterialTheme.colorScheme.primary,
+                icon = Icons.Default.TrendingUp,
+                isDarkTheme = isDarkTheme,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+
+            PremiumKPICard(
+                title = stringResource(R.string.leader_tempo_medio),
+                value = "$tempoMedio",
+                subtitle = "dias para aprovação",
+                accentColor = MaterialTheme.colorScheme.tertiary,
+                icon = Icons.Default.Schedule,
+                isDarkTheme = isDarkTheme,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+        }
+
+        Row(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        )
-        
-        PremiumKPICard(
-            title = stringResource(R.string.leader_nps_interno),
-            value = "$npsInterno",
-            subtitle = "Excelente",
-            accentColor = MaterialTheme.colorScheme.secondary,
-            icon = Icons.Default.Groups,
-            isDarkTheme = isDarkTheme,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        )
+                .fillMaxWidth()
+                .height(IntrinsicSize.Max),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            PremiumKPICard(
+                title = stringResource(R.string.home_metric_aprovadas),
+                value = ideiasAprovadas.toString(),
+                accentColor = SuccessGreen,
+                icon = Icons.Default.Lightbulb,
+                isDarkTheme = isDarkTheme,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+
+            PremiumKPICard(
+                title = stringResource(R.string.home_metric_projetos),
+                value = projetosAtivos.toString(),
+                accentColor = MaterialTheme.colorScheme.secondary,
+                icon = Icons.Default.Folder,
+                isDarkTheme = isDarkTheme,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+        }
     }
 }
 
@@ -427,7 +508,7 @@ private fun KPICardsSection(
 private fun PremiumKPICard(
     title: String,
     value: String,
-    subtitle: String,
+    subtitle: String = "",
     accentColor: Color,
     icon: ImageVector,
     isDarkTheme: Boolean,
@@ -495,13 +576,21 @@ private fun PremiumKPICard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.labelSmall,
-                color = accentColor,
-                fontWeight = FontWeight.Medium
-            )
+            if (subtitle.isNotEmpty()) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = accentColor,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
+    }
+}
+
+private fun List<AreaDesempenhoMetric>.toBarChartData(): List<BarChartData> {
+    return map { item ->
+        BarChartData(label = item.label, value = item.value, color = AISpark)
     }
 }
 
@@ -513,18 +602,24 @@ private fun LeaderDashboardPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             LeaderDashboardBody(
                 uiState = LeaderDashboardUiState(
-                    aiNarrative = "Esta semana, a divisão de Logística registrou um aumento de 40% em ideias voltadas para redução de custos.",
+                    aiNarrative = "O portfólio de inovação conta com 24 ideias ativas, com ROI consolidado de 22% a.a.",
                     desempenhoAreas = listOf(
-                        BarChartData("Logística", 40f, androidx.compose.ui.graphics.Color(0xFF00D4B2)),
-                        BarChartData("Qualidade", 32f, androidx.compose.ui.graphics.Color(0xFF00D4B2)),
-                        BarChartData("RH", 18f, androidx.compose.ui.graphics.Color(0xFFFF7A00)),
-                        BarChartData("TI", 12f, androidx.compose.ui.graphics.Color(0xFFFF7A00))
+                        AreaDesempenhoMetric("Logística", 40f),
+                        AreaDesempenhoMetric("Qualidade", 32f),
+                        AreaDesempenhoMetric("RH", 18f),
+                        AreaDesempenhoMetric("TI", 12f)
                     ),
                     roiMedio = 22.0,
-                    tempoMedio = 45,
-                    npsInterno = 87
+                    tempoMedio = 12,
+                    totalIdeias = 24,
+                    ideiasAprovadas = 14,
+                    ideiasEmProjeto = 8,
+                    projetosAtivos = 6,
+                    investimentoTotal = 150_000.0,
+                    retornoTotal = 183_000.0
                 ),
-                isDarkTheme = false
+                isDarkTheme = false,
+                onNavigateToHome = {}
             )
         }
     }

@@ -1,13 +1,11 @@
 package com.gtnix.aguiabranca.data.mapper
 
+import com.gtnix.aguiabranca.data.util.safeValueOf
 import com.gtnix.aguiabranca.data.local.entity.OrientacaoEntity
 import com.gtnix.aguiabranca.domain.model.CategoriaOrientacao
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import javax.inject.Inject
 
-/**
- * Mapper de Orientação Estratégica
- */
 class OrientacaoMapper @Inject constructor() {
 
     fun toDomain(entity: OrientacaoEntity): OrientacaoEstrategica {
@@ -15,7 +13,7 @@ class OrientacaoMapper @Inject constructor() {
             id = entity.id,
             titulo = entity.titulo,
             descricao = entity.descricao,
-            categoria = CategoriaOrientacao.valueOf(entity.categoria),
+            categoria = safeValueOf(entity.categoria, CategoriaOrientacao.REDUCAO_CUSTOS),
             prioridade = entity.prioridade,
             ativa = entity.ativa,
             criadoPor = entity.criadoPor ?: "",

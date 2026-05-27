@@ -2,15 +2,19 @@ package com.gtnix.aguiabranca.presentation.screens.orientacoes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.repository.OrientacaoRepository
 import com.gtnix.aguiabranca.domain.session.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,69 +24,82 @@ class OrientacoesViewModel @Inject constructor(
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(OrientacoesUiState())
-    val uiState: StateFlow<OrientacoesUiState> = _uiState.asStateFlow()
+    private val _actionErrorRes = MutableStateFlow<Int?>(null)
 
-    init {
-        carregarOrientacoes()
-    }
+    private val _isLider = sessionManager.getCurrentUser()?.perfil == PerfilUsuario.LIDER
 
-    private fun carregarOrientacoes() {
+    val uiState: StateFlow<OrientacoesUiState> = combine(
+        orientacaoRepository.listarTodas()
+            .map { orientacoes ->
+                OrientacoesUiState(
+                    isLoading = false,
+                    orientacoes = orientacoes,
+                    isLider = _isLider,
+                    errorMessageRes = null
+                )
+            }
+            .catch {
+                emit(
+                    OrientacoesUiState(
+                        isLoading = false,
+                        isLider = _isLider,
+                        errorMessageRes = R.string.error_load_orientacoes
+                    )
+                )
+            },
+        _actionErrorRes
+    ) { loadedState, actionErrorRes ->
+        loadedState.copy(errorMessageRes = actionErrorRes ?: loadedState.errorMessageRes)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = OrientacoesUiState(isLoading = true, isLider = _isLider)
+    )
+
+    fun toggleAtivacao(id: String, estaAtiva: Boolean) {
+        if (!isLider()) {
+            _actionErrorRes.value = R.string.error_only_leader_orientacoes
+            return
+        }
+
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             try {
-                orientacaoRepository.listarTodas().collect { orientacoes ->
-                    _uiState.update { 
-                        it.copy(
-                            isLoading = false,
-                            orientacoes = orientacoes,
-                            errorMessage = null
-                        ) 
-                    }
+                if (estaAtiva) {
+                    orientacaoRepository.desativar(id)
+                } else {
+                    orientacaoRepository.ativar(id)
                 }
             } catch (e: Exception) {
-                _uiState.update { 
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "Erro ao carregar orientações"
-                    )
+                _actionErrorRes.value = if (estaAtiva) {
+                    R.string.error_deactivate_orientacao
+                } else {
+                    R.string.error_activate_orientacao
                 }
             }
         }
     }
 
     fun desativarOrientacao(id: String) {
-        if (!isLider()) {
-            _uiState.update { it.copy(errorMessage = "Apenas líderes podem gerenciar orientações") }
-            return
-        }
-        
-        viewModelScope.launch {
-            try {
-                orientacaoRepository.desativar(id)
-            } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = "Erro ao desativar orientação") }
-            }
-        }
+        toggleAtivacao(id, estaAtiva = true)
     }
 
     fun excluirOrientacao(id: String) {
         if (!isLider()) {
-            _uiState.update { it.copy(errorMessage = "Apenas líderes podem gerenciar orientações") }
+            _actionErrorRes.value = R.string.error_only_leader_orientacoes
             return
         }
-        
+
         viewModelScope.launch {
             try {
                 orientacaoRepository.excluir(id)
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = "Erro ao excluir orientação") }
+                _actionErrorRes.value = R.string.error_delete_orientacao
             }
         }
     }
 
     fun clearError() {
-        _uiState.update { it.copy(errorMessage = null) }
+        _actionErrorRes.value = null
     }
 
     private fun isLider(): Boolean {
@@ -93,5 +110,6 @@ class OrientacoesViewModel @Inject constructor(
 data class OrientacoesUiState(
     val isLoading: Boolean = false,
     val orientacoes: List<OrientacaoEstrategica> = emptyList(),
-    val errorMessage: String? = null
+    val isLider: Boolean = false,
+    val errorMessageRes: Int? = null
 )

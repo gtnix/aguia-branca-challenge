@@ -37,9 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,7 +51,6 @@ import com.gtnix.aguiabranca.presentation.components.SkeletonListPlaceholder
 import com.gtnix.aguiabranca.presentation.theme.CardBorderLight
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.ScreenPadding
-import com.gtnix.aguiabranca.presentation.util.bounceClick
 
 @Composable
 fun RadarScreen(
@@ -93,7 +89,8 @@ private fun RadarScreenContent(
                 )
             }
 
-            uiState.errorMessage != null -> {
+            uiState.errorMessageRes != null -> {
+                val errorMessage = stringResource(uiState.errorMessageRes!!)
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -103,13 +100,13 @@ private fun RadarScreenContent(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = Icons.Default.Radar,
-                            contentDescription = "Erro no radar de inovação",
+                            contentDescription = stringResource(R.string.cd_radar_error),
                             modifier = Modifier.size(64.dp),
                             tint = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = uiState.errorMessage,
+                            text = errorMessage,
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -147,7 +144,6 @@ private fun RadarScreenContent(
                     ) { startup ->
                         StartupCard(
                             startup = startup,
-                            onClick = { },
                             modifier = Modifier.animateItemPlacement()
                         )
                     }
@@ -160,7 +156,6 @@ private fun RadarScreenContent(
 @Composable
 private fun StartupCard(
     startup: StartupPartner,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isDarkTheme = isSystemInDarkTheme()
@@ -172,17 +167,13 @@ private fun StartupCard(
     
     if (isDarkTheme) {
         GlassCard(
-            modifier = modifier
-                .fillMaxWidth()
-                .bounceClick(onClick = onClick)
+            modifier = modifier.fillMaxWidth()
         ) {
             cardContent()
         }
     } else {
         Card(
-            modifier = modifier
-                .fillMaxWidth()
-                .bounceClick(onClick = onClick),
+            modifier = modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = shape,
             border = BorderStroke(1.dp, CardBorderLight),

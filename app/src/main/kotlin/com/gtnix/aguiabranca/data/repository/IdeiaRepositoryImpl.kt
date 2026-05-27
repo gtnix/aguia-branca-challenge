@@ -10,9 +10,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-/**
- * Implementação do IdeiaRepository
- */
 class IdeiaRepositoryImpl @Inject constructor(
     private val dao: IdeiaDao,
     private val mapper: IdeiaMapper
@@ -71,5 +68,9 @@ class IdeiaRepositoryImpl @Inject constructor(
         return StatusIdeia.entries.associateWith { status ->
             dao.contarPorStatus(status.name)
         }
+    }
+
+    override suspend fun incrementUpvote(id: String) {
+        dao.incrementUpvotes(id)
     }
 }

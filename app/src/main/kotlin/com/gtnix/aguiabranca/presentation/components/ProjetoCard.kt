@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gtnix.aguiabranca.R
@@ -79,7 +80,8 @@ fun ProjetoCard(
         Card(
             modifier = modifier
                 .fillMaxWidth()
-                .bounceClick(onClick = onClick),
+                .bounceClick(onClick = onClick)
+                .semantics(mergeDescendants = true) {},
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = shape,
             border = BorderStroke(1.dp, CardBorderLight),
@@ -109,7 +111,7 @@ private fun ProjetoCardContent(projeto: Projeto) {
             ) {
                 Icon(
                     imageVector = Icons.Default.Folder,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.cd_project_icon),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(22.dp)
                 )

@@ -14,24 +14,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,43 +46,33 @@ import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
-import com.gtnix.aguiabranca.presentation.theme.ErrorRed
-import com.gtnix.aguiabranca.presentation.theme.InfoBlue
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
-import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
-import com.gtnix.aguiabranca.presentation.theme.WarningAmber
 import com.gtnix.aguiabranca.presentation.util.bounceClick
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.gtnix.aguiabranca.presentation.util.formatLongDate
 
-/**
- * IdeiaCard - Card premium para exibir uma ideia.
- *
- * Design inspirado em apps fintech (Revolut/Linear) com:
- * - StatusDot colorido à esquerda do título
- * - AIChip para detecção de similaridade
- * - Data formatada + contagem de upvotes
- * - Borda sutil ao invés de elevation
- */
+private val ApproveGreen = Color(0xFF00875A)
+
 @Composable
 fun IdeiaCard(
     ideia: Ideia,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     showQuickActions: Boolean = false,
+    showAuthorName: Boolean = showQuickActions,
     onAprovar: (() -> Unit)? = null,
     onReprovar: (() -> Unit)? = null
 ) {
     val formattedDate = remember(ideia.dataCriacao) {
-        val dateFormat = SimpleDateFormat("dd 'de' MMM. 'de' yyyy", Locale("pt", "BR"))
-        dateFormat.format(Date(ideia.dataCriacao))
+        formatLongDate(ideia.dataCriacao)
     }
-    
+    val statusColor = ideiaStatusColor(ideia.status)
+    val statusLabel = ideiaStatusLabel(ideia.status)
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .bounceClick(onClick = onClick),
+            .bounceClick(onClick = onClick)
+            .semantics(mergeDescendants = true) {},
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -99,9 +94,15 @@ fun IdeiaCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.semantics {
+                            contentDescription = statusLabel
+                        }
                     ) {
-                        StatusDot(status = ideia.status)
+                        StatusDot(
+                            color = statusColor,
+                            contentDescription = statusLabel
+                        )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
                             text = ideia.titulo,
@@ -110,11 +111,13 @@ fun IdeiaCard(
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .weight(1f)
+                                .semantics { heading() }
                         )
                     }
                 }
-                
+
                 if (ideia.temSimilaridade) {
                     Spacer(modifier = Modifier.width(8.dp))
                     AIChip(
@@ -122,9 +125,9 @@ fun IdeiaCard(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = ideia.descricao,
                 style = MaterialTheme.typography.bodyMedium,
@@ -133,9 +136,32 @@ fun IdeiaCard(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(start = 20.dp)
             )
-            
+
+            if (showAuthorName) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.padding(start = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.ideia_card_autor, ideia.autorNome),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
-            
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -148,7 +174,7 @@ fun IdeiaCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.CalendarToday,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.cd_idea_date),
                         modifier = Modifier.size(14.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
@@ -159,13 +185,13 @@ fun IdeiaCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
-                
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowUp,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.cd_upvote),
                         modifier = Modifier.size(18.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
@@ -178,25 +204,39 @@ fun IdeiaCard(
                     )
                 }
             }
-            
-            if (showQuickActions && ideia.status == StatusIdeia.PENDENTE) {
+
+            if (
+                showQuickActions &&
+                (ideia.status == StatusIdeia.PENDENTE || ideia.status == StatusIdeia.EM_ANALISE)
+            ) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(
+                    OutlinedButton(
                         onClick = { onReprovar?.invoke() },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                        ),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     ) {
                         Text(stringResource(R.string.action_reject_short))
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
                     Button(
-                        onClick = { onAprovar?.invoke() }
+                        onClick = { onAprovar?.invoke() },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = ApproveGreen,
+                            contentColor = Color.White
+                        )
                     ) {
                         Text(stringResource(R.string.action_approve_short))
                     }
@@ -207,28 +247,40 @@ fun IdeiaCard(
 }
 
 @Composable
-private fun StatusDot(
+fun IdeiaStatusDot(
     status: StatusIdeia,
     modifier: Modifier = Modifier
 ) {
-    val color = when (status) {
-        StatusIdeia.APROVADA -> SuccessGreen
-        StatusIdeia.PENDENTE -> WarningAmber
-        StatusIdeia.EM_ANALISE -> InfoBlue
-        StatusIdeia.REPROVADA -> ErrorRed
-        StatusIdeia.CONVERTIDA_PROJETO -> MaterialTheme.colorScheme.primary
-    }
-    
+    StatusDot(
+        color = ideiaStatusColor(status),
+        contentDescription = ideiaStatusLabel(status),
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun StatusDot(
+    color: Color,
+    contentDescription: String,
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier
             .size(10.dp)
             .background(color, CircleShape)
+            .semantics { this.contentDescription = contentDescription }
     )
 }
 
-/**
- * AreaChip - Chip para exibir a área de atuação.
- */
+@Composable
+private fun ideiaStatusLabel(status: StatusIdeia): String = when (status) {
+    StatusIdeia.PENDENTE -> stringResource(R.string.status_pendente)
+    StatusIdeia.EM_ANALISE -> stringResource(R.string.status_em_analise)
+    StatusIdeia.APROVADA -> stringResource(R.string.status_aprovado)
+    StatusIdeia.REPROVADA -> stringResource(R.string.status_reprovado)
+    StatusIdeia.CONVERTIDA_PROJETO -> stringResource(R.string.status_em_projeto)
+}
+
 @Composable
 fun AreaChip(
     text: String,
@@ -274,9 +326,10 @@ private fun IdeiaCardPreview() {
                         upvotes = 128,
                         temSimilaridade = true
                     ),
-                    onClick = {}
+                    onClick = {},
+                    showAuthorName = true
                 )
-                
+
                 IdeiaCard(
                     ideia = Ideia(
                         id = "2",
@@ -291,9 +344,13 @@ private fun IdeiaCardPreview() {
                         upvotes = 86,
                         temSimilaridade = false
                     ),
-                    onClick = {}
+                    onClick = {},
+                    showQuickActions = true,
+                    showAuthorName = true,
+                    onAprovar = {},
+                    onReprovar = {}
                 )
-                
+
                 IdeiaCard(
                     ideia = Ideia(
                         id = "3",
@@ -308,7 +365,8 @@ private fun IdeiaCardPreview() {
                         upvotes = 53,
                         temSimilaridade = false
                     ),
-                    onClick = {}
+                    onClick = {},
+                    showAuthorName = true
                 )
             }
         }

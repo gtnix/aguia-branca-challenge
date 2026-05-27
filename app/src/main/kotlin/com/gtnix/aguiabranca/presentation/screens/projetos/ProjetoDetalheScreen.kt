@@ -1,6 +1,7 @@
 package com.gtnix.aguiabranca.presentation.screens.projetos
 
 import androidx.compose.animation.AnimatedVisibility
+import kotlinx.coroutines.delay
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
@@ -28,7 +29,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Lightbulb
@@ -40,13 +40,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,17 +58,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
 import com.gtnix.aguiabranca.R
-import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.Projeto
 import com.gtnix.aguiabranca.domain.model.StatusProjeto
-import com.gtnix.aguiabranca.domain.repository.ProjetoRepository
-import com.gtnix.aguiabranca.domain.session.UserSession
+import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
 import com.gtnix.aguiabranca.presentation.components.AvatarData
 import com.gtnix.aguiabranca.presentation.components.AvatarStack
 import com.gtnix.aguiabranca.presentation.components.GlassCard
@@ -81,204 +73,14 @@ import com.gtnix.aguiabranca.presentation.components.MarcoTimeline
 import com.gtnix.aguiabranca.presentation.components.ProjectTimeline
 import com.gtnix.aguiabranca.presentation.components.ProjetoStatusBadge
 import com.gtnix.aguiabranca.presentation.components.SectionHeader
-import com.gtnix.aguiabranca.presentation.components.TimelineStatus
-import com.gtnix.aguiabranca.presentation.navigation.Destination
 import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
+import com.gtnix.aguiabranca.presentation.theme.WarningAmber
+import com.gtnix.aguiabranca.presentation.theme.ErrorRed
 import com.gtnix.aguiabranca.presentation.util.bounceClick
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import javax.inject.Inject
-
-@HiltViewModel
-class ProjetoDetalheViewModel @Inject constructor(
-    private val projetoRepository: ProjetoRepository,
-    private val userSession: UserSession,
-    savedStateHandle: SavedStateHandle
-) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(ProjetoDetalheUiState())
-    val uiState: StateFlow<ProjetoDetalheUiState> = _uiState.asStateFlow()
-
-    private val projetoId: String = savedStateHandle[Destination.ProjetoDetalhe.ARG_PROJETO_ID] ?: ""
-
-    init {
-        carregarProjeto()
-    }
-
-    private fun carregarProjeto() {
-        _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            try {
-                val projeto = projetoRepository.buscarPorId(projetoId)
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        projeto = projeto,
-                        perfil = userSession.perfil,
-                        progressoSlider = projeto?.progresso?.toFloat() ?: 0f,
-                        marcos = generateMockMarcos(projeto),
-                        ideiasVinculadas = generateMockIdeiasVinculadas(),
-                        membrosEquipe = generateMockMembros(projeto)
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "Erro ao carregar projeto") }
-            }
-        }
-    }
-
-    fun onProgressoChange(value: Float) {
-        _uiState.update { it.copy(progressoSlider = value) }
-    }
-
-    fun salvarProgresso() {
-        val projeto = _uiState.value.projeto ?: return
-        viewModelScope.launch {
-            try {
-                val novoProgresso = _uiState.value.progressoSlider.toInt()
-                projetoRepository.atualizarProgresso(projeto.id, novoProgresso)
-                val atualizado = projeto.copy(progresso = novoProgresso)
-                _uiState.update { it.copy(projeto = atualizado, actionSuccess = true) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = "Erro ao salvar progresso") }
-            }
-        }
-    }
-
-    fun concluirProjeto() {
-        val projeto = _uiState.value.projeto ?: return
-        viewModelScope.launch {
-            try {
-                val concluido = projeto.copy(
-                    status = StatusProjeto.CONCLUIDO,
-                    progresso = 100,
-                    dataConclusao = System.currentTimeMillis()
-                )
-                projetoRepository.salvar(concluido)
-                _uiState.update { it.copy(projeto = concluido, progressoSlider = 100f, actionSuccess = true) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = "Erro ao concluir projeto") }
-            }
-        }
-    }
-
-    fun atualizarStatus() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(actionSuccess = true) }
-            delay(2000)
-            _uiState.update { it.copy(actionSuccess = false) }
-        }
-    }
-
-    private fun generateMockMarcos(projeto: Projeto?): List<MarcoTimeline> {
-        if (projeto == null) return emptyList()
-        
-        val progresso = projeto.progresso
-        return listOf(
-            MarcoTimeline(
-                titulo = "Levantamento de Requisitos",
-                data = "10/05/2024",
-                status = if (progresso >= 20) TimelineStatus.COMPLETED else TimelineStatus.FUTURE
-            ),
-            MarcoTimeline(
-                titulo = "Desenvolvimento do MVP",
-                data = "05/06/2024",
-                status = if (progresso >= 40) TimelineStatus.COMPLETED 
-                        else if (progresso >= 20) TimelineStatus.CURRENT 
-                        else TimelineStatus.FUTURE
-            ),
-            MarcoTimeline(
-                titulo = "Testes e Validação",
-                data = "Em andamento",
-                status = if (progresso >= 60) TimelineStatus.COMPLETED 
-                        else if (progresso >= 40) TimelineStatus.CURRENT 
-                        else TimelineStatus.FUTURE
-            ),
-            MarcoTimeline(
-                titulo = "Implantação Piloto",
-                data = "20/06/2024",
-                status = if (progresso >= 80) TimelineStatus.COMPLETED 
-                        else if (progresso >= 60) TimelineStatus.CURRENT 
-                        else TimelineStatus.FUTURE
-            ),
-            MarcoTimeline(
-                titulo = "Lançamento Oficial",
-                data = "30/06/2024",
-                status = if (progresso >= 100) TimelineStatus.COMPLETED 
-                        else if (progresso >= 80) TimelineStatus.CURRENT 
-                        else TimelineStatus.FUTURE
-            )
-        )
-    }
-
-    private fun generateMockIdeiasVinculadas(): List<IdeiaVinculadaSimple> {
-        return listOf(
-            IdeiaVinculadaSimple(
-                id = "1",
-                titulo = "Alertas Inteligentes de Manutenção",
-                descricao = "Reduzir falhas e tempo de inatividade da frota.",
-                upvotes = 128
-            ),
-            IdeiaVinculadaSimple(
-                id = "2",
-                titulo = "Otimização de Rotas com IA",
-                descricao = "Reduzir custo de combustível e melhorar entregas.",
-                upvotes = 96
-            ),
-            IdeiaVinculadaSimple(
-                id = "3",
-                titulo = "Dashboard de Consumo",
-                descricao = "Visualização em tempo real do consumo.",
-                upvotes = 74
-            )
-        )
-    }
-
-    private fun generateMockMembros(projeto: Projeto?): List<AvatarData> {
-        if (projeto == null) return emptyList()
-        
-        val responsavelInitials = projeto.responsavelNome
-            .split(" ")
-            .take(2)
-            .mapNotNull { it.firstOrNull()?.uppercase() }
-            .joinToString("")
-        
-        return listOf(
-            AvatarData(responsavelInitials),
-            AvatarData("JC"),
-            AvatarData("MR"),
-            AvatarData("PL"),
-            AvatarData("TC")
-        )
-    }
-}
-
-data class IdeiaVinculadaSimple(
-    val id: String,
-    val titulo: String,
-    val descricao: String,
-    val upvotes: Int
-)
-
-data class ProjetoDetalheUiState(
-    val isLoading: Boolean = false,
-    val projeto: Projeto? = null,
-    val perfil: PerfilUsuario = PerfilUsuario.OPERADOR,
-    val progressoSlider: Float = 0f,
-    val errorMessage: String? = null,
-    val actionSuccess: Boolean = false,
-    val marcos: List<MarcoTimeline> = emptyList(),
-    val ideiasVinculadas: List<IdeiaVinculadaSimple> = emptyList(),
-    val membrosEquipe: List<AvatarData> = emptyList()
-)
 
 @Composable
 fun ProjetoDetalheScreen(
@@ -307,20 +109,9 @@ private fun ProjetoDetalheContent(
         modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.btn_voltar),
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            AguiaTopBar(
+                title = stringResource(R.string.projeto_detalhe_titulo),
+                onBackClick = onNavigateBack
             )
         },
         bottomBar = {
@@ -410,7 +201,7 @@ private fun ProjetoDetalheContent(
                     ) {
                         InfoCardSection(
                             responsavel = projeto.responsavelNome,
-                            prazo = formatDate(projeto.dataPrevistaConclusao),
+                            projeto = projeto,
                             membros = uiState.membrosEquipe
                         )
                     }
@@ -509,7 +300,7 @@ private fun ProgressSection(progress: Float) {
 @Composable
 private fun InfoCardSection(
     responsavel: String,
-    prazo: String,
+    projeto: Projeto,
     membros: List<AvatarData>
 ) {
     GlassCard(modifier = Modifier.fillMaxWidth()) {
@@ -521,13 +312,9 @@ private fun InfoCardSection(
                 label = stringResource(R.string.projeto_detalhe_responsavel),
                 value = responsavel
             )
-            
-            InfoRow(
-                icon = Icons.Default.CalendarToday,
-                label = stringResource(R.string.projeto_prazo),
-                value = prazo
-            )
-            
+
+            PrazoComparisonSection(projeto = projeto)
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -564,6 +351,126 @@ private fun InfoCardSection(
                     avatarSize = 36.dp
                 )
             }
+        }
+    }
+}
+
+private enum class PrazoStatus {
+    INDEFINIDO,
+    NO_PRAZO,
+    PROXIMO,
+    ATRASADO,
+    CONCLUIDO_NO_PRAZO,
+    CONCLUIDO_ATRASO
+}
+
+private fun calcularPrazoStatus(projeto: Projeto): PrazoStatus {
+    val prazo = projeto.dataPrevistaConclusao ?: return PrazoStatus.INDEFINIDO
+    val agora = System.currentTimeMillis()
+    val seteDiasMs = 7L * 24 * 60 * 60 * 1000
+
+    if (projeto.status == StatusProjeto.CONCLUIDO) {
+        val dataReal = projeto.dataConclusao ?: agora
+        return if (dataReal <= prazo) PrazoStatus.CONCLUIDO_NO_PRAZO else PrazoStatus.CONCLUIDO_ATRASO
+    }
+
+    return when {
+        agora > prazo -> PrazoStatus.ATRASADO
+        prazo - agora <= seteDiasMs -> PrazoStatus.PROXIMO
+        else -> PrazoStatus.NO_PRAZO
+    }
+}
+
+@Composable
+private fun PrazoComparisonSection(projeto: Projeto) {
+    val prazoStatus = calcularPrazoStatus(projeto)
+    val statusColor = when (prazoStatus) {
+        PrazoStatus.INDEFINIDO -> MaterialTheme.colorScheme.outline
+        PrazoStatus.NO_PRAZO, PrazoStatus.CONCLUIDO_NO_PRAZO -> SuccessGreen
+        PrazoStatus.PROXIMO -> WarningAmber
+        PrazoStatus.ATRASADO, PrazoStatus.CONCLUIDO_ATRASO -> ErrorRed
+    }
+    val statusLabelRes = when (prazoStatus) {
+        PrazoStatus.INDEFINIDO -> R.string.projeto_prazo_indefinido
+        PrazoStatus.NO_PRAZO -> R.string.projeto_prazo_no_prazo
+        PrazoStatus.PROXIMO -> R.string.projeto_prazo_proximo
+        PrazoStatus.ATRASADO -> R.string.projeto_prazo_atrasado
+        PrazoStatus.CONCLUIDO_NO_PRAZO -> R.string.projeto_prazo_concluido_prazo
+        PrazoStatus.CONCLUIDO_ATRASO -> R.string.projeto_prazo_concluido_atraso
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.CalendarToday,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = stringResource(R.string.projeto_prazo),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(statusColor.copy(alpha = 0.1f))
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.projeto_prazo_previsto),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    text = formatDate(projeto.dataPrevistaConclusao),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = stringResource(R.string.projeto_prazo_realizado),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    text = projeto.dataConclusao?.let { formatDate(it) }
+                        ?: stringResource(R.string.projeto_prazo_indefinido),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(statusColor)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(statusLabelRes),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = statusColor
+            )
         }
     }
 }

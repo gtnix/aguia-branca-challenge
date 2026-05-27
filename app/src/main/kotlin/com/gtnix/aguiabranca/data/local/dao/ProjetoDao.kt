@@ -9,23 +9,9 @@ import androidx.room.Update
 import com.gtnix.aguiabranca.data.local.entity.ProjetoEntity
 import kotlinx.coroutines.flow.Flow
 
-/**
- * DAO de Projetos
- *
- * ## Conceito FIAP - Material 07A
- *
- * Este DAO inclui queries para dashboard com agregações.
- */
 @Dao
 interface ProjetoDao {
 
-    // ========================================================================
-    // QUERIES DE LEITURA
-    // ========================================================================
-
-    /**
-     * Lista todos os projetos ordenados por status e data.
-     */
     @Query("""
         SELECT * FROM projetos 
         ORDER BY 
@@ -40,28 +26,15 @@ interface ProjetoDao {
     """)
     fun listarTodos(): Flow<List<ProjetoEntity>>
 
-    /**
-     * Lista projetos por área.
-     */
     @Query("SELECT * FROM projetos WHERE area = :area ORDER BY dataCriacao DESC")
     fun listarPorArea(area: String): Flow<List<ProjetoEntity>>
 
-    /**
-     * Lista projetos por status.
-     */
     @Query("SELECT * FROM projetos WHERE status = :status ORDER BY dataCriacao DESC")
     fun listarPorStatus(status: String): Flow<List<ProjetoEntity>>
 
-    /**
-     * Lista projetos de um responsável.
-     */
     @Query("SELECT * FROM projetos WHERE responsavelId = :responsavelId ORDER BY dataCriacao DESC")
     fun listarPorResponsavel(responsavelId: String): Flow<List<ProjetoEntity>>
 
-    /**
-     * Lista projetos onde o usuário é membro.
-     * Usa LIKE para buscar no JSON de membrosIds.
-     */
     @Query("""
         SELECT * FROM projetos 
         WHERE responsavelId = :usuarioId OR membrosIds LIKE '%' || :usuarioId || '%'
@@ -69,15 +42,8 @@ interface ProjetoDao {
     """)
     fun listarPorUsuario(usuarioId: String): Flow<List<ProjetoEntity>>
 
-    /**
-     * Lista projetos alinhados a uma orientação.
-     */
     @Query("SELECT * FROM projetos WHERE orientacaoId = :orientacaoId ORDER BY dataCriacao DESC")
     fun listarPorOrientacao(orientacaoId: String): Flow<List<ProjetoEntity>>
-
-    // ========================================================================
-    // QUERIES DE BUSCA E CONTAGEM
-    // ========================================================================
 
     @Query("SELECT * FROM projetos WHERE id = :id")
     suspend fun buscarPorId(id: String): ProjetoEntity?
@@ -88,15 +54,8 @@ interface ProjetoDao {
     @Query("SELECT COUNT(*) FROM projetos WHERE status = :status")
     suspend fun contarPorStatus(status: String): Int
 
-    /**
-     * Calcula média de progresso dos projetos em andamento.
-     */
     @Query("SELECT AVG(progresso) FROM projetos WHERE status = 'EM_ANDAMENTO'")
     suspend fun mediaProgressoEmAndamento(): Float?
-
-    // ========================================================================
-    // OPERAÇÕES DE ESCRITA
-    // ========================================================================
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserir(projeto: ProjetoEntity)
@@ -107,21 +66,12 @@ interface ProjetoDao {
     @Update
     suspend fun atualizar(projeto: ProjetoEntity)
 
-    /**
-     * Atualiza status do projeto.
-     */
     @Query("UPDATE projetos SET status = :novoStatus WHERE id = :id")
     suspend fun atualizarStatus(id: String, novoStatus: String)
 
-    /**
-     * Atualiza progresso do projeto.
-     */
     @Query("UPDATE projetos SET progresso = :progresso WHERE id = :id")
     suspend fun atualizarProgresso(id: String, progresso: Int)
 
-    /**
-     * Conclui um projeto.
-     */
     @Query("""
         UPDATE projetos 
         SET status = 'CONCLUIDO', 
@@ -132,9 +82,6 @@ interface ProjetoDao {
     """)
     suspend fun concluir(id: String, dataConclusao: Long, resultados: String?)
 
-    /**
-     * Atualiza lista de membros.
-     */
     @Query("UPDATE projetos SET membrosIds = :membrosIds WHERE id = :id")
     suspend fun atualizarMembros(id: String, membrosIds: String)
 

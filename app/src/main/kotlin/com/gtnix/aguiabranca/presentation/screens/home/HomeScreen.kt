@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,27 +23,25 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Radar
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.SupportAgent
+import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,7 +49,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -67,81 +63,60 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.R
+import com.gtnix.aguiabranca.domain.model.CategoriaOrientacao
+import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
-import com.gtnix.aguiabranca.presentation.components.AnimatedCurrencyCounter
-import com.gtnix.aguiabranca.presentation.components.FloatingNavBar
-import com.gtnix.aguiabranca.presentation.components.FloatingNavItem
-import com.gtnix.aguiabranca.presentation.components.AddNewIdeiaCard
+import com.gtnix.aguiabranca.domain.usecase.dashboard.IdeiaConvertidaRecente
+import com.gtnix.aguiabranca.domain.usecase.dashboard.WeeklyRecap
 import com.gtnix.aguiabranca.presentation.components.CompactIdeiaCard
+import com.gtnix.aguiabranca.presentation.components.GamificationSnippetCard
 import com.gtnix.aguiabranca.presentation.components.GradientMetricCard
 import com.gtnix.aguiabranca.presentation.components.GradientMetricCardDefaults
 import com.gtnix.aguiabranca.presentation.components.GlassCard
-import com.gtnix.aguiabranca.presentation.components.IdeiaStatusBadge
+import com.gtnix.aguiabranca.presentation.components.InovagabBrandLogo
 import com.gtnix.aguiabranca.presentation.components.InspirationHeroCard
+import com.gtnix.aguiabranca.presentation.components.LiderHeroCard
 import com.gtnix.aguiabranca.presentation.components.SectionHeader
 import com.gtnix.aguiabranca.presentation.components.SkeletonAvatar
 import com.gtnix.aguiabranca.presentation.components.SkeletonCard
 import com.gtnix.aguiabranca.presentation.components.SkeletonLoader
 import com.gtnix.aguiabranca.presentation.components.SkeletonMetricCard
 import com.gtnix.aguiabranca.presentation.components.SkeletonText
-import com.gtnix.aguiabranca.presentation.components.charts.DonutChart
+import com.gtnix.aguiabranca.presentation.components.charts.FunnelChartHorizontal
 import com.gtnix.aguiabranca.presentation.components.charts.FunnelStep
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.NavBarDimensions
 import com.gtnix.aguiabranca.presentation.theme.SuccessGreen
+import androidx.compose.ui.res.stringResource
 import com.gtnix.aguiabranca.presentation.util.bounceClick
 import com.gtnix.aguiabranca.presentation.util.formatPercent
 import java.util.Calendar
-
-@Composable
-fun HomeScreen(
-    viewModel: HomeViewModel,
-    perfil: String,
-    onNavigateToIdeias: () -> Unit,
-    onNavigateToProjetos: () -> Unit,
-    onNavigateToOrientacoes: () -> Unit,
-    onNavigateToPerfil: () -> Unit,
-    onNavigateToNovaIdeia: () -> Unit,
-    onNavigateToRadar: () -> Unit
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(perfil) {
-        viewModel.carregarDados(perfil)
-    }
-
-    HomeScreenContent(
-        uiState = uiState,
-        onRefresh = viewModel::refresh,
-        onNavigateToIdeias = onNavigateToIdeias,
-        onNavigateToProjetos = onNavigateToProjetos,
-        onNavigateToOrientacoes = onNavigateToOrientacoes,
-        onNavigateToPerfil = onNavigateToPerfil,
-        onNavigateToNovaIdeia = onNavigateToNovaIdeia,
-        onNavigateToRadar = onNavigateToRadar
-    )
-}
 
 @Composable
 fun HomeContent(
     viewModel: HomeViewModel,
     perfil: String,
     onNavigateToOrientacoes: () -> Unit,
+    onNavigateToOrientacaoDetalhe: (String) -> Unit = {},
     onNavigateToRadar: () -> Unit,
     onNavigateToLeaderDashboard: () -> Unit = {},
     onNavigateToNovaIdeia: () -> Unit = {},
     onNavigateToIdeias: () -> Unit = {},
-    onNavigateToProjetos: () -> Unit = {}
+    onNavigateToIdeiaDetalhe: (String) -> Unit = {},
+    onNavigateToProjetos: () -> Unit = {},
+    onNavigateToRanking: () -> Unit = {},
+    onNavigateToNovaOrientacao: () -> Unit = {},
+    onNavigateToNotificacoes: () -> Unit = {},
+    onNavigateToPerfilTab: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -153,82 +128,18 @@ fun HomeContent(
         uiState = uiState,
         onRefresh = viewModel::refresh,
         onNavigateToOrientacoes = onNavigateToOrientacoes,
+        onNavigateToOrientacaoDetalhe = onNavigateToOrientacaoDetalhe,
         onNavigateToRadar = onNavigateToRadar,
         onNavigateToLeaderDashboard = onNavigateToLeaderDashboard,
         onNavigateToNovaIdeia = onNavigateToNovaIdeia,
         onNavigateToIdeias = onNavigateToIdeias,
-        onNavigateToProjetos = onNavigateToProjetos
+        onNavigateToIdeiaDetalhe = onNavigateToIdeiaDetalhe,
+        onNavigateToProjetos = onNavigateToProjetos,
+        onNavigateToRanking = onNavigateToRanking,
+        onNavigateToNovaOrientacao = onNavigateToNovaOrientacao,
+        onNavigateToNotificacoes = onNavigateToNotificacoes,
+        onNavigateToPerfilTab = onNavigateToPerfilTab
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HomeScreenContent(
-    uiState: HomeUiState,
-    onRefresh: () -> Unit,
-    onNavigateToIdeias: () -> Unit,
-    onNavigateToProjetos: () -> Unit,
-    onNavigateToOrientacoes: () -> Unit,
-    onNavigateToPerfil: () -> Unit,
-    onNavigateToNovaIdeia: () -> Unit,
-    onNavigateToRadar: () -> Unit
-) {
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = {
-            val homeLabel = stringResource(R.string.nav_home)
-            val ideiasLabel = stringResource(R.string.nav_ideias)
-            val projetosLabel = stringResource(R.string.nav_projetos)
-            val perfilLabel = stringResource(R.string.nav_perfil)
-            
-            val navItems = buildList {
-                add(FloatingNavItem("home", homeLabel, Icons.Outlined.Home, Icons.Filled.Home))
-                add(FloatingNavItem("ideias", ideiasLabel, Icons.Outlined.Lightbulb, Icons.Filled.Lightbulb))
-                if (uiState.perfil != PerfilUsuario.OPERADOR) {
-                    add(FloatingNavItem("projetos", projetosLabel, Icons.Outlined.Folder, Icons.Filled.Folder))
-                }
-                add(FloatingNavItem("perfil", perfilLabel, Icons.Outlined.Person, Icons.Filled.Person))
-            }
-            
-            FloatingNavBar(
-                items = navItems,
-                selectedRoute = "home",
-                onItemSelected = { route ->
-                    when (route) {
-                        "ideias" -> onNavigateToIdeias()
-                        "projetos" -> onNavigateToProjetos()
-                        "perfil" -> onNavigateToPerfil()
-                    }
-                },
-                centerAction = if (uiState.perfil != PerfilUsuario.LIDER) onNavigateToNovaIdeia else null
-            )
-        }
-    ) { paddingValues ->
-        val pullRefreshState = rememberPullToRefreshState()
-        
-        PullToRefreshBox(
-            isRefreshing = uiState.isRefreshing,
-            onRefresh = onRefresh,
-            state = pullRefreshState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            if (uiState.isLoading && !uiState.isRefreshing) {
-                HomeSkeletonScreen()
-            } else {
-                HomePremiumContent(
-                    uiState = uiState,
-                    onNavigateToOrientacoes = onNavigateToOrientacoes,
-                    onNavigateToRadar = onNavigateToRadar,
-                    onNavigateToNovaIdeia = onNavigateToNovaIdeia,
-                    onNavigateToProjetos = onNavigateToProjetos,
-                    onNavigateToIdeias = onNavigateToIdeias,
-                    onActivityClick = {}
-                )
-            }
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -237,11 +148,17 @@ private fun HomeBodyContent(
     uiState: HomeUiState,
     onRefresh: () -> Unit,
     onNavigateToOrientacoes: () -> Unit,
+    onNavigateToOrientacaoDetalhe: (String) -> Unit = {},
     onNavigateToRadar: () -> Unit,
     onNavigateToLeaderDashboard: () -> Unit = {},
     onNavigateToNovaIdeia: () -> Unit = {},
     onNavigateToIdeias: () -> Unit = {},
-    onNavigateToProjetos: () -> Unit = {}
+    onNavigateToIdeiaDetalhe: (String) -> Unit = {},
+    onNavigateToProjetos: () -> Unit = {},
+    onNavigateToRanking: () -> Unit = {},
+    onNavigateToNovaOrientacao: () -> Unit = {},
+    onNavigateToNotificacoes: () -> Unit = {},
+    onNavigateToPerfilTab: () -> Unit = {}
 ) {
     val pullRefreshState = rememberPullToRefreshState()
     
@@ -258,57 +175,83 @@ private fun HomeBodyContent(
                 HomePremiumContent(
                     uiState = uiState,
                     onNavigateToOrientacoes = onNavigateToOrientacoes,
+                    onNavigateToOrientacaoDetalhe = onNavigateToOrientacaoDetalhe,
                     onNavigateToRadar = onNavigateToRadar,
-                    onNavigateToNovaIdeia = onNavigateToNovaIdeia,
                     onNavigateToProjetos = onNavigateToProjetos,
                     onNavigateToIdeias = onNavigateToIdeias,
-                    onActivityClick = {},
-                    onNavigateToLeaderDashboard = onNavigateToLeaderDashboard
+                    onNavigateToIdeiaDetalhe = onNavigateToIdeiaDetalhe,
+                    onActivityClick = onNavigateToIdeiaDetalhe,
+                    onNavigateToLeaderDashboard = onNavigateToLeaderDashboard,
+                    onNavigateToNovaIdeia = onNavigateToNovaIdeia,
+                    onNavigateToRanking = onNavigateToRanking,
+                    onNavigateToNovaOrientacao = onNavigateToNovaOrientacao,
+                    onNavigateToNotificacoes = onNavigateToNotificacoes,
+                    onNavigateToPerfilTab = onNavigateToPerfilTab
                 )
             }
         }
     }
 }
 
-// =============================================================================
-// PREMIUM HOME CONTENT
-// =============================================================================
-
 @Composable
 private fun HomePremiumContent(
     uiState: HomeUiState,
     onNavigateToOrientacoes: () -> Unit,
+    onNavigateToOrientacaoDetalhe: (String) -> Unit = {},
     onNavigateToRadar: () -> Unit,
-    onNavigateToNovaIdeia: () -> Unit,
     onNavigateToProjetos: () -> Unit,
     onNavigateToIdeias: () -> Unit,
+    onNavigateToIdeiaDetalhe: (String) -> Unit,
     onActivityClick: (String) -> Unit,
-    onNavigateToLeaderDashboard: () -> Unit = {}
+    onNavigateToLeaderDashboard: () -> Unit = {},
+    onNavigateToNovaIdeia: () -> Unit = {},
+    onNavigateToRanking: () -> Unit = {},
+    onNavigateToNovaOrientacao: () -> Unit = {},
+    onNavigateToNotificacoes: () -> Unit = {},
+    onNavigateToPerfilTab: () -> Unit = {}
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 24.dp)
+        contentPadding = PaddingValues(bottom = NavBarDimensions.ContentBottomPaddingWithFab)
     ) {
         item {
-            PremiumTopBar(onNotificationClick = {})
+            // Para o líder, aproveitamos o slot do avatar para mostrar um chip
+            // compacto com nível + posição (substitui o GamificationSnippetCard
+            // grande, evitando duplicação com NivelCard do Perfil — decisão da
+            // seção 9 "Redundâncias" da auditoria).
+            PremiumTopBar(
+                nomeUsuario = uiState.nomeUsuario,
+                onNotificationsClick = onNavigateToNotificacoes,
+                onProfileClick = onNavigateToPerfilTab,
+                liderNivelChip = if (uiState.perfil == PerfilUsuario.LIDER && uiState.pontuacao != null) {
+                    LiderNivelChipState(
+                        nivelLabel = uiState.pontuacao.nivel.label,
+                        posicao = uiState.posicaoRanking
+                    )
+                } else null,
+                onNivelChipClick = onNavigateToRanking
+            )
         }
-        
+
+        item {
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+
         item {
             GreetingSection(
                 nome = uiState.nomeUsuario,
+                perfil = uiState.perfil,
+                ideiasPendentes = uiState.ideiasPendentesAvaliacao,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
         }
-        
+
         item {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
         }
-        
-        // =====================================================================
-        // GESTOR-SPECIFIC FLOW
-        // =====================================================================
+
         if (uiState.perfil == PerfilUsuario.GESTOR) {
             item {
                 GestorHeroCard(
@@ -365,12 +308,23 @@ private fun HomePremiumContent(
                 }
             }
 
+            if (uiState.orientacoes.isNotEmpty()) {
+                item {
+                    HomeOrientacoesSection(
+                        orientacoes = uiState.orientacoes,
+                        onSeeAllClick = onNavigateToOrientacoes,
+                        onOrientacaoClick = onNavigateToOrientacaoDetalhe,
+                        sectionActionLabel = stringResource(R.string.orientacao_ver_todas),
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+            }
+
             item {
-                GestorQuickActionsSection(
-                    ideiasPendentes = uiState.ideiasPendentes,
-                    totalProjetos = uiState.totalProjetos,
-                    onAvaliarClick = onNavigateToIdeias,
-                    onProjetosClick = onNavigateToProjetos,
+                HomeComplementActionsSection(
                     onRadarClick = onNavigateToRadar,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
@@ -379,120 +333,48 @@ private fun HomePremiumContent(
             item {
                 Spacer(modifier = Modifier.height(24.dp))
             }
+        }
 
+        if (uiState.perfil == PerfilUsuario.OPERADOR) {
             if (uiState.orientacoes.isNotEmpty()) {
                 item {
-                    SectionHeader(
-                        title = stringResource(R.string.home_section_orientacoes),
+                    HomeOrientacoesSection(
+                        orientacoes = uiState.orientacoes,
+                        onSeeAllClick = onNavigateToOrientacoes,
+                        onOrientacaoClick = onNavigateToOrientacaoDetalhe,
+                        sectionActionLabel = stringResource(R.string.orientacao_ver_todas),
                         modifier = Modifier.padding(horizontal = 20.dp)
                     )
-                }
-                item {
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(horizontal = 20.dp)
-                    ) {
-                        items(
-                            items = uiState.orientacoes,
-                            key = { it.id }
-                        ) { orientacao ->
-                            OrientacaoCard(
-                                titulo = orientacao.titulo,
-                                categoria = orientacao.categoria.name
-                            )
-                        }
-                    }
                 }
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
                 }
             }
 
-            if (uiState.minhasIdeias.isNotEmpty()) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.home_gestor_ideias_recentes),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable(onClick = onNavigateToIdeias)
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = stringResource(R.string.home_gestor_ver_todas),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
-                }
+            if (uiState.ideiasConvertidasRecentes.isNotEmpty()) {
                 items(
-                    items = uiState.minhasIdeias.take(5),
-                    key = { it.id }
-                ) { ideia ->
-                    IdeiaResumoCard(
-                        titulo = ideia.titulo,
-                        status = ideia.status,
-                        area = ideia.area.name,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
+                    items = uiState.ideiasConvertidasRecentes,
+                    key = { it.ideia.id }
+                ) { convertida ->
+                    IdeiaConvertidaCard(
+                        convertida = convertida,
+                        onClick = { onNavigateToIdeiaDetalhe(convertida.ideia.id) },
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 12.dp)
                     )
                 }
+                item {
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
             }
-        }
 
-        // =====================================================================
-        // OPERADOR-SPECIFIC FLOW
-        // =====================================================================
-        if (uiState.perfil == PerfilUsuario.OPERADOR) {
-            item {
-                OperadorMetricsSection(
-                    totalIdeias = uiState.totalIdeias,
-                    ideiasAprovadas = uiState.ideiasAprovadas,
-                    engajamento = uiState.engajamentoPercentual,
-                    isDarkTheme = isDarkTheme,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-            
-            item {
-                InspirationHeroCard(
-                    headline = stringResource(R.string.hero_headline_operador),
-                    subheadline = stringResource(R.string.hero_subheadline_operador),
-                    ctaText = stringResource(R.string.hero_cta_operador),
-                    onCtaClick = onNavigateToNovaIdeia,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-            
             if (uiState.minhasIdeias.isNotEmpty()) {
                 item {
                     SectionHeader(
                         title = stringResource(R.string.home_section_minhas_ideias),
+                        actionLabel = stringResource(R.string.home_activity_see_all),
+                        onActionClick = onNavigateToIdeias,
                         modifier = Modifier.padding(horizontal = 20.dp)
                     )
                 }
@@ -508,52 +390,7 @@ private fun HomePremiumContent(
                             CompactIdeiaCard(
                                 titulo = ideia.titulo,
                                 status = ideia.status.name.replace("_", " "),
-                                onClick = { }
-                            )
-                        }
-                        item {
-                            AddNewIdeiaCard(onClick = onNavigateToNovaIdeia)
-                        }
-                    }
-                }
-                item {
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
-            }
-
-            if (uiState.atividadesRecentes.isNotEmpty()) {
-                item {
-                    AtividadeRecenteSection(
-                        atividades = uiState.atividadesRecentes,
-                        onSeeAllClick = onNavigateToIdeias,
-                        onActivityClick = onActivityClick,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
-            }
-
-            if (uiState.orientacoes.isNotEmpty()) {
-                item {
-                    SectionHeader(
-                        title = stringResource(R.string.home_section_orientacoes),
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                }
-                item {
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(horizontal = 20.dp)
-                    ) {
-                        items(
-                            items = uiState.orientacoes,
-                            key = { it.id }
-                        ) { orientacao ->
-                            OrientacaoCard(
-                                titulo = orientacao.titulo,
-                                categoria = orientacao.categoria.name
+                                onClick = { onNavigateToIdeiaDetalhe(ideia.id) }
                             )
                         }
                     }
@@ -561,53 +398,123 @@ private fun HomePremiumContent(
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
                 }
-            }
-
-            item {
-                SectionHeader(
-                    title = stringResource(R.string.home_quick_actions),
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-            }
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    ActionCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.Lightbulb,
-                        title = stringResource(R.string.ideias_nova),
-                        onClick = onNavigateToNovaIdeia
-                    )
-                    ActionCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.Lightbulb,
-                        title = stringResource(R.string.nav_ideias),
-                        onClick = onNavigateToIdeias
+            } else {
+                item {
+                    InspirationHeroCard(
+                        headline = stringResource(R.string.hero_headline_operador),
+                        subheadline = stringResource(R.string.hero_subheadline_operador),
+                        ctaText = stringResource(R.string.hero_cta_operador),
+                        onCtaClick = onNavigateToNovaIdeia,
+                        modifier = Modifier.padding(horizontal = 20.dp)
                     )
                 }
+                item {
+                    Spacer(modifier = Modifier.height(28.dp))
+                }
             }
-        }
 
-        // =====================================================================
-        // LIDER-SPECIFIC FLOW
-        // =====================================================================
-        if (uiState.perfil == PerfilUsuario.LIDER) {
+            if (uiState.pontuacao != null) {
+                item {
+                    GamificationSnippetCard(
+                        pontuacao = uiState.pontuacao,
+                        posicaoRanking = uiState.posicaoRanking,
+                        onClick = onNavigateToRanking,
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+            }
+
             item {
-                PremiumMetricsSection(
+                OperadorMetricsSimplificado(
                     totalIdeias = uiState.totalIdeias,
-                    totalProjetos = uiState.totalProjetos,
-                    engajamento = uiState.engajamentoPercentual,
+                    ideiasAprovadas = uiState.ideiasAprovadas,
                     isDarkTheme = isDarkTheme,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
 
             item {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+
+        if (uiState.perfil == PerfilUsuario.LIDER) {
+            item {
+                LiderHeroCard(
+                    orientacoesAtivas = uiState.orientacoes.size,
+                    onPublicarClick = onNavigateToNovaOrientacao,
+                    onVerOrientacoesClick = onNavigateToOrientacoes,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            // KPI strip clicável (L-10): cada cartão navega para a tela
+            // correspondente — Ideias, Projetos e Leader Dashboard.
+            item {
+                PremiumMetricsSection(
+                    totalIdeias = uiState.totalIdeias,
+                    totalProjetos = uiState.totalProjetos,
+                    engajamento = uiState.engajamentoPercentual,
+                    isDarkTheme = isDarkTheme,
+                    onIdeiasClick = onNavigateToIdeias,
+                    onProjetosClick = onNavigateToProjetos,
+                    onEngajamentoClick = onNavigateToLeaderDashboard,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(28.dp))
+            }
+
+            if (uiState.orientacoes.isNotEmpty()) {
+                item {
+                    HomeOrientacoesSection(
+                        orientacoes = uiState.orientacoes,
+                        onSeeAllClick = onNavigateToOrientacoes,
+                        onOrientacaoClick = onNavigateToOrientacaoDetalhe,
+                        sectionActionLabel = stringResource(R.string.home_manage_strategy),
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+            }
+
+            // Recap semanal.
+            item {
+                WeeklyRecapCard(
+                    recap = uiState.weeklyRecap,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            // Resumo executivo + funil mini inline (L-16).
+            item {
+                ExecutiveSummaryCTACard(
+                    roi = uiState.roiConsolidado,
+                    totalIdeias = uiState.totalIdeias,
+                    ideiasAprovadas = uiState.ideiasAprovadas,
+                    ideiasEmProjeto = uiState.ideiasEmProjeto,
+                    onClick = onNavigateToLeaderDashboard,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
             }
 
             if (uiState.atividadesRecentes.isNotEmpty()) {
@@ -624,170 +531,251 @@ private fun HomePremiumContent(
                 }
             }
 
-            if (uiState.orientacoes.isNotEmpty()) {
-                item {
-                    SectionHeader(
-                        title = stringResource(R.string.home_section_orientacoes),
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                }
-                item {
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(horizontal = 20.dp)
-                    ) {
-                        items(
-                            items = uiState.orientacoes,
-                            key = { it.id }
-                        ) { orientacao ->
-                            OrientacaoCard(
-                                titulo = orientacao.titulo,
-                                categoria = orientacao.categoria.name
-                            )
-                        }
-                    }
-                }
-                item {
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
-            }
-
+            // Explorar (Radar de Inovação).
             item {
-                SectionHeader(
-                    title = stringResource(R.string.dashboard_titulo),
+                HomeComplementActionsSection(
+                    onRadarClick = onNavigateToRadar,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
-            }
-            item {
-                DashboardExecutivo(
-                    totalIdeias = uiState.totalIdeias,
-                    ideiasAprovadas = uiState.ideiasAprovadas,
-                    projetosAtivos = uiState.ideiasEmProjeto,
-                    investimentoTotal = uiState.investimentoTotal,
-                    retornoTotal = uiState.retornoTotal,
-                    roi = uiState.roiConsolidado,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-            item {
-                ExecutiveActionsCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    icon = Icons.Default.Insights,
-                    title = stringResource(R.string.leader_resumo_executivo),
-                    subtitle = "Visão consolidada de métricas e insights",
-                    onClick = onNavigateToLeaderDashboard,
-                    isHighlighted = true
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    ActionCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.Settings,
-                        title = stringResource(R.string.home_manage_strategy),
-                        onClick = onNavigateToOrientacoes
-                    )
-                    ActionCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.Radar,
-                        title = stringResource(R.string.home_innovation_radar),
-                        onClick = onNavigateToRadar
-                    )
-                }
             }
             item {
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
-        
-        item {
-            Spacer(modifier = Modifier.height(NavBarDimensions.ContentBottomPaddingWithFab))
+    }
+}
+
+/**
+ * Estado opcional do chip de nível compacto exibido na top bar do líder
+ * (decisão da seção 9 "Redundâncias" — substitui o GamificationSnippetCard
+ * grande para liberar espaço ao Hero CTA).
+ */
+private data class LiderNivelChipState(
+    val nivelLabel: String,
+    val posicao: Int?
+)
+
+@Composable
+private fun PremiumTopBar(
+    nomeUsuario: String,
+    onNotificationsClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
+    liderNivelChip: LiderNivelChipState? = null,
+    onNivelChipClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    val cdNotifications = stringResource(R.string.cd_notifications)
+    val cdAvatar = stringResource(R.string.cd_user_avatar)
+    val initial = nomeUsuario.trim().firstOrNull()?.uppercase() ?: "?"
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, top = 10.dp, end = 12.dp, bottom = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        InovagabBrandLogo()
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (liderNivelChip != null) {
+                LiderNivelChip(
+                    state = liderNivelChip,
+                    onClick = onNivelChipClick
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            IconButton(onClick = onNotificationsClick) {
+                Icon(
+                    imageVector = Icons.Outlined.Notifications,
+                    contentDescription = cdNotifications,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .clickable(onClick = onProfileClick)
+                    .semantics { contentDescription = cdAvatar },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = initial,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }
 
-// =============================================================================
-// PREMIUM TOP BAR
-// =============================================================================
-
 @Composable
-private fun PremiumTopBar(
-    onNotificationClick: () -> Unit,
-    modifier: Modifier = Modifier
+private fun LiderNivelChip(
+    state: LiderNivelChipState,
+    onClick: () -> Unit
 ) {
-    val cdNotifications = stringResource(R.string.cd_notifications)
-    
+    val color = MaterialTheme.colorScheme.primary
+    val label = if (state.posicao != null) {
+        stringResource(R.string.home_lider_chip_nivel, state.nivelLabel, state.posicao)
+    } else {
+        stringResource(R.string.home_lider_chip_nivel_sem_ranking, state.nivelLabel)
+    }
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(color.copy(alpha = 0.12f))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = stringResource(R.string.home_logo),
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
+        Icon(
+            imageVector = Icons.Default.Star,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(14.dp)
         )
-        
-        IconButton(
-            onClick = onNotificationClick,
-            modifier = Modifier.semantics { contentDescription = cdNotifications }
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = color,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun GreetingSection(
+    nome: String,
+    perfil: PerfilUsuario,
+    ideiasPendentes: Int,
+    modifier: Modifier = Modifier
+) {
+    val greeting = getGreetingByTime()
+    val cdOnline = stringResource(R.string.cd_status_online)
+    val subtitle = when (perfil) {
+        PerfilUsuario.OPERADOR -> when {
+            ideiasPendentes > 1 -> stringResource(R.string.home_greeting_operador_pendentes_plural, ideiasPendentes)
+            ideiasPendentes == 1 -> stringResource(R.string.home_greeting_operador_pendentes_single)
+            else -> stringResource(R.string.home_greeting_operador_empty)
+        }
+        PerfilUsuario.LIDER -> when {
+            ideiasPendentes > 1 -> stringResource(
+                R.string.home_greeting_lider_pendentes_plural,
+                ideiasPendentes
+            )
+            ideiasPendentes == 1 -> stringResource(R.string.home_greeting_lider_pendentes_single)
+            else -> stringResource(R.string.home_greeting_lider_empty)
+        }
+        PerfilUsuario.GESTOR -> null
+    }
+
+    Column(modifier = modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Notifications,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface
+            Text(
+                text = "$greeting, $nome!",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(SuccessGreen, CircleShape)
+                    .semantics { contentDescription = cdOnline }
+            )
+        }
+
+        if (subtitle != null) {
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
 }
 
-// =============================================================================
-// GREETING SECTION
-// =============================================================================
-
 @Composable
-private fun GreetingSection(
-    nome: String,
+private fun WeeklyRecapCard(
+    recap: WeeklyRecap,
     modifier: Modifier = Modifier
 ) {
-    val greeting = getGreetingByTime()
-    val cdOnline = stringResource(R.string.cd_status_online)
-    
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+    val resources = LocalContext.current.resources
+    val summary = buildString {
+        append(stringResource(R.string.home_recap_prefix))
+        append(' ')
+        append(resources.getQuantityString(R.plurals.home_recap_novas_ideias, recap.novasIdeias, recap.novasIdeias))
+        append(", ")
+        append(resources.getQuantityString(R.plurals.home_recap_avaliacoes, recap.avaliacoes, recap.avaliacoes))
+        append(", ")
+        append(resources.getQuantityString(R.plurals.home_projetos_atualizados, recap.projetosAtualizados, recap.projetosAtualizados))
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Text(
-            text = "$greeting, $nome",
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        
-        Spacer(modifier = Modifier.width(8.dp))
-        
-        Box(
+        Row(
             modifier = Modifier
-                .size(12.dp)
-                .background(SuccessGreen, CircleShape)
-                .semantics { contentDescription = cdOnline }
-        )
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                        CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.home_recap_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = summary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
     }
 }
 
@@ -801,9 +789,6 @@ private fun getGreetingByTime(): String {
     }
 }
 
-// =============================================================================
-// PREMIUM METRICS SECTION
-// =============================================================================
 
 @Composable
 private fun PremiumMetricsSection(
@@ -811,14 +796,19 @@ private fun PremiumMetricsSection(
     totalProjetos: Int,
     engajamento: Int,
     isDarkTheme: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onIdeiasClick: (() -> Unit)? = null,
+    onProjetosClick: (() -> Unit)? = null,
+    onEngajamentoClick: (() -> Unit)? = null
 ) {
     val ideiasLabel = stringResource(R.string.home_metric_ideias_ativas)
     val projetosLabel = stringResource(R.string.home_metric_projetos)
-    val engajamentoLabel = stringResource(R.string.home_metric_engajamento)
-    val thisWeek = stringResource(R.string.home_trend_this_week)
-    val thisMonth = stringResource(R.string.home_trend_this_month)
-    
+    val engajamentoLabel = stringResource(R.string.home_metric_engajamento_short)
+
+    val cdIdeias = stringResource(R.string.cd_lider_kpi_ideias)
+    val cdProjetos = stringResource(R.string.cd_lider_kpi_projetos)
+    val cdEngajamento = stringResource(R.string.cd_lider_kpi_engajamento)
+
     val unifiedGradient = if (isDarkTheme) {
         GradientMetricCardDefaults.UnifiedGradientDark
     } else {
@@ -830,33 +820,51 @@ private fun PremiumMetricsSection(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         GradientMetricCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .then(
+                    if (onIdeiasClick != null) {
+                        Modifier
+                            .bounceClick(onClick = onIdeiasClick)
+                            .semantics { contentDescription = cdIdeias }
+                    } else Modifier
+                ),
             title = ideiasLabel,
             value = totalIdeias.toString(),
-            trend = "+12 $thisWeek",
-            trendPositive = true,
             icon = Icons.Default.Lightbulb,
             gradientColors = unifiedGradient,
             accentColor = MaterialTheme.colorScheme.primary
         )
-        
+
         GradientMetricCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .then(
+                    if (onProjetosClick != null) {
+                        Modifier
+                            .bounceClick(onClick = onProjetosClick)
+                            .semantics { contentDescription = cdProjetos }
+                    } else Modifier
+                ),
             title = projetosLabel,
             value = totalProjetos.toString(),
-            trend = "+3 $thisMonth",
-            trendPositive = true,
             icon = Icons.Default.Folder,
             gradientColors = unifiedGradient,
             accentColor = MaterialTheme.colorScheme.tertiary
         )
-        
+
         GradientMetricCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .then(
+                    if (onEngajamentoClick != null) {
+                        Modifier
+                            .bounceClick(onClick = onEngajamentoClick)
+                            .semantics { contentDescription = cdEngajamento }
+                    } else Modifier
+                ),
             title = engajamentoLabel,
             value = "$engajamento%",
-            trend = "+8% $thisMonth",
-            trendPositive = true,
             icon = Icons.Default.Groups,
             gradientColors = unifiedGradient,
             accentColor = MaterialTheme.colorScheme.secondary
@@ -865,18 +873,118 @@ private fun PremiumMetricsSection(
 }
 
 @Composable
-private fun OperadorMetricsSection(
+private fun IdeiaConvertidaCard(
+    convertida: IdeiaConvertidaRecente,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val shape = RoundedCornerShape(20.dp)
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val roiColor = if (convertida.roi >= 0) SuccessGreen else MaterialTheme.colorScheme.error
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .bounceClick(onClick = onClick)
+            .clip(shape)
+            .shadow(
+                elevation = 12.dp,
+                shape = shape,
+                ambientColor = primaryColor.copy(alpha = 0.25f),
+                spotColor = primaryColor.copy(alpha = 0.25f)
+            )
+            .background(
+                Brush.horizontalGradient(
+                    colors = listOf(
+                        primaryColor,
+                        primaryColor.copy(alpha = 0.85f)
+                    )
+                ),
+                shape
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(52.dp)
+                    .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.AutoAwesome,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.home_ideia_convertida_titulo),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(
+                        R.string.home_ideia_convertida_subtitulo,
+                        convertida.ideia.titulo,
+                        convertida.projeto.nome
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = if (convertida.roi >= 0) {
+                            Icons.AutoMirrored.Filled.TrendingUp
+                        } else {
+                            Icons.AutoMirrored.Filled.TrendingDown
+                        },
+                        contentDescription = null,
+                        tint = roiColor,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(
+                            R.string.home_ideia_convertida_roi,
+                            formatPercent(convertida.roi)
+                        ),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = roiColor
+                    )
+                }
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun OperadorMetricsSimplificado(
     totalIdeias: Int,
     ideiasAprovadas: Int,
-    engajamento: Int,
     isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
     val minhasIdeiasLabel = stringResource(R.string.home_metric_minhas_ideias)
     val aprovadasLabel = stringResource(R.string.home_metric_aprovadas)
-    val engajamentoLabel = stringResource(R.string.home_metric_engajamento)
-    val thisWeek = stringResource(R.string.home_trend_this_week)
-    val thisMonth = stringResource(R.string.home_trend_this_month)
     
     val unifiedGradient = if (isDarkTheme) {
         GradientMetricCardDefaults.UnifiedGradientDark
@@ -892,8 +1000,6 @@ private fun OperadorMetricsSection(
             modifier = Modifier.weight(1f),
             title = minhasIdeiasLabel,
             value = totalIdeias.toString(),
-            trend = "+2 $thisWeek",
-            trendPositive = true,
             icon = Icons.Default.Lightbulb,
             gradientColors = unifiedGradient,
             accentColor = MaterialTheme.colorScheme.primary
@@ -903,29 +1009,13 @@ private fun OperadorMetricsSection(
             modifier = Modifier.weight(1f),
             title = aprovadasLabel,
             value = ideiasAprovadas.toString(),
-            trend = "+1 $thisMonth",
-            trendPositive = true,
             icon = Icons.AutoMirrored.Filled.TrendingUp,
             gradientColors = unifiedGradient,
             accentColor = SuccessGreen
         )
-        
-        GradientMetricCard(
-            modifier = Modifier.weight(1f),
-            title = engajamentoLabel,
-            value = "$engajamento%",
-            trend = "+5% $thisMonth",
-            trendPositive = true,
-            icon = Icons.Default.Groups,
-            gradientColors = unifiedGradient,
-            accentColor = MaterialTheme.colorScheme.secondary
-        )
     }
 }
 
-// =============================================================================
-// ATIVIDADE RECENTE SECTION
-// =============================================================================
 
 @Composable
 private fun AtividadeRecenteSection(
@@ -1103,9 +1193,6 @@ private fun formatTimestamp(timestamp: Long): String {
     }
 }
 
-// =============================================================================
-// SKELETON LOADING SCREEN
-// =============================================================================
 
 @Composable
 private fun HomeSkeletonScreen(
@@ -1161,339 +1248,379 @@ private fun HomeSkeletonScreen(
     }
 }
 
-// =============================================================================
-// DASHBOARD EXECUTIVO (Líder only) - Premium Bento Grid Layout
-// =============================================================================
 
 @Composable
-private fun DashboardExecutivo(
+private fun ExecutiveSummaryCTACard(
+    roi: Double,
     totalIdeias: Int,
     ideiasAprovadas: Int,
-    projetosAtivos: Int,
-    investimentoTotal: Double,
-    retornoTotal: Double,
-    roi: Double,
+    ideiasEmProjeto: Int,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isDarkTheme = isSystemInDarkTheme()
-    val cardShape = RoundedCornerShape(24.dp)
-    val cardColors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surface
-    )
-    val cardElevation = CardDefaults.cardElevation(
-        defaultElevation = if (isDarkTheme) 0.dp else 4.dp
-    )
-    val borderColor = if (isDarkTheme) {
-        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.12f)
+    val shape = RoundedCornerShape(24.dp)
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val roiColor = if (roi >= 0) SuccessGreen else MaterialTheme.colorScheme.error
+    val trendIcon = if (roi >= 0) {
+        Icons.AutoMirrored.Filled.TrendingUp
     } else {
-        Color.Transparent
+        Icons.AutoMirrored.Filled.TrendingDown
     }
-    
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // ROI Hero Card - Full Width
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (isDarkTheme) Modifier.border(1.dp, borderColor, cardShape)
-                    else Modifier
-                ),
-            colors = cardColors,
-            shape = cardShape,
-            elevation = cardElevation
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = stringResource(R.string.dashboard_roi_anual),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    val roiColor = if (roi >= 0) SuccessGreen else MaterialTheme.colorScheme.error
-                    Text(
-                        text = formatPercent(roi),
-                        style = MaterialTheme.typography.displaySmall,
-                        fontWeight = FontWeight.Bold,
-                        color = roiColor
-                    )
-                    
-                    Spacer(modifier = Modifier.height(4.dp))
-                    
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (roi >= 0) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown,
-                            contentDescription = null,
-                            tint = roiColor,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = if (roi >= 0) "+2.3% vs mês anterior" else "-1.2% vs mês anterior",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = roiColor
-                        )
-                    }
-                }
-                
-                val roiColor = if (roi >= 0) SuccessGreen else MaterialTheme.colorScheme.error
-                DonutChart(
-                    percentage = (roi.toFloat() / 100f).coerceIn(0f, 1f),
-                    centerText = "",
-                    color = roiColor,
-                    size = 80.dp,
-                    strokeWidth = 10.dp
-                )
-            }
-        }
 
-        // Funil Card - Full Width
-        Card(
+    val gradientColors = if (isDarkTheme) {
+        listOf(
+            primaryColor.copy(alpha = 0.22f),
+            primaryColor.copy(alpha = 0.10f),
+            MaterialTheme.colorScheme.surface
+        )
+    } else {
+        listOf(
+            primaryColor.copy(alpha = 0.14f),
+            primaryColor.copy(alpha = 0.05f),
+            MaterialTheme.colorScheme.surface
+        )
+    }
+
+    val borderColor = if (isDarkTheme) {
+        primaryColor.copy(alpha = 0.25f)
+    } else {
+        primaryColor.copy(alpha = 0.15f)
+    }
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .bounceClick(onClick = onClick),
+        shape = shape,
+        color = Color.Transparent
+    ) {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (isDarkTheme) Modifier.border(1.dp, borderColor, cardShape)
-                    else Modifier
-                ),
-            colors = cardColors,
-            shape = cardShape,
-            elevation = cardElevation
+                .background(Brush.linearGradient(gradientColors))
+                .border(1.dp, borderColor, shape)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp)
+                    .padding(20.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.funil_title),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
-                Spacer(modifier = Modifier.height(20.dp))
-                
-                val ideiasLabel = stringResource(R.string.funil_ideias)
-                val aprovadasLabel = stringResource(R.string.funil_aprovadas)
-                val projetosLabel = stringResource(R.string.funil_em_projeto)
-                
-                FunnelChartHorizontal(
-                    steps = listOf(
-                        FunnelStep(ideiasLabel, totalIdeias, MaterialTheme.colorScheme.primary),
-                        FunnelStep(aprovadasLabel, ideiasAprovadas, SuccessGreen),
-                        FunnelStep(projetosLabel, projetosAtivos, MaterialTheme.colorScheme.tertiary)
-                    )
-                )
-            }
-        }
-
-        // Financeiro - Split Cards
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            FinanceiroMiniCard(
-                label = stringResource(R.string.dashboard_investimento),
-                value = investimentoTotal,
-                isNegative = true,
-                isDarkTheme = isDarkTheme,
-                modifier = Modifier.weight(1f)
-            )
-            FinanceiroMiniCard(
-                label = stringResource(R.string.dashboard_retorno),
-                value = retornoTotal,
-                isNegative = false,
-                isDarkTheme = isDarkTheme,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Composable
-private fun FunnelChartHorizontal(
-    steps: List<FunnelStep>,
-    modifier: Modifier = Modifier
-) {
-    val maxValue = steps.maxOfOrNull { it.value }?.toFloat()?.coerceAtLeast(1f) ?: 1f
-    
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        steps.forEach { step ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = step.label,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.width(90.dp)
-                )
-                
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(24.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(step.color.copy(alpha = 0.12f))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    val fraction = (step.value.toFloat() / maxValue).coerceIn(0f, 1f)
                     Box(
                         modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth(fraction)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(step.color)
+                            .size(44.dp)
+                            .background(
+                                if (isDarkTheme) Color.White.copy(alpha = 0.12f)
+                                else primaryColor.copy(alpha = 0.12f),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Insights,
+                            contentDescription = null,
+                            tint = if (isDarkTheme) Color.White else primaryColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.leader_resumo_executivo),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-                
-                Spacer(modifier = Modifier.width(12.dp))
-                
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.dashboard_roi),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = formatPercent(roi),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = roiColor
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(roiColor.copy(alpha = if (isDarkTheme) 0.15f else 0.1f))
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = trendIcon,
+                            contentDescription = null,
+                            tint = roiColor,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Text(
-                    text = step.value.toString(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = step.color,
-                    modifier = Modifier.width(36.dp),
-                    textAlign = TextAlign.End
+                    text = stringResource(
+                        R.string.home_lider_funil_inline,
+                        totalIdeias,
+                        ideiasAprovadas,
+                        ideiasEmProjeto
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = stringResource(R.string.home_leader_ver_analise_completa),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = primaryColor
                 )
             }
         }
     }
 }
+
 
 @Composable
-private fun FinanceiroMiniCard(
-    label: String,
-    value: Double,
-    isNegative: Boolean,
-    isDarkTheme: Boolean,
+private fun HomeOrientacoesSection(
+    orientacoes: List<OrientacaoEstrategica>,
+    onSeeAllClick: () -> Unit,
+    onOrientacaoClick: (String) -> Unit,
+    sectionActionLabel: String,
     modifier: Modifier = Modifier
 ) {
-    val cardShape = RoundedCornerShape(20.dp)
-    val borderColor = if (isDarkTheme) {
-        Color.White.copy(alpha = 0.06f)
-    } else {
-        Color(0xFFE5E7EB)
-    }
-    
-    val accentColor = if (isNegative) MaterialTheme.colorScheme.error else SuccessGreen
-    val backgroundColor = if (isDarkTheme) {
-        Color(0xFF1C1C1E)
-    } else {
-        Color.White
-    }
-    
-    val cardModifier = if (isDarkTheme) {
-        modifier
-            .clip(cardShape)
-            .border(1.dp, borderColor, cardShape)
-            .background(backgroundColor)
-    } else {
-        modifier
-            .shadow(
-                elevation = 2.dp,
-                shape = cardShape,
-                ambientColor = Color.Black.copy(alpha = 0.04f),
-                spotColor = Color.Black.copy(alpha = 0.04f)
-            )
-            .clip(cardShape)
-            .border(1.dp, borderColor, cardShape)
-            .background(backgroundColor)
-    }
-    
-    Box(modifier = cardModifier) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
+    Column(modifier = modifier) {
+        SectionHeader(
+            title = stringResource(R.string.home_section_orientacoes),
+            actionLabel = sectionActionLabel,
+            onActionClick = onSeeAllClick
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(end = 4.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .background(
-                            color = accentColor.copy(alpha = if (isDarkTheme) 0.15f else 0.1f),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = if (isNegative) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
-                        contentDescription = null,
-                        tint = accentColor,
-                        modifier = Modifier.size(14.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+            items(
+                items = orientacoes,
+                key = { it.id }
+            ) { orientacao ->
+                OrientacaoCard(
+                    orientacao = orientacao,
+                    onClick = { onOrientacaoClick(orientacao.id) }
                 )
             }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            AnimatedCurrencyCounter(
-                targetValue = value,
-                style = MaterialTheme.typography.titleLarge,
-                color = accentColor
-            )
         }
     }
 }
-
-// =============================================================================
-// SHARED COMPONENTS
-// =============================================================================
 
 @Composable
 private fun OrientacaoCard(
-    titulo: String,
-    categoria: String
+    orientacao: OrientacaoEstrategica,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
+    val shape = RoundedCornerShape(16.dp)
+    val categoriaAccent = orientacaoCategoriaColor(orientacao.categoria)
+    val borderColor = if (isDarkTheme) {
+        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
+    } else {
+        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
+    }
+
     Card(
-        modifier = Modifier.width(200.dp),
+        modifier = modifier
+            .width(280.dp)
+            .bounceClick(onClick = onClick)
+            .then(
+                if (isDarkTheme) Modifier.border(1.dp, borderColor, shape)
+                else Modifier
+            ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = MaterialTheme.colorScheme.surface
         ),
-        shape = RoundedCornerShape(12.dp)
+        shape = shape,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isDarkTheme) 0.dp else 2.dp
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(
+                            categoriaAccent.copy(alpha = if (isDarkTheme) 0.18f else 0.12f)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = orientacaoCategoriaIcon(orientacao.categoria),
+                        contentDescription = null,
+                        tint = categoriaAccent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                OrientacaoPrioridadeBadge(prioridade = orientacao.prioridade)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             Text(
-                text = categoria.replace("_", " "),
+                text = orientacaoCategoriaLabel(orientacao.categoria),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.secondary
+                color = categoriaAccent,
+                fontWeight = FontWeight.Medium
             )
+
             Spacer(modifier = Modifier.height(4.dp))
+
             Text(
-                text = titulo,
+                text = orientacao.titulo,
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
-                maxLines = 2
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = orientacao.descricao,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            orientacao.dataExpiracao?.let { expiracao ->
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Flag,
+                        contentDescription = null,
+                        tint = if (expiracao < System.currentTimeMillis()) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.outline
+                        },
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = orientacaoExpiracaoLabel(expiracao),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (expiracao < System.currentTimeMillis()) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OrientacaoPrioridadeBadge(prioridade: Int) {
+    val color = when {
+        prioridade <= 1 -> MaterialTheme.colorScheme.error
+        prioridade == 2 -> Color(0xFFFF9800)
+        prioridade == 3 -> MaterialTheme.colorScheme.tertiary
+        else -> SuccessGreen
+    }
+    val label = when {
+        prioridade <= 1 -> "P1"
+        prioridade == 2 -> "P2"
+        prioridade == 3 -> "P3"
+        else -> "P$prioridade"
+    }
+
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(color.copy(alpha = 0.12f))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.PriorityHigh,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(14.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = color
             )
         }
     }
+}
+
+private fun orientacaoExpiracaoLabel(expiracao: Long): String {
+    val formatter = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale("pt", "BR"))
+    val prefix = if (expiracao < System.currentTimeMillis()) "Expirou em" else "Expira em"
+    return "$prefix ${formatter.format(java.util.Date(expiracao))}"
+}
+
+private fun orientacaoCategoriaLabel(categoria: CategoriaOrientacao): String = when (categoria) {
+    CategoriaOrientacao.REDUCAO_CUSTOS -> "Redução de Custos"
+    CategoriaOrientacao.QUALIDADE_SERVICO -> "Qualidade de Serviço"
+    CategoriaOrientacao.INOVACAO_TECNOLOGICA -> "Inovação Tecnológica"
+    CategoriaOrientacao.SUSTENTABILIDADE -> "Sustentabilidade"
+    CategoriaOrientacao.SEGURANCA -> "Segurança"
+    CategoriaOrientacao.EXPERIENCIA_CLIENTE -> "Experiência do Cliente"
+    CategoriaOrientacao.EFICIENCIA_OPERACIONAL -> "Eficiência Operacional"
+}
+
+private fun orientacaoCategoriaColor(categoria: CategoriaOrientacao): Color = when (categoria) {
+    CategoriaOrientacao.REDUCAO_CUSTOS -> Color(0xFF2196F3)
+    CategoriaOrientacao.QUALIDADE_SERVICO -> Color(0xFF4CAF50)
+    CategoriaOrientacao.INOVACAO_TECNOLOGICA -> Color(0xFF9C27B0)
+    CategoriaOrientacao.SUSTENTABILIDADE -> Color(0xFF009688)
+    CategoriaOrientacao.SEGURANCA -> Color(0xFFFF9800)
+    CategoriaOrientacao.EXPERIENCIA_CLIENTE -> Color(0xFFE91E63)
+    CategoriaOrientacao.EFICIENCIA_OPERACIONAL -> Color(0xFF607D8B)
+}
+
+private fun orientacaoCategoriaIcon(categoria: CategoriaOrientacao): ImageVector = when (categoria) {
+    CategoriaOrientacao.REDUCAO_CUSTOS -> Icons.AutoMirrored.Filled.TrendingDown
+    CategoriaOrientacao.QUALIDADE_SERVICO -> Icons.Default.Star
+    CategoriaOrientacao.INOVACAO_TECNOLOGICA -> Icons.Default.Lightbulb
+    CategoriaOrientacao.SUSTENTABILIDADE -> Icons.Default.Eco
+    CategoriaOrientacao.SEGURANCA -> Icons.Default.Security
+    CategoriaOrientacao.EXPERIENCIA_CLIENTE -> Icons.Default.SupportAgent
+    CategoriaOrientacao.EFICIENCIA_OPERACIONAL -> Icons.Default.Speed
 }
 
 @Composable
@@ -1552,181 +1679,6 @@ private fun ActionCard(
     }
 }
 
-@Composable
-private fun ExecutiveActionsCard(
-    modifier: Modifier = Modifier,
-    icon: ImageVector,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    isHighlighted: Boolean = false
-) {
-    val isDarkTheme = isSystemInDarkTheme()
-    val shape = RoundedCornerShape(20.dp)
-    val primaryColor = MaterialTheme.colorScheme.primary
-    
-    val gradientBrush = if (isHighlighted) {
-        androidx.compose.ui.graphics.Brush.horizontalGradient(
-            colors = listOf(
-                primaryColor,
-                primaryColor.copy(alpha = 0.85f)
-            )
-        )
-    } else {
-        androidx.compose.ui.graphics.Brush.horizontalGradient(
-            colors = listOf(
-                MaterialTheme.colorScheme.surface,
-                MaterialTheme.colorScheme.surface
-            )
-        )
-    }
-    
-    val contentColor = if (isHighlighted) {
-        MaterialTheme.colorScheme.onPrimary
-    } else {
-        MaterialTheme.colorScheme.onSurface
-    }
-    
-    val subtitleColor = if (isHighlighted) {
-        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
-    
-    val borderColor = if (!isHighlighted && isDarkTheme) {
-        MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
-    } else {
-        Color.Transparent
-    }
-    
-    Box(
-        modifier = modifier
-            .bounceClick(onClick = onClick)
-            .clip(shape)
-            .then(
-                if (!isHighlighted && isDarkTheme) {
-                    Modifier.border(1.dp, borderColor, shape)
-                } else if (isHighlighted) {
-                    Modifier.shadow(
-                        elevation = if (isDarkTheme) 8.dp else 12.dp,
-                        shape = shape,
-                        ambientColor = primaryColor.copy(alpha = 0.25f),
-                        spotColor = primaryColor.copy(alpha = 0.25f)
-                    )
-                } else {
-                    Modifier.shadow(
-                        elevation = 4.dp,
-                        shape = shape
-                    )
-                }
-            )
-            .background(gradientBrush, shape)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .background(
-                        if (isHighlighted) Color.White.copy(alpha = 0.2f)
-                        else primaryColor.copy(alpha = 0.1f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = if (isHighlighted) Color.White else primaryColor,
-                    modifier = Modifier.size(26.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = contentColor
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = subtitleColor
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(
-                        if (isHighlighted) Color.White.copy(alpha = 0.15f)
-                        else MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = null,
-                    tint = if (isHighlighted) Color.White else primaryColor,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun IdeiaResumoCard(
-    titulo: String,
-    status: com.gtnix.aguiabranca.domain.model.StatusIdeia,
-    area: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Lightbulb,
-                contentDescription = stringResource(R.string.cd_idea_icon),
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(32.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = titulo,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = area.replace("_", " "),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-            }
-            IdeiaStatusBadge(status = status)
-        }
-    }
-}
-
-// =============================================================================
-// GESTOR-SPECIFIC COMPONENTS
-// =============================================================================
 
 @Composable
 private fun GestorHeroCard(
@@ -1740,7 +1692,11 @@ private fun GestorHeroCard(
     val hasPending = ideiasPendentes > 0
 
     val gradientColors = if (isDarkTheme) {
-        listOf(Color(0xFF0D1B2A), Color(0xFF0A1628), Color(0xFF061220))
+        listOf(
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+            MaterialTheme.colorScheme.surface
+        )
     } else {
         listOf(
             MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
@@ -1750,7 +1706,7 @@ private fun GestorHeroCard(
     }
 
     val borderColor = if (isDarkTheme) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
     } else {
         MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
     }
@@ -1864,8 +1820,6 @@ private fun GestorMetricsSection(
     val pendentesLabel = stringResource(R.string.home_gestor_metric_pendentes)
     val projetosLabel = stringResource(R.string.home_metric_projetos)
     val conversaoLabel = stringResource(R.string.home_gestor_metric_taxa_conversao)
-    val thisWeek = stringResource(R.string.home_trend_this_week)
-    val thisMonth = stringResource(R.string.home_trend_this_month)
 
     val unifiedGradient = if (isDarkTheme) {
         GradientMetricCardDefaults.UnifiedGradientDark
@@ -1881,8 +1835,6 @@ private fun GestorMetricsSection(
             modifier = Modifier.weight(1f),
             title = pendentesLabel,
             value = ideiasPendentes.toString(),
-            trend = if (ideiasPendentes > 0) "+$ideiasPendentes $thisWeek" else "0 $thisWeek",
-            trendPositive = ideiasPendentes > 0,
             icon = Icons.Default.Lightbulb,
             gradientColors = unifiedGradient,
             accentColor = if (ideiasPendentes > 0) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline
@@ -1892,8 +1844,6 @@ private fun GestorMetricsSection(
             modifier = Modifier.weight(1f),
             title = projetosLabel,
             value = totalProjetos.toString(),
-            trend = if (totalProjetos > 0) "+1 $thisMonth" else "0 $thisMonth",
-            trendPositive = totalProjetos > 0,
             icon = Icons.Default.Folder,
             gradientColors = unifiedGradient,
             accentColor = MaterialTheme.colorScheme.tertiary
@@ -1903,8 +1853,6 @@ private fun GestorMetricsSection(
             modifier = Modifier.weight(1f),
             title = conversaoLabel,
             value = "$taxaConversao%",
-            trend = if (taxaConversao > 0) "+$taxaConversao% $thisMonth" else "0% $thisMonth",
-            trendPositive = taxaConversao > 0,
             icon = Icons.AutoMirrored.Filled.TrendingUp,
             gradientColors = unifiedGradient,
             accentColor = SuccessGreen
@@ -1946,44 +1894,15 @@ private fun GestorFunilSection(
 }
 
 @Composable
-private fun GestorQuickActionsSection(
-    ideiasPendentes: Int,
-    totalProjetos: Int,
-    onAvaliarClick: () -> Unit,
-    onProjetosClick: () -> Unit,
+private fun HomeComplementActionsSection(
     onRadarClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         SectionHeader(
-            title = stringResource(R.string.home_quick_actions),
+            title = stringResource(R.string.home_quick_actions_complement),
             modifier = Modifier
         )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            ActionCardWithBadge(
-                modifier = Modifier.weight(1f),
-                icon = Icons.Default.Assessment,
-                title = stringResource(R.string.home_gestor_avaliar_ideias),
-                badgeCount = ideiasPendentes,
-                onClick = onAvaliarClick
-            )
-            ActionCardWithBadge(
-                modifier = Modifier.weight(1f),
-                icon = Icons.Default.Folder,
-                title = stringResource(R.string.home_gestor_meus_projetos),
-                badgeCount = totalProjetos,
-                onClick = onProjetosClick
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
         ActionCard(
             modifier = Modifier.fillMaxWidth(),
             icon = Icons.Default.Radar,
@@ -1993,96 +1912,15 @@ private fun GestorQuickActionsSection(
     }
 }
 
-@Composable
-private fun ActionCardWithBadge(
-    modifier: Modifier = Modifier,
-    icon: ImageVector,
-    title: String,
-    badgeCount: Int,
-    onClick: () -> Unit
-) {
-    val isDarkTheme = isSystemInDarkTheme()
-    val borderColor = if (isDarkTheme) {
-        MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
-    } else {
-        MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
-    }
-
-    Surface(
-        modifier = modifier
-            .bounceClick(onClick = onClick)
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, borderColor, RoundedCornerShape(16.dp)),
-        color = MaterialTheme.colorScheme.surface,
-        shadowElevation = if (isDarkTheme) 0.dp else 1.dp,
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            if (badgeCount > 0) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .background(
-                            MaterialTheme.colorScheme.primary,
-                            CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = badgeCount.toString(),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-            }
-        }
-    }
-}
-
-// =============================================================================
-// PREVIEWS
-// =============================================================================
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeScreenPreview() {
     InovagabTheme {
-        HomeScreenContent(
+        HomeBodyContent(
             uiState = HomeUiState(
                 perfil = PerfilUsuario.GESTOR,
+                nomeUsuario = "Ana",
                 totalIdeias = 47,
                 ideiasAprovadas = 18,
                 ideiasEmProjeto = 7,
@@ -2120,7 +1958,6 @@ private fun HomeScreenPreview() {
             onNavigateToIdeias = {},
             onNavigateToProjetos = {},
             onNavigateToOrientacoes = {},
-            onNavigateToPerfil = {},
             onNavigateToNovaIdeia = {},
             onNavigateToRadar = {}
         )
@@ -2131,9 +1968,10 @@ private fun HomeScreenPreview() {
 @Composable
 private fun HomeScreenDarkPreview() {
     InovagabTheme {
-        HomeScreenContent(
+        HomeBodyContent(
             uiState = HomeUiState(
                 perfil = PerfilUsuario.GESTOR,
+                nomeUsuario = "Ana",
                 totalIdeias = 47,
                 ideiasAprovadas = 18,
                 ideiasEmProjeto = 7,
@@ -2162,7 +2000,6 @@ private fun HomeScreenDarkPreview() {
             onNavigateToIdeias = {},
             onNavigateToProjetos = {},
             onNavigateToOrientacoes = {},
-            onNavigateToPerfil = {},
             onNavigateToNovaIdeia = {},
             onNavigateToRadar = {}
         )
@@ -2173,9 +2010,10 @@ private fun HomeScreenDarkPreview() {
 @Composable
 private fun HomeScreenLiderPreview() {
     InovagabTheme {
-        HomeScreenContent(
+        HomeBodyContent(
             uiState = HomeUiState(
                 perfil = PerfilUsuario.LIDER,
+                nomeUsuario = "Carlos",
                 totalIdeias = 42,
                 ideiasAprovadas = 18,
                 ideiasEmProjeto = 7,
@@ -2198,7 +2036,6 @@ private fun HomeScreenLiderPreview() {
             onNavigateToIdeias = {},
             onNavigateToProjetos = {},
             onNavigateToOrientacoes = {},
-            onNavigateToPerfil = {},
             onNavigateToNovaIdeia = {},
             onNavigateToRadar = {}
         )

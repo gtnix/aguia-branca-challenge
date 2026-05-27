@@ -27,9 +27,9 @@ Aplicativo móvel nativo Android desenvolvido para o Grupo Águia Branca como pa
 
 | Perfil | Funcionalidades |
 |--------|-----------------|
-| **Operador** | Consultar orientações estratégicas, cadastrar ideias/problemas, acompanhar status das próprias ideias |
-| **Gestor** | Avaliar e priorizar ideias, aprovar/reprovar com feedback, criar e gerenciar projetos |
-| **Líder** | CRUD de orientações estratégicas, visão de todos os projetos, dashboard executivo com métricas |
+| **Operador** | Consultar orientações estratégicas, cadastrar ideias/problemas (texto ou voz), acompanhar status das próprias ideias, ranking e conquistas |
+| **Gestor** | Avaliar e priorizar ideias, aprovar/reprovar com feedback, criar e gerenciar projetos, ranking |
+| **Líder** | CRUD de orientações estratégicas, visão de todos os projetos, dashboard executivo com métricas, ranking |
 
 ---
 
@@ -64,10 +64,20 @@ Aplicativo móvel nativo Android desenvolvido para o Grupo Águia Branca como pa
 - [x] Visualização de dados do usuário
 - [x] Estatísticas pessoais
 
-### Pendentes (Sprint 1)
-- [ ] CRUD completo de Orientações Estratégicas
-- [ ] Dashboard executivo com métricas consolidadas
-- [ ] Testes unitários
+### Orientações Estratégicas
+- [x] CRUD completo de Orientações (Líder)
+- [x] Listagem e detalhe
+- [x] Editar e excluir orientações
+
+### Dashboard Executivo
+- [x] Dashboard com métricas consolidadas (Líder)
+- [x] ROI, investimento, retorno
+- [x] Funil de inovação
+
+### Gamificação
+- [x] Sistema de pontuação e níveis
+- [x] Conquistas por perfil
+- [x] Ranking de inovadores
 
 ---
 
@@ -171,8 +181,10 @@ git clone https://github.com/gtnix/aguia-branca-challenge.git
 - [x] Gestão de Projetos
 - [x] Radar de Inovação
 - [x] Tela de Perfil
-- [ ] CRUD Orientações Estratégicas
-- [ ] Dashboard executivo
+- [x] CRUD Orientações Estratégicas
+- [x] Dashboard executivo (Líder)
+- [x] Testes unitários (UseCases + ViewModels)
+- [x] Gamificação (pontuação, conquistas, ranking)
 - [ ] APK release
 - [ ] Vídeo demonstrativo
 
@@ -210,4 +222,4 @@ Projeto acadêmico - Challenge FIAP 2026
 
 ---
 
-*Última atualização: 25 de Maio de 2026*
+*Última atualização: 26 de Maio de 2026*

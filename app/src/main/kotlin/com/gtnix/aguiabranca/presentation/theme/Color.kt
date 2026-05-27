@@ -1,6 +1,9 @@
 package com.gtnix.aguiabranca.presentation.theme
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.gtnix.aguiabranca.domain.model.ConquistaTier
+import com.gtnix.aguiabranca.domain.model.NivelUsuario
 
 // =============================================================================
 // LIGHT SCHEME - Premium Blue Theme
@@ -95,9 +98,62 @@ val CompletedGreen = Color(0xFF059669)
 // GAMIFICATION COLORS - Level badges
 // =============================================================================
 
-val LevelIniciante = NeutralGray
+val LevelInicianteStart = Color(0xFF7FCBF5)
+val LevelInicianteEnd = Color(0xFF00D4B2)
+val LevelIniciante = LevelInicianteStart
+val LevelEmAscensaoStart = Color(0xFF00E5A0)
+val LevelEmAscensaoEnd = Color(0xFF00D4B2)
+val LevelEmAscensao = LevelEmAscensaoStart
 val LevelEngajado = AISpark
+val LevelEngajadoEnd = Color(0xFF6EFFD8)
 val LevelVisionario = LightSecondary
+val LevelVisionarioEnd = WarningAmber
+val LevelTransformadorStart = Color(0xFFFFD700)
+val LevelTransformadorEnd = Color(0xFFFFA500)
+val LevelTransformador = LevelTransformadorStart
+
+fun levelGradientColors(nivel: NivelUsuario): List<Color> = when (nivel) {
+    NivelUsuario.INICIANTE -> listOf(LevelInicianteStart, LevelInicianteEnd)
+    NivelUsuario.EM_ASCENSAO -> listOf(LevelEmAscensaoStart, LevelEmAscensaoEnd)
+    NivelUsuario.ENGAJADO -> listOf(LevelEngajado, LevelEngajadoEnd)
+    NivelUsuario.VISIONARIO -> listOf(LevelVisionario, LevelVisionarioEnd)
+    NivelUsuario.TRANSFORMADOR -> listOf(LevelTransformadorStart, LevelTransformadorEnd)
+}
+
+fun levelBrush(nivel: NivelUsuario): Brush = Brush.linearGradient(levelGradientColors(nivel))
+
+// =============================================================================
+// RANKING / PODIUM - Medal accents
+// =============================================================================
+
+val MedalGold = Color(0xFFFFD700)
+val MedalSilver = Color(0xFFC0C0C0)
+val MedalBronze = Color(0xFFCD7F32)
+val MedalGoldGlow = Color(0x33FFD700)
+val MedalSilverGlow = Color(0x33C0C0C0)
+val MedalBronzeGlow = Color(0x33CD7F32)
+
+// =============================================================================
+// ACHIEVEMENT TIERS - Metallic badge frames
+// =============================================================================
+
+val TierBronzeStart = Color(0xFFCD7F32)
+val TierBronzeEnd = Color(0xFF8B5A2B)
+val TierPrataStart = Color(0xFFC0C0C0)
+val TierPrataEnd = Color(0xFF808080)
+val TierOuroStart = Color(0xFFFFD700)
+val TierOuroEnd = Color(0xFFFFA500)
+val TierPlatinaStart = Color(0xFFE5E4E2)
+val TierPlatinaEnd = Color(0xFF00D4B2)
+
+fun tierGradientColors(tier: ConquistaTier): List<Color> = when (tier) {
+    ConquistaTier.BRONZE -> listOf(TierBronzeStart, TierBronzeEnd)
+    ConquistaTier.PRATA -> listOf(TierPrataStart, TierPrataEnd)
+    ConquistaTier.OURO -> listOf(TierOuroStart, TierOuroEnd)
+    ConquistaTier.PLATINA -> listOf(TierPlatinaStart, TierPlatinaEnd)
+}
+
+fun tierBrush(tier: ConquistaTier): Brush = Brush.linearGradient(tierGradientColors(tier))
 
 // =============================================================================
 // PREMIUM SURFACE TOKENS - Unified card system
@@ -106,5 +162,9 @@ val LevelVisionario = LightSecondary
 val SurfaceElevatedLight = Color(0xFFFFFFFF)
 val SurfaceElevatedDark = Color(0xFF1C1C1E)
 
-val CardBorderLight = Color(0xFFE5E7EB)
+val CardBorderLight = Color(0xFFE8ECF1)
 val CardBorderDark = Color(0x0FFFFFFF)
+
+val GlassFillLight = Color(0xFFF7F9FC)
+val GlassBorderLight = Color(0xFFE8ECF1)
+val SurfaceTintLight = Color(0xFFF8FAFC)

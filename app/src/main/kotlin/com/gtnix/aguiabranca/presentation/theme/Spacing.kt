@@ -29,7 +29,7 @@ object NavBarDimensions {
     val BottomPadding = 12.dp
     
     val ContentBottomPaddingWithFab = PillHeight + FabSize + FabSpacing + BottomPadding + 16.dp
-    val ContentBottomPaddingNoFab = PillHeight + BottomPadding + 16.dp
+    val ContentBottomPaddingNoFab = PillHeight + BottomPadding + 48.dp + 16.dp
 }
 
 object ScreenPadding {

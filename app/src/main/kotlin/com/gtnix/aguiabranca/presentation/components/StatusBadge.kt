@@ -50,14 +50,22 @@ fun StatusBadge(
     }
 }
 
+fun ideiaStatusColor(status: StatusIdeia): Color = when (status) {
+    StatusIdeia.PENDENTE -> WarningAmber
+    StatusIdeia.EM_ANALISE -> InfoBlue
+    StatusIdeia.APROVADA -> SuccessGreen
+    StatusIdeia.REPROVADA -> ErrorRed
+    StatusIdeia.CONVERTIDA_PROJETO -> Color(0xFF7C3AED)
+}
+
 @Composable
 fun IdeiaStatusBadge(status: StatusIdeia, modifier: Modifier = Modifier) {
     val (color, text) = when (status) {
-        StatusIdeia.PENDENTE -> WarningAmber to stringResource(R.string.status_awaiting_evaluation)
-        StatusIdeia.EM_ANALISE -> InfoBlue to stringResource(R.string.status_under_analysis)
-        StatusIdeia.APROVADA -> SuccessGreen to stringResource(R.string.status_idea_approved)
-        StatusIdeia.REPROVADA -> ErrorRed to stringResource(R.string.status_not_prioritized)
-        StatusIdeia.CONVERTIDA_PROJETO -> MaterialTheme.colorScheme.primary to stringResource(R.string.status_converted_project)
+        StatusIdeia.PENDENTE -> ideiaStatusColor(status) to stringResource(R.string.status_awaiting_evaluation)
+        StatusIdeia.EM_ANALISE -> ideiaStatusColor(status) to stringResource(R.string.status_under_analysis)
+        StatusIdeia.APROVADA -> ideiaStatusColor(status) to stringResource(R.string.status_idea_approved)
+        StatusIdeia.REPROVADA -> ideiaStatusColor(status) to stringResource(R.string.status_not_prioritized)
+        StatusIdeia.CONVERTIDA_PROJETO -> ideiaStatusColor(status) to stringResource(R.string.status_converted_project)
     }
     StatusBadge(text = text, color = color, modifier = modifier)
 }

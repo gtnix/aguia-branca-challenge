@@ -18,88 +18,31 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-/**
- * Módulo Hilt para Repositories
- *
- * ## Conceito FIAP - Dependency Injection
- *
- * Este módulo faz o "bind" entre interfaces e implementações.
- *
- * ### @Binds vs @Provides
- *
- * | @Provides                          | @Binds                              |
- * |------------------------------------|-------------------------------------|
- * | Método normal                      | Método abstrato                     |
- * | Pode ter lógica de criação         | Apenas mapeia interface → impl      |
- * | Retorna instância                  | Retorna a própria implementação     |
- *
- * Usamos @Binds porque:
- * 1. É mais eficiente (não gera código extra)
- * 2. As implementações já têm @Inject constructor
- *
- * ### Fluxo
- *
- * ```kotlin
- * // No ViewModel
- * class LoginViewModel @Inject constructor(
- *     private val repository: UsuarioRepository  // Interface!
- * )
- *
- * // Hilt verifica: "Como crio UsuarioRepository?"
- * // Encontra @Binds → Usa UsuarioRepositoryImpl
- * // UsuarioRepositoryImpl tem @Inject constructor(dao, mapper)
- * // Hilt cria dao e mapper automaticamente
- * ```
- */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
 
-    /**
-     * Quando alguém pedir UsuarioRepository, forneça UsuarioRepositoryImpl.
-     */
     @Binds
     @Singleton
-    abstract fun bindUsuarioRepository(
-        impl: UsuarioRepositoryImpl
-    ): UsuarioRepository
-
-    /**
-     * Quando alguém pedir OrientacaoRepository, forneça OrientacaoRepositoryImpl.
-     */
-    @Binds
-    @Singleton
-    abstract fun bindOrientacaoRepository(
-        impl: OrientacaoRepositoryImpl
-    ): OrientacaoRepository
-
-    /**
-     * Quando alguém pedir IdeiaRepository, forneça IdeiaRepositoryImpl.
-     */
-    @Binds
-    @Singleton
-    abstract fun bindIdeiaRepository(
-        impl: IdeiaRepositoryImpl
-    ): IdeiaRepository
-
-    /**
-     * Quando alguém pedir ProjetoRepository, forneça ProjetoRepositoryImpl.
-     */
-    @Binds
-    @Singleton
-    abstract fun bindProjetoRepository(
-        impl: ProjetoRepositoryImpl
-    ): ProjetoRepository
+    abstract fun bindUsuarioRepository(impl: UsuarioRepositoryImpl): UsuarioRepository
 
     @Binds
     @Singleton
-    abstract fun bindInovacaoAbertaRepository(
-        impl: InovacaoAbertaRepositoryImpl
-    ): InovacaoAbertaRepository
+    abstract fun bindOrientacaoRepository(impl: OrientacaoRepositoryImpl): OrientacaoRepository
 
     @Binds
     @Singleton
-    abstract fun bindSessionManager(
-        impl: SessionManagerImpl
-    ): SessionManager
+    abstract fun bindIdeiaRepository(impl: IdeiaRepositoryImpl): IdeiaRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindProjetoRepository(impl: ProjetoRepositoryImpl): ProjetoRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindInovacaoAbertaRepository(impl: InovacaoAbertaRepositoryImpl): InovacaoAbertaRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSessionManager(impl: SessionManagerImpl): SessionManager
 }

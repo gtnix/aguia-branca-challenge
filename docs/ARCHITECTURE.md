@@ -571,13 +571,16 @@ Lista de IDs (`membrosIds`) é convertida para JSON String via TypeConverter par
 | `PerfilScreen` | Perfil do usuário logado | Todos |
 | `RadarScreen` | Radar de Inovação (startups) | Gestor, Líder |
 
-### Telas Planejadas (Sprint 2)
+### Telas Adicionais (Implementadas)
 
 | Tela | Descrição | Perfis |
 |------|-----------|--------|
 | `OrientacoesScreen` | Lista orientações estratégicas | Todos |
-| `NovaOrientacaoScreen` | Criar/Editar orientação | Líder |
-| `DashboardScreen` | Métricas consolidadas completas | Líder |
+| `NovaOrientacaoScreen` | Criar orientação | Líder |
+| `EditarOrientacaoScreen` | Editar orientação existente | Líder |
+| `OrientacaoDetalheScreen` | Detalhe da orientação | Todos |
+| `LeaderDashboardScreen` | Dashboard executivo com métricas | Líder |
+| `RankingScreen` | Ranking de inovadores | Todos |
 
 ---
 
@@ -617,12 +620,14 @@ Lista de IDs (`membrosIds`) é convertida para JSON String via TypeConverter par
 - [x] Radar de Inovação (startups parceiras)
 - [x] Navegação type-safe com sealed class
 - [x] DatabaseSeeder com dados iniciais
+- [x] CRUD completo de Orientações Estratégicas
+- [x] Dashboard executivo (LeaderDashboardScreen)
+- [x] Gamificação (pontuação, conquistas, ranking)
+- [x] Testes unitários (UseCases + ViewModels)
+- [x] Captura de ideias por voz (SpeechRecognizer)
 
 ### Pendente
 
-- [ ] CRUD completo de Orientações Estratégicas
-- [ ] Dashboard com métricas consolidadas
-- [ ] Testes unitários
 - [ ] APK release
 - [ ] Vídeo demonstrativo
 
@@ -666,7 +671,7 @@ Ver [`docs/PROMPT_MANUS_UX_RESEARCH.md`](./PROMPT_MANUS_UX_RESEARCH.md) para o p
 
 ---
 
-## 11. Como Executar
+## 12. Como Executar
 
 ```bash
 # Abrir no Android Studio
@@ -681,4 +686,4 @@ Ver [`docs/PROMPT_MANUS_UX_RESEARCH.md`](./PROMPT_MANUS_UX_RESEARCH.md) para o p
 
 ---
 
-*Última atualização: 25 de Maio de 2026 — Sprint 1*
+*Última atualização: 26 de Maio de 2026 — Sprint 1*

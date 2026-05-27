@@ -5,32 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/**
- * Entity Room: Ideia
- *
- * ## Conceito FIAP - Material 07A
- *
- * ### Relacionamentos
- *
- * ```
- * ┌─────────┐       ┌────────────┐       ┌───────────┐
- * │ Usuario ├───────┤   Ideia    ├───────┤ Orientacao│
- * └─────────┘       └──────┬─────┘       └───────────┘
- *    autor              │
- *                       │ se aprovada
- *                       ▼
- *                  ┌─────────┐
- *                  │ Projeto │
- *                  └─────────┘
- * ```
- *
- * ### Índices para Performance
- *
- * Criamos índices nas colunas mais usadas em filtros:
- * - autorId: "Minhas Ideias"
- * - area: Ideias por área (visão GESTOR)
- * - status: Ideias pendentes de avaliação
- */
 @Entity(
     tableName = "ideias",
     foreignKeys = [

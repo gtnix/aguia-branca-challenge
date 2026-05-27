@@ -2,6 +2,7 @@ package com.gtnix.aguiabranca.presentation.screens.orientacoes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.CategoriaOrientacao
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
@@ -26,11 +27,11 @@ class NovaOrientacaoViewModel @Inject constructor(
     val uiState: StateFlow<NovaOrientacaoUiState> = _uiState.asStateFlow()
 
     fun onTituloChange(titulo: String) {
-        _uiState.update { it.copy(titulo = titulo, errorMessage = null) }
+        _uiState.update { it.copy(titulo = titulo, errorMessageRes = null) }
     }
 
     fun onDescricaoChange(descricao: String) {
-        _uiState.update { it.copy(descricao = descricao, errorMessage = null) }
+        _uiState.update { it.copy(descricao = descricao, errorMessageRes = null) }
     }
 
     fun onCategoriaChange(categoria: CategoriaOrientacao) {
@@ -46,17 +47,17 @@ class NovaOrientacaoViewModel @Inject constructor(
         val user = sessionManager.getCurrentUser()
         
         if (user == null) {
-            _uiState.update { it.copy(errorMessage = "Usuário não logado") }
+            _uiState.update { it.copy(errorMessageRes = R.string.error_user_not_logged) }
             return
         }
         
         if (user.perfil != PerfilUsuario.LIDER) {
-            _uiState.update { it.copy(errorMessage = "Apenas líderes podem criar orientações") }
+            _uiState.update { it.copy(errorMessageRes = R.string.error_only_leader_create_orientacao) }
             return
         }
         
         if (current.titulo.isBlank() || current.descricao.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Preencha todos os campos obrigatórios") }
+            _uiState.update { it.copy(errorMessageRes = R.string.novo_projeto_erro_campos) }
             return
         }
 
@@ -82,7 +83,7 @@ class NovaOrientacaoViewModel @Inject constructor(
                 _uiState.update { 
                     it.copy(
                         isLoading = false, 
-                        errorMessage = "Erro ao salvar orientação"
+                        errorMessageRes = R.string.error_save_orientacao
                     ) 
                 }
             }
@@ -96,5 +97,5 @@ data class NovaOrientacaoUiState(
     val categoria: CategoriaOrientacao = CategoriaOrientacao.EFICIENCIA_OPERACIONAL,
     val prioridade: Int = 3,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessageRes: Int? = null
 )

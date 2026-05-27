@@ -1,5 +1,6 @@
 package com.gtnix.aguiabranca.data.mapper
 
+import com.gtnix.aguiabranca.data.util.safeValueOf
 import com.gtnix.aguiabranca.data.local.entity.IdeiaEntity
 import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.Ideia
@@ -7,9 +8,6 @@ import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
 import javax.inject.Inject
 
-/**
- * Mapper de Ideia
- */
 class IdeiaMapper @Inject constructor() {
 
     fun toDomain(entity: IdeiaEntity): Ideia {
@@ -17,9 +15,9 @@ class IdeiaMapper @Inject constructor() {
             id = entity.id,
             titulo = entity.titulo,
             descricao = entity.descricao,
-            tipo = TipoIdeia.valueOf(entity.tipo),
-            area = AreaAtuacao.valueOf(entity.area),
-            status = StatusIdeia.valueOf(entity.status),
+            tipo = safeValueOf(entity.tipo, TipoIdeia.IDEIA),
+            area = safeValueOf(entity.area, AreaAtuacao.OPERACOES),
+            status = safeValueOf(entity.status, StatusIdeia.PENDENTE),
             autorId = entity.autorId,
             autorNome = entity.autorNome,
             orientacaoId = entity.orientacaoId,

@@ -84,40 +84,67 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun InovagabTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            val dynamicScheme = if (darkTheme) 
-                dynamicDarkColorScheme(context) 
-            else 
-                dynamicLightColorScheme(context)
-            
-            if (darkTheme) dynamicScheme.copy(
-                primary = DarkPrimary,
-                onPrimary = DarkOnPrimary,
-                secondary = DarkSecondary,
-                onSecondary = DarkOnSecondary,
-                tertiary = DarkTertiary,
-                onTertiary = DarkOnTertiary,
-                background = DarkBackground,
-                onBackground = DarkOnBackground,
-                surface = DarkSurface,
-                onSurface = DarkOnSurface
-            ) else dynamicScheme.copy(
-                primary = LightPrimary,
-                onPrimary = LightOnPrimary,
-                secondary = LightSecondary,
-                onSecondary = LightOnSecondary,
-                tertiary = LightTertiary,
-                onTertiary = LightOnTertiary,
-                background = LightBackground,
-                onBackground = LightOnBackground,
-                surface = LightSurface,
-                onSurface = LightOnSurface
-            )
+            if (darkTheme) {
+                dynamicDarkColorScheme(context).copy(
+                    primary = DarkPrimary,
+                    onPrimary = DarkOnPrimary,
+                    primaryContainer = DarkPrimaryContainer,
+                    onPrimaryContainer = DarkOnPrimaryContainer,
+                    secondary = DarkSecondary,
+                    onSecondary = DarkOnSecondary,
+                    secondaryContainer = DarkSecondaryContainer,
+                    onSecondaryContainer = DarkOnSecondaryContainer,
+                    tertiary = DarkTertiary,
+                    onTertiary = DarkOnTertiary,
+                    tertiaryContainer = DarkTertiaryContainer,
+                    onTertiaryContainer = DarkOnTertiaryContainer,
+                    background = DarkBackground,
+                    onBackground = DarkOnBackground,
+                    surface = DarkSurface,
+                    onSurface = DarkOnSurface,
+                    surfaceVariant = DarkSurfaceVariant,
+                    onSurfaceVariant = DarkOnSurfaceVariant,
+                    error = DarkError,
+                    onError = DarkOnError,
+                    errorContainer = DarkErrorContainer,
+                    onErrorContainer = DarkOnErrorContainer,
+                    outline = DarkOutline,
+                    outlineVariant = DarkOutlineVariant
+                )
+            } else {
+                dynamicLightColorScheme(context).copy(
+                    primary = LightPrimary,
+                    onPrimary = LightOnPrimary,
+                    primaryContainer = LightPrimaryContainer,
+                    onPrimaryContainer = LightOnPrimaryContainer,
+                    secondary = LightSecondary,
+                    onSecondary = LightOnSecondary,
+                    secondaryContainer = LightSecondaryContainer,
+                    onSecondaryContainer = LightOnSecondaryContainer,
+                    tertiary = LightTertiary,
+                    onTertiary = LightOnTertiary,
+                    tertiaryContainer = LightTertiaryContainer,
+                    onTertiaryContainer = LightOnTertiaryContainer,
+                    background = LightBackground,
+                    onBackground = LightOnBackground,
+                    surface = LightSurface,
+                    onSurface = LightOnSurface,
+                    surfaceVariant = LightSurfaceVariant,
+                    onSurfaceVariant = LightOnSurfaceVariant,
+                    error = LightError,
+                    onError = LightOnError,
+                    errorContainer = LightErrorContainer,
+                    onErrorContainer = LightOnErrorContainer,
+                    outline = LightOutline,
+                    outlineVariant = LightOutlineVariant
+                )
+            }
         }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme

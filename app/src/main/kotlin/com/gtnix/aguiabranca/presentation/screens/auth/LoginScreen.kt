@@ -1,6 +1,7 @@
 package com.gtnix.aguiabranca.presentation.screens.auth
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,13 +61,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,11 +86,10 @@ import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 
-// Águia Branca brand blue palette - inspired by Brazilian sky
 private val LoginGradient = listOf(
-    Color(0xFF0A2540),  // Deep navy - brand primary
-    Color(0xFF0F3460),  // Mid navy
-    Color(0xFF16537E)   // Lighter navy
+    Color(0xFF0A2540),
+    Color(0xFF0F3460),
+    Color(0xFF16537E)
 )
 
 @Composable
@@ -96,6 +98,7 @@ fun LoginScreen(
     onLoginSuccess: (PerfilUsuario) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val errorMessage = uiState.errorMessageRes?.let { stringResource(it) }
 
     LaunchedEffect(uiState.loginSuccess, uiState.perfil) {
         if (uiState.loginSuccess && uiState.perfil != null) {
@@ -122,6 +125,8 @@ private fun LoginScreenContent(
     onDemoLogin: (PerfilUsuario) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+    val featureUnderDevelopment = stringResource(R.string.feature_under_development)
     
     val infiniteTransition = rememberInfiniteTransition(label = "backgroundAnim")
     val glowScale by infiniteTransition.animateFloat(
@@ -142,7 +147,6 @@ private fun LoginScreenContent(
             )
             .imePadding()
     ) {
-        // Subtle orange glow - innovation accent (brand secondary color)
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -161,7 +165,6 @@ private fun LoginScreenContent(
                 )
         )
         
-        // Subtle blue glow - brand reinforcement
         Box(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -198,12 +201,15 @@ private fun LoginScreenContent(
                 email = uiState.email,
                 senha = uiState.senha,
                 isLoading = uiState.isLoading,
-                errorMessage = uiState.errorMessage,
+                errorMessageRes = uiState.errorMessageRes,
                 onEmailChange = onEmailChange,
                 onSenhaChange = onSenhaChange,
                 onLoginClick = onLoginClick,
                 onMoveFocus = { focusManager.moveFocus(FocusDirection.Down) },
-                onClearFocus = { focusManager.clearFocus() }
+                onClearFocus = { focusManager.clearFocus() },
+                onForgotPasswordClick = {
+                    Toast.makeText(context, featureUnderDevelopment, Toast.LENGTH_SHORT).show()
+                }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -234,7 +240,8 @@ private fun PremiumLoginHeader() {
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = Color.White,
-            letterSpacing = (-0.5).sp
+            letterSpacing = (-0.5).sp,
+            modifier = Modifier.semantics { heading() }
         )
         
         Spacer(modifier = Modifier.height(4.dp))
@@ -252,12 +259,13 @@ private fun GlassLoginCard(
     email: String,
     senha: String,
     isLoading: Boolean,
-    errorMessage: String?,
+    errorMessageRes: Int?,
     onEmailChange: (String) -> Unit,
     onSenhaChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onMoveFocus: () -> Unit,
-    onClearFocus: () -> Unit
+    onClearFocus: () -> Unit,
+    onForgotPasswordClick: () -> Unit
 ) {
     val shape = RoundedCornerShape(24.dp)
     
@@ -304,10 +312,10 @@ private fun GlassLoginCard(
                 }
             )
 
-            if (errorMessage != null) {
+            errorMessageRes?.let { messageRes ->
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = errorMessage,
+                    text = stringResource(messageRes),
                     color = Color(0xFFFF6B6B),
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center
@@ -346,7 +354,7 @@ private fun GlassLoginCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(onClick = { }) {
+            TextButton(onClick = onForgotPasswordClick) {
                 Text(
                     text = stringResource(R.string.auth_forgot_password),
                     style = MaterialTheme.typography.bodySmall,
@@ -368,6 +376,7 @@ private fun GlassTextField(
     imeAction: ImeAction = ImeAction.Done,
     onImeAction: () -> Unit = {}
 ) {
+    val emailIconDesc = stringResource(R.string.cd_email_field)
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -377,7 +386,7 @@ private fun GlassTextField(
         leadingIcon = {
             Icon(
                 imageVector = leadingIcon,
-                contentDescription = null,
+                contentDescription = emailIconDesc,
                 tint = Color.White.copy(alpha = 0.7f)
             )
         },
@@ -417,6 +426,7 @@ private fun GlassPasswordField(
     val showPasswordDesc = stringResource(R.string.cd_show_password)
     val hidePasswordDesc = stringResource(R.string.cd_hide_password)
 
+    val passwordIconDesc = stringResource(R.string.cd_password_field)
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -426,7 +436,7 @@ private fun GlassPasswordField(
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Lock,
-                contentDescription = null,
+                contentDescription = passwordIconDesc,
                 tint = Color.White.copy(alpha = 0.7f)
             )
         },
@@ -561,7 +571,7 @@ private fun DemoProfileChip(
             ) {
                 Icon(
                     imageVector = icon,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.cd_demo_profile, label),
                     tint = Color.White.copy(alpha = 0.9f),
                     modifier = Modifier.size(20.dp)
                 )
@@ -633,7 +643,7 @@ private fun LoginScreenErrorPreview() {
         LoginScreenContent(
             uiState = LoginUiState(
                 email = "teste@email.com",
-                errorMessage = "E-mail ou senha inválidos"
+                errorMessageRes = R.string.login_error_invalid_credentials
             ),
             onEmailChange = {},
             onSenhaChange = {},
