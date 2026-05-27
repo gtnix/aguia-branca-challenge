@@ -163,9 +163,9 @@ Matriz resumida de permissões:
 
 | Ação | Operador | Gestor | Líder |
 |------|:--------:|:------:|:-----:|
-| Submeter ideia | ✅ | ✅ | ✅ |
-| Avaliar / aprovar ideia | ❌ | ✅ | ✅ |
-| Criar / editar projeto | ❌ | ✅ | ✅ |
+| Submeter ideia | ✅ | ❌ | ❌ |
+| Consultar / priorizar / aprovar ideias | ❌ | ✅ | ❌ |
+| Criar / editar projeto | ❌ | ✅ | ❌ |
 | CRUD orientações | ❌ | ❌ | ✅ |
 | Dashboard executivo completo | ❌ | Parcial | ✅ |
 | Radar de startups | ❌ | ✅ | ✅ |
@@ -251,8 +251,7 @@ O Challenge exige **pelo menos uma** integração externa efetiva (API REST, Baa
 Sequência de chamada (Sprint 1):
 
 ```
-RadarScreen → RadarViewModel → GetStartupsUseCase
-      → InovacaoAbertaRepositoryImpl → InovacaoApiService (Retrofit)
+RadarScreen → RadarViewModel → InovacaoAbertaRepositoryImpl → InovacaoApiService (Retrofit)
             → OkHttp → MockApiInterceptor → JSON mock → UI (lista + matchScore)
 ```
 
@@ -300,6 +299,8 @@ cd aguia-branca-challenge
 | `marcos.silva@aguiabranca.com.br` | `123456` | Líder | Marcos Silva |
 
 > Os dados são inseridos automaticamente na primeira execução se o banco estiver vazio.
+
+**Atalhos Demo na tela de login:** chips **Operador**, **Gestor** e **Líder** preenchem automaticamente e-mail e senha dos usuários acima — útil para demonstração rápida sem digitar credenciais.
 
 ---
 

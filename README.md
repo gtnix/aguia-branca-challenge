@@ -162,9 +162,9 @@ git clone https://github.com/gtnix/aguia-branca-challenge.git
 
 | Email | Senha | Perfil | Nome |
 |-------|-------|--------|------|
-| motorista@aguiabranca.com.br | 123456 | Operador | Pedro Santos |
-| gestor@aguiabranca.com.br | 123456 | Gestor | Ana Oliveira |
-| ceo@aguiabranca.com.br | 123456 | Líder | Carlos Silva |
+| pedro.santos@aguiabranca.com.br | 123456 | Operador | Pedro Santos |
+| ana.oliveira@aguiabranca.com.br | 123456 | Gestor | Ana Oliveira |
+| marcos.silva@aguiabranca.com.br | 123456 | Líder | Marcos Silva |
 
 ---
 
@@ -201,7 +201,8 @@ git clone https://github.com/gtnix/aguia-branca-challenge.git
 
 | Nome | RM | Turma |
 |------|-----|-------|
-| Giuliana Takara | - | - |
+| André Luiz Oliveira da Silva | 565836 | Grupo 82 |
+| Giuliana Abe Takara | 562736 | Grupo 82 |
 
 ---
 

@@ -1,0 +1,45 @@
+ENTREGA CHALLENGE FIAP 612289 — Grupo 82
+Inovagab / Grupo Águia Branca
+
+Integrantes:
+  André Luiz Oliveira da Silva — RM 565836
+  Giuliana Abe Takara — RM 562736
+
+VÍDEO DEMONSTRATIVO
+-------------------
+Link oficial (incluído na documentação técnica PDF):
+  https://youtu.be/9FJmqSRNSkQ
+  Duração: ~7 minutos
+
+O arquivo MP4 não foi incluído automaticamente neste pacote
+( download automático indisponível neste ambiente ).
+
+Opções para Giuliana enviar ao Moodle:
+  1) Anexar o link do YouTube junto com a documentação PDF (link já está no PDF); OU
+  2) Baixar o vídeo manualmente (YouTube Studio / gravador) e enviar como MP4; OU
+  3) Usar yt-dlp no PC dela:
+       yt-dlp -o "VIDEO_DEMONSTRATIVO.mp4" "https://youtu.be/9FJmqSRNSkQ"
+
+APK (se ausente no pacote master)
+---------------------------------
+Neste computador não havia JDK/Android SDK para compilar.
+Giuliana deve gerar o APK no Android Studio ou via terminal:
+
+  cd aguia-branca-challenge
+  .\gradlew assembleDebug
+
+Arquivo gerado:
+  app\build\outputs\apk\debug\app-debug.apk
+
+CREDENCIAIS DEMO
+----------------
+Chips Demo na tela de login (Operador / Gestor / Líder) ou:
+  pedro.santos@aguiabranca.com.br / 123456  (Operador)
+  ana.oliveira@aguiabranca.com.br / 123456   (Gestor)
+  marcos.silva@aguiabranca.com.br / 123456   (Líder)
+
+MOODLE
+------
+https://on.fiap.com.br/mod/assign/view.php?id=612289
+
+Antes de enviar: selecionar TRAZER GRUPO ANTERIOR → Grupo 82.
