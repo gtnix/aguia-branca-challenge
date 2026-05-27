@@ -132,6 +132,27 @@ class ProjetoDetalheViewModelTest {
     }
 
     @Test
+    fun `dado projeto planejado quando atualiza status então muda para EM_ANDAMENTO`() = runTest {
+        val projetoPlanejado = TestDataFactory.createProjeto(
+            id = "projeto-123",
+            status = StatusProjeto.PLANEJADO
+        )
+        projetoRepository = FakeProjetoRepository(listOf(projetoPlanejado))
+        sessionManager.setUser(TestDataFactory.createUsuario(perfil = PerfilUsuario.GESTOR))
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.atualizarStatus()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.actionSuccess)
+        assertEquals(StatusProjeto.EM_ANDAMENTO, state.projeto?.status)
+        assertNotNull(state.projeto?.dataInicio)
+    }
+
+    @Test
     fun `dado projeto concluído quando conclui então progresso é 100`() = runTest {
         sessionManager.setUser(TestDataFactory.createUsuario(perfil = PerfilUsuario.GESTOR))
 

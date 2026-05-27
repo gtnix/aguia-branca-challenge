@@ -14,7 +14,6 @@ import com.gtnix.aguiabranca.presentation.components.AvatarData
 import com.gtnix.aguiabranca.presentation.components.MarcoTimeline
 import com.gtnix.aguiabranca.presentation.navigation.Destination
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -100,11 +99,33 @@ class ProjetoDetalheViewModel @Inject constructor(
     }
 
     fun atualizarStatus() {
+        val projeto = _uiState.value.projeto ?: return
+        val proximoStatus = proximoStatus(projeto.status) ?: return
+
         viewModelScope.launch {
-            _uiState.update { it.copy(actionSuccess = true) }
-            delay(2000)
-            _uiState.update { it.copy(actionSuccess = false) }
+            try {
+                val atualizado = projeto.copy(
+                    status = proximoStatus,
+                    dataInicio = if (proximoStatus == StatusProjeto.EM_ANDAMENTO) {
+                        projeto.dataInicio ?: System.currentTimeMillis()
+                    } else {
+                        projeto.dataInicio
+                    }
+                )
+                projetoRepository.atualizarStatus(projeto.id, proximoStatus)
+                if (proximoStatus == StatusProjeto.EM_ANDAMENTO && projeto.dataInicio == null) {
+                    projetoRepository.salvar(atualizado)
+                }
+                _uiState.update { it.copy(projeto = atualizado, actionSuccess = true) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = "Erro ao atualizar status") }
+            }
         }
+    }
+
+    private fun proximoStatus(atual: StatusProjeto): StatusProjeto? = when (atual) {
+        StatusProjeto.PLANEJADO -> StatusProjeto.EM_ANDAMENTO
+        else -> null
     }
 
     private suspend fun carregarIdeiasVinculadas(projeto: Projeto): List<IdeiaVinculadaSimple> {

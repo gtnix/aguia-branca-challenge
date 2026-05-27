@@ -1,7 +1,6 @@
 package com.gtnix.aguiabranca.presentation.screens.projetos
 
 import androidx.compose.animation.AnimatedVisibility
-import kotlinx.coroutines.delay
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
@@ -33,6 +32,7 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Card
@@ -42,6 +42,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,6 +73,7 @@ import com.gtnix.aguiabranca.presentation.components.AvatarStack
 import com.gtnix.aguiabranca.presentation.components.GlassCard
 import com.gtnix.aguiabranca.presentation.components.GradientProgressBar
 import com.gtnix.aguiabranca.presentation.components.InovagabButton
+import com.gtnix.aguiabranca.presentation.components.InovagabButtonVariant
 import com.gtnix.aguiabranca.presentation.components.MarcoTimeline
 import com.gtnix.aguiabranca.presentation.components.ProjectTimeline
 import com.gtnix.aguiabranca.presentation.components.ProjetoStatusBadge
@@ -92,6 +97,9 @@ fun ProjetoDetalheScreen(
     ProjetoDetalheContent(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
+        onProgressoChange = viewModel::onProgressoChange,
+        onSalvarProgresso = viewModel::salvarProgresso,
+        onConcluirProjeto = viewModel::concluirProjeto,
         onAtualizarStatus = viewModel::atualizarStatus
     )
 }
@@ -101,9 +109,25 @@ fun ProjetoDetalheScreen(
 private fun ProjetoDetalheContent(
     uiState: ProjetoDetalheUiState,
     onNavigateBack: () -> Unit,
+    onProgressoChange: (Float) -> Unit,
+    onSalvarProgresso: () -> Unit,
+    onConcluirProjeto: () -> Unit,
     onAtualizarStatus: () -> Unit
 ) {
-    val isDarkTheme = isSystemInDarkTheme()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val successMessage = stringResource(R.string.projeto_detalhe_sucesso)
+
+    LaunchedEffect(uiState.actionSuccess) {
+        if (uiState.actionSuccess) {
+            snackbarHostState.showSnackbar(successMessage)
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
+    }
+
+    val canManage = uiState.perfil == PerfilUsuario.GESTOR || uiState.perfil == PerfilUsuario.LIDER
     
     Scaffold(
         modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
@@ -114,21 +138,38 @@ private fun ProjetoDetalheContent(
                 onBackClick = onNavigateBack
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
-            if (uiState.projeto != null && 
-                (uiState.perfil == PerfilUsuario.GESTOR || uiState.perfil == PerfilUsuario.LIDER)) {
+            val projeto = uiState.projeto
+            if (projeto != null && canManage) {
                 Surface(
                     color = MaterialTheme.colorScheme.background,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    InovagabButton(
-                        text = stringResource(R.string.projeto_atualizar_status),
-                        onClick = onAtualizarStatus,
-                        leadingIcon = Icons.Default.Refresh,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 16.dp)
-                    )
+                    when (projeto.status) {
+                        StatusProjeto.PLANEJADO -> {
+                            InovagabButton(
+                                text = stringResource(R.string.projeto_atualizar_status),
+                                onClick = onAtualizarStatus,
+                                leadingIcon = Icons.Default.Refresh,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                            )
+                        }
+                        StatusProjeto.EM_ANDAMENTO -> {
+                            InovagabButton(
+                                text = stringResource(R.string.projeto_detalhe_concluir),
+                                onClick = onConcluirProjeto,
+                                leadingIcon = Icons.Default.CheckCircle,
+                                variant = InovagabButtonVariant.Success,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                            )
+                        }
+                        else -> Unit
+                    }
                 }
             }
         }
@@ -162,6 +203,7 @@ private fun ProjetoDetalheContent(
 
             else -> {
                 val projeto = uiState.projeto
+                val canEditProgress = canManage && projeto.status == StatusProjeto.EM_ANDAMENTO
                 var contentVisible by remember { mutableStateOf(false) }
                 
                 LaunchedEffect(Unit) {
@@ -190,9 +232,17 @@ private fun ProjetoDetalheContent(
                         visible = contentVisible,
                         delayMillis = 100
                     ) {
-                        ProgressSection(
-                            progress = projeto.progresso / 100f
-                        )
+                        if (canEditProgress) {
+                            EditableProgressSection(
+                                progress = uiState.progressoSlider,
+                                onProgressChange = onProgressoChange,
+                                onSalvar = onSalvarProgresso
+                            )
+                        } else {
+                            ProgressSection(
+                                progress = projeto.progresso / 100f
+                            )
+                        }
                     }
                     
                     AnimatedSection(
@@ -280,6 +330,67 @@ private fun HeaderSection(
         Spacer(modifier = Modifier.width(12.dp))
         
         ProjetoStatusBadge(status = status)
+    }
+}
+
+@Composable
+private fun EditableProgressSection(
+    progress: Float,
+    onProgressChange: (Float) -> Unit,
+    onSalvar: () -> Unit
+) {
+    GlassCard(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(4.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.projeto_detalhe_progresso),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "${progress.toInt()}%",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Slider(
+                value = progress,
+                onValueChange = onProgressChange,
+                valueRange = 0f..100f,
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                )
+            )
+
+            GradientProgressBar(
+                progress = progress / 100f,
+                modifier = Modifier.fillMaxWidth(),
+                height = 8.dp,
+                showLabel = false,
+                gradientColors = listOf(
+                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.tertiary
+                )
+            )
+
+            InovagabButton(
+                text = stringResource(R.string.projeto_detalhe_salvar_progresso),
+                onClick = onSalvar,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 

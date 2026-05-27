@@ -1,415 +1,310 @@
-# Levantamento Completo de Requisitos
-## Plataforma de Inovação Corporativa - Grupo Águia Branca
+# Levantamento de Requisitos — InovaGAB
 
-> Documento extraído do material oficial do Challenge FIAP 2026
-
----
-
-## 1. SOBRE A EMPRESA - GRUPO ÁGUIA BRANCA
-
-### 1.1 Dados Corporativos
-
-| Informação | Valor |
-|------------|-------|
-| **Setor** | Transporte e Logística |
-| **Porte** | Um dos maiores conglomerados de transporte e logística do Brasil |
-| **Colaboradores** | +20.000 funcionários |
-| **Empresas** | Mais de 25 empresas no grupo |
-| **Propósito** | "Mover o mundo com excelência e respeito às pessoas" |
-| **Valores** | Inovação, Ética, Respeito às pessoas |
-
-### 1.2 Divisões de Negócios
-
-O grupo opera em três divisões independentes:
-
-1. **PASSAGEIROS** - Transporte de pessoas
-2. **COMÉRCIO** - Atividades comerciais
-3. **LOGÍSTICA** - Transporte de cargas e operações logísticas
-
-### 1.3 Contexto de Inovação Atual
-
-- Já possui iniciativas de inovação que geram resultados
-- Possui um sistema de suporte atual (legado)
-- Busca ampliar integração entre estratégia, execução e mensuração
-- Necessidade de maior visibilidade, escalabilidade e captura de valor
+**Plataforma de Inovação Corporativa | Challenge FIAP 2026 — Grupo Águia Branca**
 
 ---
 
-## 2. PROBLEMA DE NEGÓCIO
+## 1. Problema Proposto
 
-### 2.1 Desafios Identificados
+O Grupo Águia Branca, conglomerado com atuação em transporte de passageiros, logística e comércio, precisa de uma **plataforma de inovação corporativa** que conecte estratégia, pessoas, processos e tecnologia.
 
-| Desafio | Descrição |
-|---------|-----------|
-| **Conexão Estratégica** | Conectar o direcionamento da alta gestão à execução prática na ponta |
-| **Visibilidade do Funil** | Acompanhar jornada completa: ideia inicial → projetos → resultados |
-| **Engajamento Operacional** | Incluir colaboradores de TODOS os níveis no processo criativo |
-| **Mensuração de Valor** | Demonstrar impacto real e ROI das iniciativas |
+O desafio proposto pela FIAP exige uma solução mobile que permita:
 
-### 2.2 O Que NÃO Buscam
+1. **Capturar** dores e oportunidades do dia a dia (operadores de campo)
+2. **Estruturar** ideias em projetos alinhados à estratégia corporativa (gestores)
+3. **Acompanhar** resultados mensuráveis e direcionar a inovação (líderes)
 
-> "NÃO BUSCAMOS APENAS UM APP DE IDEIAS"
-> 
-> "Buscamos um sistema capaz de conectar estratégia, execução e resultados, transformando inovação em valor real."
+A solução entregue — app Android **InovaGAB** — implementa esses três pilares com três perfis de usuário, persistência offline-first e gamificação para engajamento.
 
 ---
 
-## 3. SÍNTESE DO DESAFIO
+## 2. Requisitos Funcionais
 
-Desenvolver uma **solução mobile de gestão de inovação corporativa** estruturada para integrar:
+### 2.1 Autenticação (Auth)
 
-- **Estratégia**
-- **Pessoas**
-- **Processos**
-- **Tecnologia**
+| ID | Requisito | Status |
+|----|-----------|--------|
+| AUTH-01 | Login com email e senha | ✅ Implementado |
+| AUTH-02 | Três perfis: Operador, Gestor, Líder | ✅ Implementado |
+| AUTH-03 | Sessão persistente entre reinicializações | ✅ DataStore |
+| AUTH-04 | Login demo rápido por perfil (botões na tela) | ✅ Implementado |
+| AUTH-05 | Seed automático de usuários demo na 1ª execução | ✅ DatabaseSeeder |
+| AUTH-06 | Logout com limpeza de sessão | ✅ Implementado |
 
-Em um único ambiente, promovendo engajamento de colaboradores em **todos os níveis**.
+### 2.2 Orientações Estratégicas
 
-### 3.1 Três Pilares Funcionais
+| ID | Requisito | Status |
+|----|-----------|--------|
+| ORI-01 | Listar orientações ativas | ✅ Todos os perfis |
+| ORI-02 | Visualizar detalhe de orientação | ✅ Implementado |
+| ORI-03 | Criar orientação (Líder) | ✅ NovaOrientacaoScreen |
+| ORI-04 | Editar orientação (Líder) | ✅ EditarOrientacaoScreen |
+| ORI-05 | Excluir orientação (Líder) | ✅ OrientacoesViewModel |
+| ORI-06 | Categorias e prioridade | ✅ CategoriaOrientacao |
+
+### 2.3 Ideias / Problemas
+
+| ID | Requisito | Status |
+|----|-----------|--------|
+| IDE-01 | Cadastrar ideia ou problema | ✅ NovaIdeiaScreen |
+| IDE-02 | Entrada por voz (SpeechRecognizer pt-BR) | ✅ VoiceRecordButton |
+| IDE-03 | Sugestões de área/impacto por análise de texto | ✅ Regras locais (keywords) |
+| IDE-04 | Associar área de atuação e orientação estratégica | ✅ Implementado |
+| IDE-05 | Campos de impacto e esforço estimados | ✅ Implementado |
+| IDE-06 | Listar ideias com filtro por status | ✅ IdeiasScreen |
+| IDE-07 | Visualizar detalhe da ideia | ✅ IdeiaDetalheScreen |
+| IDE-08 | Avaliar ideia: aprovar/reprovar (Gestor/Líder) | ✅ AprovarIdeiaUseCase |
+| IDE-09 | Feedback obrigatório ao reprovar | ✅ Validado no Use Case |
+| IDE-10 | Converter ideia aprovada em projeto | ✅ Navegação para NovoProjeto |
+| IDE-11 | Indicador de similaridade (flag `temSimilaridade`) | ✅ Exibido em IdeiaCard (dados seed) |
+| IDE-12 | Upvote em ideias | ✅ IdeiaRepository.incrementUpvote |
+
+### 2.4 Projetos
+
+| ID | Requisito | Status |
+|----|-----------|--------|
+| PRO-01 | Criar projeto manualmente | ✅ NovoProjetoScreen |
+| PRO-02 | Criar projeto a partir de ideia aprovada | ✅ Com ideiaId na rota |
+| PRO-03 | Listar projetos (Gestor/Líder) | ✅ ProjetosScreen |
+| PRO-04 | Visualizar detalhe com progresso e ROI | ✅ ProjetoDetalheScreen |
+| PRO-05 | Métricas financeiras (investimento/retorno) | ✅ Projeto.investimento/retorno |
+| PRO-06 | Ciclo de vida (Planejado → Em Andamento → Concluído) | ✅ StatusProjeto |
+| PRO-07 | Cálculo automático de ROI | ✅ Propriedade `Projeto.roi` |
+
+### 2.5 Dashboard
+
+| ID | Requisito | Status |
+|----|-----------|--------|
+| DASH-01 | Home personalizada por perfil | ✅ HomeViewModel + HomeContent |
+| DASH-02 | KPIs consolidados (Líder) | ✅ LeaderDashboardScreen |
+| DASH-03 | ROI, investimento e retorno total | ✅ GetDashboardUseCase |
+| DASH-04 | Funil de inovação | ✅ FunnelChart |
+| DASH-05 | Desempenho por área | ✅ HorizontalBarChart |
+| DASH-06 | Recap semanal (novas ideias, avaliações) | ✅ WeeklyRecap |
+| DASH-07 | Narrativa de insights (Líder) | ✅ generateAINarrative (baseada em KPIs) |
+
+### 2.6 Gamificação
+
+| ID | Requisito | Status |
+|----|-----------|--------|
+| GAM-01 | Sistema de pontuação por ações | ✅ CalcularPontuacaoUseCase |
+| GAM-02 | Níveis de usuário (5 níveis) | ✅ NivelUsuario enum |
+| GAM-03 | Conquistas desbloqueáveis por perfil | ✅ TipoConquista + tiers |
+| GAM-04 | Ranking top-10 por perfil | ✅ RankingScreen |
+| GAM-05 | Filtro por divisão (minha / grupo completo) | ✅ DivisaoFilter |
+| GAM-06 | Posição do usuário logado no ranking | ✅ ResultadoRanking |
+
+### 2.7 Inovação Aberta
+
+| ID | Requisito | Status |
+|----|-----------|--------|
+| INO-01 | Radar de startups parceiras | ✅ RadarScreen |
+| INO-02 | Score de compatibilidade (matchScore) | ✅ StartupPartner |
+| INO-03 | Integração via Retrofit (mock Sprint 1) | ✅ MockApiInterceptor |
+
+### 2.8 Outros
+
+| ID | Requisito | Status |
+|----|-----------|--------|
+| OUT-01 | Perfil do usuário com estatísticas | ✅ PerfilScreen |
+| OUT-02 | Notificações | ⏳ Placeholder ("Em breve") |
+| OUT-03 | Pull-to-refresh na Home | ✅ PullToRefreshBox |
+
+---
+
+## 3. Requisitos Não-Funcionais
+
+| ID | Categoria | Requisito | Implementação |
+|----|-----------|-----------|---------------|
+| RNF-01 | Performance | UI não bloqueia Main Thread | Coroutines + `Dispatchers.Default` em KPIs pesados |
+| RNF-02 | Performance | Listas reativas sem reload manual | Room `Flow` + Compose recomposition |
+| RNF-03 | Segurança | Senhas não armazenadas em texto plano | SHA-256 via `PasswordHasher` |
+| RNF-04 | Segurança | Controle de acesso por perfil | Use Cases + ViewModels |
+| RNF-05 | UX | Navegação intuitiva com bottom bar + FAB contextual | `MainNavPolicy` |
+| RNF-06 | UX | Transições animadas entre telas | Slide/fade 300 ms |
+| RNF-07 | UX | Suporte dark/light theme | Material 3 `InovagabTheme` |
+| RNF-08 | UX | Edge-to-edge layout | Activity + Scaffold |
+| RNF-09 | Offline-first | App funcional sem internet | Room como fonte primária |
+| RNF-10 | Manutenibilidade | Arquitetura testável | Clean Architecture + DI |
+| RNF-11 | Qualidade | Cobertura de testes unitários | ~133 testes (Use Cases + ViewModels) |
+| RNF-12 | Compatibilidade | Android 8.0+ (API 26) | minSdk 26 |
+
+---
+
+## 4. Matriz de Funcionalidades por Perfil
+
+| Funcionalidade | Operador | Gestor | Líder |
+|----------------|:--------:|:------:|:-----:|
+| Login / Logout | ✅ | ✅ | ✅ |
+| Consultar orientações estratégicas | ✅ | ✅ | ✅ |
+| CRUD orientações estratégicas | ❌ | ❌ | ✅ |
+| Cadastrar ideias (texto/voz) | ✅ | ❌ | ❌ |
+| Listar ideias (escopo filtrado) | Próprias | Da área | Todas |
+| Avaliar ideias (aprovar/reprovar) | ❌ | ✅ | ✅ |
+| Converter ideia em projeto | ❌ | ✅ | ✅ |
+| Criar projetos | ❌ | ✅ | ✅ |
+| Listar/gerenciar projetos | ❌ | Da área | Todos |
+| Dashboard executivo (KPIs) | ❌ | Parcial (Home) | ✅ |
+| Radar de startups | ✅ | ✅ | ✅ |
+| Gamificação (pontos/nível/conquistas) | ✅ | ✅ | ✅ |
+| Ranking | ✅ | ✅ | ✅ |
+| Perfil e estatísticas | ✅ | ✅ | ✅ |
+| Notificações | ⏳ | ⏳ | ⏳ |
+| Tab Projetos (bottom nav) | ❌ | ✅ | ✅ |
+| FAB contextual | Nova Ideia | Novo Projeto | Nova Orientação |
+
+---
+
+## 5. Fluxos Principais
+
+### 5.1 Login e Restauração de Sessão
 
 ```
-┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│   CAPTURAR  │ ───► │  ESTRUTURAR │ ───► │ ACOMPANHAR  │
-│             │      │             │      │             │
-│ Dores e     │      │ Transformar │      │ Monitorar   │
-│ oportunida- │      │ em inicia-  │      │ até resul-  │
-│ des do dia  │      │ tivas ali-  │      │ tados men-  │
-│ a dia       │      │ nhadas      │      │ suráveis    │
-└─────────────┘      └─────────────┘      └─────────────┘
+1. App inicia → AppViewModel.restoreSession()
+2. SessionDataStore retorna user_id (se existir)
+3. UsuarioRepository.buscarPorId() valida usuário
+4. Se válido → Home/{perfil}; senão → Login
+5. Login: email + senha → hash SHA-256 → autenticar no Room
+6. Sucesso → SessionManager.login() → navega para Home
+```
+
+**Usuários demo (senha: `123456`):**
+
+| Email | Perfil | Nome |
+|-------|--------|------|
+| pedro.santos@aguiabranca.com.br | Operador | Pedro Santos |
+| ana.oliveira@aguiabranca.com.br | Gestor | Ana Oliveira |
+| marcos.silva@aguiabranca.com.br | Líder | Marcos Silva |
+
+### 5.2 Cadastro de Ideia (Operador)
+
+```
+1. Operador acessa Nova Ideia (FAB ou Home)
+2. Opcional: grava voz via SpeechRecognizerHelper (pt-BR)
+   └─ Fallback: simulação typewriter se reconhecimento indisponível
+3. Texto transcrito → analyzeTextForAISuggestions()
+   └─ Sugere área (Logística, Comercial, etc.) e impacto por keywords
+4. Operador preenche/confirma campos (tipo, área, orientação)
+5. NovaIdeiaViewModel.salvar() → IdeiaRepository.salvar()
+6. Room persiste → Flow atualiza listas automaticamente
+```
+
+### 5.3 Avaliação de Ideia (Gestor)
+
+```
+1. Gestor acessa Ideias → filtra pendentes da sua área
+2. Abre detalhe → informa impacto/esforço
+3. Aprova ou reprova (feedback obrigatório se reprovar)
+4. AprovarIdeiaUseCase valida perfil e atualiza status
+5. Ideia aprovada pode ser convertida em projeto
+```
+
+### 5.4 Conversão Ideia → Projeto (Gestor)
+
+```
+1. Gestor abre ideia aprovada → "Converter em Projeto"
+2. Navega para NovoProjetoScreen com ideiaId
+3. Preenche dados do projeto (objetivo, métricas, responsável)
+4. ProjetoRepository.salvar() + IdeiaRepository.vincularProjeto()
+5. Status da ideia → CONVERTIDA_PROJETO
+```
+
+### 5.5 Gestão de Orientações (Líder)
+
+```
+1. Líder acessa Orientações (Home ou FAB)
+2. Cria/edita/exclui orientações estratégicas
+3. OrientacaoRepository persiste no Room
+4. Operadores vinculam ideias às orientações ativas
+5. Líder acompanha alinhamento no Dashboard Executivo
+```
+
+### 5.6 Ranking e Gamificação
+
+```
+1. Usuário acessa Ranking (Home ou Perfil)
+2. GetRankingUseCase lista usuários do perfil selecionado
+3. CalcularPontuacaoUseCase computa pontos por ações do perfil
+4. Ranking exibe top-10 + posição do usuário logado
+5. Conquistas e nível visíveis no Perfil e Home
+```
+
+### 5.7 Radar de Startups
+
+```
+1. Usuário acessa Radar (Home)
+2. RadarViewModel chama InovacaoAbertaRepository
+3. Retrofit → MockApiInterceptor retorna JSON mock
+4. RadarScreen exibe startups com matchScore
 ```
 
 ---
 
-## 4. OS CINCO PILARES DA SOLUÇÃO
+## 6. Conectividade com Serviços Externos
 
-| # | Pilar | Descrição |
-|---|-------|-----------|
-| 01 | **DIRECIONAMENTO** | Alinhamento com objetivos estratégicos do GAB para foco no que gera valor |
-| 02 | **GESTÃO DE IDEIAS** | Captura estruturada de dores e sugestões de todos os níveis |
-| 03 | **INOVAÇÃO ABERTA** | Conexão com ecossistema externo para acelerar soluções |
-| 04 | **GESTÃO DE PROJETOS** | Estruturação de ideias validadas em iniciativas reais com cronograma e acompanhamento |
-| 05 | **MENSURAÇÃO** | Acompanhamento de indicadores e ROI para demonstrar impacto real |
+### Implementado (Sprint 1)
 
----
+| Serviço | Integração | Dados |
+|---------|------------|-------|
+| Radar de Startups | Retrofit + `MockApiInterceptor` | 3 startups mockadas com matchScore |
+| Reconhecimento de voz | Android `SpeechRecognizer` API | Transcrição pt-BR on-device |
 
-## 5. PERFIS DE USUÁRIO (CRÍTICO)
+### Estratégia de Integração
 
-### 5.1 OPERADOR - Nível Operacional
+```
+┌─────────────┐     Sprint 1      ┌──────────────────┐
+│  ViewModel  │ ────────────────► │ Repository (domain)│
+└─────────────┘                   └────────┬─────────┘
+                                             │
+                              ┌──────────────┴──────────────┐
+                              │                             │
+                     Room (offline-first)          Retrofit (remoto)
+                     fonte primária               mock → real (Sprint 2)
+```
 
-**Papel**: Registro e Captura
-
-**Características**:
-- Colaboradores de base
-- Precisam de registro RÁPIDO
-- Interface deve ser SIMPLES e INTUITIVA
-- Captura de dores operacionais SEM FRICÇÃO
-
-**Funcionalidades PERMITIDAS**:
-- ✅ Consultar orientações sobre estratégias da empresa (somente leitura)
-- ✅ Cadastrar ideias de inovação/problemas do dia a dia
-- ✅ Acompanhar status das PRÓPRIAS ideias cadastradas
-
-**Funcionalidades PROIBIDAS**:
-- ❌ Criar projetos
-- ❌ Aprovar/reprovar ideias
-- ❌ Gerenciar orientações estratégicas
-- ❌ Ver dashboard executivo completo
+- **Offline-first:** Room é a fonte de verdade para ideias, projetos, orientações e usuários
+- **Retrofit preparado:** stack completa (OkHttp, Gson, logging) com interceptor substituível
+- **Sincronização futura:** Sprint 2 adicionará sync bidirecional com backend REST
 
 ---
 
-### 5.2 GESTOR - Nível Tático
+## 7. Inovações Implementadas
 
-**Papel**: Gestão e Curadoria
+| Inovação | Descrição | Implementação |
+|----------|-----------|---------------|
+| **Gamificação corporativa** | Pontos, 5 níveis, 16 tipos de conquistas com tiers (Bronze→Platina), ranking por perfil | `CalcularPontuacaoUseCase`, `GetRankingUseCase`, `GamificationSnippetCard` |
+| **Entrada por voz** | Captura de ideias via microfone em português | `SpeechRecognizerHelper`, `VoiceRecordButton`, fallback typewriter |
+| **Sugestões inteligentes** | Análise de texto para sugerir área e impacto | `NovaIdeiaViewModel.analyzeTextForAISuggestions()` — regras por keywords (não é ML externo) |
+| **Radar de inovação aberta** | Descoberta de startups parceiras com score de compatibilidade | `RadarScreen`, `MockApiInterceptor`, `StartupPartner.matchScore` |
+| **Dashboard executivo com IA** | Narrativa automática baseada em KPIs | `LeaderDashboardViewModel.generateAINarrative()` |
+| **Indicador de similaridade** | Badge "similar" em ideias com flag `temSimilaridade` | `AIChip` em `IdeiaCard` |
+| **UI premium** | Design system customizado, glass cards, animações, pull-to-refresh | Theme InovaGAB, componentes em `presentation/components/` |
 
-**Características**:
-- Gestores e coordenadores
-- Responsáveis pela avaliação e priorização
-- Precisam de visão clara do funil
-- Ferramentas para decisões ágeis
-
-**Funcionalidades PERMITIDAS**:
-- ✅ Consultar orientações sobre estratégias (somente leitura)
-- ✅ Consultar ideias cadastradas pelos operadores
-- ✅ **PRIORIZAR** ideias
-- ✅ **APROVAR/REPROVAR** ideias
-- ✅ **CADASTRAR** projetos/iniciativas
-- ✅ **ATUALIZAR** dados dos projetos (progresso, resultados)
-- ✅ Acompanhar progresso dos projetos
-
-**Funcionalidades PROIBIDAS**:
-- ❌ Gerenciar orientações estratégicas
-- ❌ Ver dashboard executivo completo (apenas da sua área)
+> **Transparência:** as funcionalidades marcadas como "IA" utilizam lógica local baseada em regras e templates, não modelos de linguagem externos. A infraestrutura Retrofit está preparada para integração com serviços de IA no Sprint 2.
 
 ---
 
-### 5.3 LÍDER - Nível Estratégico
+## 8. Roadmap Sprint 2
 
-**Papel**: Decisão e Visão
+| Item | Descrição | Prioridade |
+|------|-----------|------------|
+| **Backend REST** | API Java/C# com endpoints CRUD completos | Alta |
+| **Autenticação JWT** | Substituir auth local por tokens com refresh | Alta |
+| **Sincronização** | Sync Room ↔ Backend (ideias, projetos, orientações) | Alta |
+| **Remover mock** | Substituir `MockApiInterceptor` por API real de startups | Média |
+| **Notificações push** | Implementar `NotificacoesScreen` com FCM | Média |
+| **IA real** | Integração com LLM para sugestões e detecção de similaridade | Média |
+| **Observabilidade** | Logs estruturados, métricas e crash reporting | Média |
+| **Segurança avançada** | bcrypt/Argon2, certificate pinning, ProGuard | Alta |
+| **APK release** | Build assinado para distribuição | Alta (Sprint 1 pendente) |
+| **Testes instrumentados** | Espresso/Compose UI tests | Baixa |
 
-**Características**:
-- Lideranças da empresa
-- Necessitam visão de portfólio
-- Suporte à decisão com dados consolidados
+### Entregáveis Sprint 1 pendentes
 
-**Funcionalidades PERMITIDAS**:
-- ✅ **GERENCIAR** orientações estratégicas (CRUD completo)
-- ✅ Consultar andamento de TODOS os projetos
-- ✅ Visualizar **DASHBOARD** com principais resultados
-
-**Métricas do Dashboard**:
-- ROI (Return on Investment)
-- Redução de custos
-- Ganho de produtividade
-- Lucro obtido
-- Prazo vs previsto
-- Investimento realizado
-- Retorno financeiro por projeto
-- Resumo geral consolidado
+- [ ] APK release assinado
+- [ ] Vídeo demonstrativo
+- [ ] Documentação técnica (.PDF ou .PPT) — *este documento atende parcialmente; exportar para PDF para entrega formal*
 
 ---
 
-## 6. REQUISITOS FUNCIONAIS DETALHADOS
-
-### 6.1 Módulo de Autenticação
-
-| ID | Requisito | Prioridade |
-|----|-----------|------------|
-| AUTH-01 | Login com 3 perfis de usuários (operador, gestor, líder) | OBRIGATÓRIO |
-| AUTH-02 | Gerenciamento seguro de sessão | OBRIGATÓRIO |
-| AUTH-03 | Restrições por nível de acesso | OBRIGATÓRIO |
-
-### 6.2 Módulo de Orientações Estratégicas
-
-| ID | Requisito | Quem Usa | Prioridade |
-|----|-----------|----------|------------|
-| ORI-01 | CRUD completo de orientações | LÍDER | OBRIGATÓRIO |
-| ORI-02 | Consultar orientações (leitura) | TODOS | OBRIGATÓRIO |
-| ORI-03 | Orientações devem guiar quais ideias são prioritárias | Sistema | OBRIGATÓRIO |
-
-### 6.3 Módulo de Ideias/Problemas
-
-| ID | Requisito | Quem Usa | Prioridade |
-|----|-----------|----------|------------|
-| IDE-01 | Cadastrar ideias/problemas (interface simples) | OPERADOR | OBRIGATÓRIO |
-| IDE-02 | Consultar PRÓPRIAS ideias | OPERADOR | OBRIGATÓRIO |
-| IDE-03 | Acompanhar status das ideias | OPERADOR | OBRIGATÓRIO |
-| IDE-04 | Listar TODAS as ideias | GESTOR | OBRIGATÓRIO |
-| IDE-05 | **PRIORIZAR** ideias | GESTOR | OBRIGATÓRIO |
-| IDE-06 | **APROVAR** ideias | GESTOR | OBRIGATÓRIO |
-| IDE-07 | **REPROVAR** ideias com feedback | GESTOR | OBRIGATÓRIO |
-| IDE-08 | Converter ideia aprovada em projeto | GESTOR | OBRIGATÓRIO |
-
-### 6.4 Módulo de Projetos
-
-| ID | Requisito | Quem Usa | Prioridade |
-|----|-----------|----------|------------|
-| PRJ-01 | Cadastrar projetos/iniciativas | GESTOR | OBRIGATÓRIO |
-| PRJ-02 | Atualizar dados do projeto | GESTOR | OBRIGATÓRIO |
-| PRJ-03 | Atualizar progresso (%) | GESTOR | OBRIGATÓRIO |
-| PRJ-04 | Adicionar resultados obtidos | GESTOR | OBRIGATÓRIO |
-| PRJ-05 | Consultar etapa atual | LÍDER | OBRIGATÓRIO |
-| PRJ-06 | Consultar status | LÍDER | OBRIGATÓRIO |
-| PRJ-07 | Consultar investimento | LÍDER | OBRIGATÓRIO |
-| PRJ-08 | Consultar prazo | LÍDER | OBRIGATÓRIO |
-| PRJ-09 | Consultar retorno financeiro | LÍDER | OBRIGATÓRIO |
-
-### 6.5 Módulo de Dashboard (LÍDER)
-
-| ID | Requisito | Prioridade |
-|----|-----------|------------|
-| DSH-01 | Resumo estruturado dos resultados dos projetos | OBRIGATÓRIO |
-| DSH-02 | Retornos específicos POR PROJETO | OBRIGATÓRIO |
-| DSH-03 | Resumo GERAL consolidado | OBRIGATÓRIO |
-| DSH-04 | Métrica: ROI | OBRIGATÓRIO |
-| DSH-05 | Métrica: Lucro obtido | OBRIGATÓRIO |
-| DSH-06 | Métrica: Prazo (previsto vs realizado) | OBRIGATÓRIO |
-| DSH-07 | Métrica: Investimento | OBRIGATÓRIO |
-| DSH-08 | Métrica: Aumento de produtividade | OBRIGATÓRIO |
-
----
-
-## 7. REQUISITOS TÉCNICOS
-
-### 7.1 Plataforma
-
-- **Aplicativo nativo** para Android ou iOS
-- **Escolhido**: Android
-- **API mínima**: 26 (Android 8.0)
-
-### 7.2 Conectividade com Serviços Externos (OBRIGATÓRIA)
-
-Pelo menos **UMA** das opções deve ser implementada de forma **efetiva e funcional** (não demonstrativa):
-
-| Opção | Descrição |
-|-------|-----------|
-| APIs REST | Consumo de APIs mockadas ou reais |
-| BaaS | Firebase, OneSignal, Backendless, AWS Amplify |
-| Database | Banco de dados em tempo real ou em nuvem |
-
-### 7.3 Arquitetura Implementada
-
-| Componente | Tecnologia |
-|------------|------------|
-| Arquitetura | Clean Architecture + MVVM |
-| DI | Hilt |
-| Persistência Local | Room |
-| Network | Retrofit + OkHttp |
-| Async | Coroutines + Flow |
-| UI | Jetpack Compose |
-
----
-
-## 8. SUGESTÕES DE INOVAÇÃO (DIFERENCIAL)
-
-O documento convida a implementar melhorias para promover engajamento:
-
-| Sugestão | Descrição |
-|----------|-----------|
-| **Dinâmicas de Priorização** | Mecânicas diferenciadas para filtrar e priorizar ideias |
-| **Sistema de Reconhecimento** | Reconhecimentos para quem mais contribuir ou tiver ideias escolhidas (gamificação) |
-| **Automatização de Fluxos** | Automatizar transições de status, notificações, etc |
-| **Visualização de Resultados** | Visibilidade prática e diferenciada dos resultados |
-
----
-
-## 9. CRITÉRIOS DE AVALIAÇÃO
-
-| Critério | Peso |
-|----------|------|
-| Adequação ao problema proposto | 20% |
-| **Implementação técnica funcional** | **30%** |
-| **Qualidade do código** | **25%** |
-| Apresentação e documentação | 15% |
-| Criatividade e inovação | 10% |
-
----
-
-## 10. ENTREGÁVEIS SPRINT 1
-
-**Data de Entrega**: 26/05/2026 - 23:00h
-
-| Item | Formato |
-|------|---------|
-| Aplicativo | APK (Android) |
-| Código-fonte | .zip completo |
-| Documentação técnica | PDF ou PPT |
-| Vídeo demonstrativo | Máx 5 minutos |
-
----
-
-## 11. SPRINT 2 - PREVIEW (2º Semestre)
-
-| Item | Descrição |
-|------|-----------|
-| Backend | Java ou C# |
-| APIs | APIs REST completas |
-| Integração | Com app nativo |
-| Segurança | Restrições por nível de acesso |
-| Serviços externos | Consumo real |
-| Observabilidade | Auditoria, logs, métricas |
-
----
-
-## 12. IDENTIDADE VISUAL E CORES
-
-### 12.1 Cores Corporativas
-
-| Cor | Hex | Uso |
-|-----|-----|-----|
-| **Azul Principal** | `#1565C0` | Botões, links, ações primárias |
-| **Azul Escuro** | `#0D47A1` | Headers, TopBar |
-| **Azul Claro** | `#BBDEFB` | Containers de destaque |
-| **Laranja** | `#FF8F00` | FABs, ações secundárias, energia |
-| **Laranja Escuro** | `#E65100` | Variante |
-| **Verde** | `#2E7D32` | Sustentabilidade, sucesso |
-| **Verde Claro** | `#C8E6C9` | Containers verdes |
-
-### 12.2 Cores de Status
-
-| Status | Cor Hex | Nome |
-|--------|---------|------|
-| Pendente | `#9E9E9E` | Cinza |
-| Em Análise | `#2196F3` | Azul |
-| Aprovado | `#4CAF50` | Verde |
-| Reprovado | `#F44336` | Vermelho |
-| Em Andamento | `#FF9800` | Laranja |
-| Concluído | `#2E7D32` | Verde Escuro |
-
-### 12.3 Significado das Cores
-
-- **Azul**: Confiança, profissionalismo
-- **Laranja**: Energia, inovação
-- **Verde**: Sustentabilidade (parte do challenge ESG)
-
----
-
-## 13. RESULTADOS ESPERADOS PELO CLIENTE
-
-| Resultado | Descrição |
-|-----------|-----------|
-| **Sistema Integrado** | Conectar estratégia, pessoas, processos e tecnologia |
-| **Engajamento Contínuo** | Participação ativa de colaboradores de todos os níveis |
-| **Execução Ágil** | Transformar ideias em projetos reais e estruturados |
-| **Impacto Mensurável** | Eficiência operacional, redução de custos, geração de receita |
-
----
-
-## 14. STATUS DA IMPLEMENTAÇÃO
-
-### Requisitos Implementados
-
-| Requisito | Status | Observação |
-|-----------|--------|------------|
-| Login com 3 perfis | ✅ Implementado | Operador, Gestor, Líder |
-| Cadastro de ideias/problemas | ✅ Implementado | Com tipo (Ideia/Problema) e área |
-| Consulta de próprias ideias | ✅ Implementado | Filtro por autor |
-| Listagem de todas ideias | ✅ Implementado | Para Gestor/Líder |
-| Aprovação/Reprovação de ideias | ✅ Implementado | IdeiaDetalheScreen com ações |
-| Priorização de ideias | ✅ Implementado | Campos impacto/esforço + score |
-| Cadastro de projetos | ✅ Implementado | Manual ou via conversão de ideia |
-| Métricas financeiras em Projeto | ✅ Implementado | Investimento, retorno, ROI |
-| Atualizar progresso do projeto | ✅ Implementado | Campo progresso 0-100% |
-| Diferenciação por perfil | ✅ Implementado | Home e ações por perfil |
-| Radar de Inovação | ✅ Implementado | Startups parceiras |
-| CRUD de Orientações (Líder) | ✅ Implementado | Criar, listar, editar, excluir, detalhe |
-| Dashboard executivo (Líder) | ✅ Implementado | ROI, investimento, retorno, funil de inovação |
-| Testes unitários | ✅ Implementado | UseCases e ViewModels com fakes |
-| Gamificação | ✅ Implementado | Pontuação, níveis, conquistas, ranking |
-| Captura por voz | ✅ Implementado | SpeechRecognizer para ideias |
-
-### Requisitos Pendentes
-
-| Gap | Gravidade | Descrição |
-|-----|-----------|-----------|
-| APK release | **ALTA** | Gerar APK assinado para entrega |
-| Vídeo demonstrativo | **ALTA** | Gravar vídeo de até 5 minutos |
-| Notificações | BAIXA | Avisos de mudança de status |
-
----
-
-## 15. INFORMAÇÕES ADICIONAIS
-
-### 15.1 Equipe
-
-- Limite: 5 alunos por equipe
-- Mesma turma obrigatória
-- Entrega por um integrante apenas
-
-### 15.2 Prazos
-
-| Marco | Data |
-|-------|------|
-| Kick-off | 30/04/2026 |
-| **Entrega Sprint 1** | **26/05/2026 - 23:00h** |
-
-> ⚠️ **ATENÇÃO**: NÃO há prazo de atraso para o Challenge
-
-### 15.3 Contexto
-
-- Challenge FIAP 2026
-- Global Solution
-- Disciplina de Desenvolvimento Mobile
-
----
-
-*Documento gerado a partir do material oficial "Plataforma de Inovação Corporativa - Grupo Águia Branca"*
+*Documento gerado para entrega Sprint 1 — Challenge FIAP 2026.*
