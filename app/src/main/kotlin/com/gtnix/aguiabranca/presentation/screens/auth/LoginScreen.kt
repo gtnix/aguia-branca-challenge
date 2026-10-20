@@ -1,5 +1,6 @@
 package com.gtnix.aguiabranca.presentation.screens.auth
 
+import android.app.Activity
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -40,6 +41,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +57,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -68,12 +71,13 @@ import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.presentation.components.LoginCredentialsFieldStyle
 import com.gtnix.aguiabranca.presentation.components.LoginGroupedCredentialsCard
+import androidx.core.view.WindowCompat
 import com.gtnix.aguiabranca.presentation.theme.AsaAzul
 import com.gtnix.aguiabranca.presentation.theme.AzulAcao
+import com.gtnix.aguiabranca.presentation.theme.FundoPagina
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.LocalDarkTheme
 import com.gtnix.aguiabranca.presentation.theme.MarinhoInstitucional
-import com.gtnix.aguiabranca.presentation.theme.MarinhoSuperficie
 import com.gtnix.aguiabranca.presentation.theme.contentOn
 
 private val LoginButtonShape = RoundedCornerShape(percent = 50)
@@ -114,9 +118,45 @@ private fun LoginScreenContent(
     onLoginClick: () -> Unit,
     onDemoLogin: (PerfilUsuario) -> Unit
 ) {
+    val appIsDark = LocalDarkTheme.current
+    InovagabTheme(darkTheme = false) {
+        LoginScreenBody(
+            uiState = uiState,
+            appIsDark = appIsDark,
+            onEmailChange = onEmailChange,
+            onSenhaChange = onSenhaChange,
+            onLoginClick = onLoginClick,
+            onDemoLogin = onDemoLogin
+        )
+    }
+}
+
+@Composable
+private fun LoginScreenBody(
+    uiState: LoginUiState,
+    appIsDark: Boolean,
+    onEmailChange: (String) -> Unit,
+    onSenhaChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
+    onDemoLogin: (PerfilUsuario) -> Unit
+) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val view = LocalView.current
     val featureUnderDevelopment = stringResource(R.string.feature_under_development)
+
+    if (!view.isInEditMode) {
+        DisposableEffect(appIsDark) {
+            val window = (view.context as Activity).window
+            val controller = WindowCompat.getInsetsController(window, view)
+            controller.isAppearanceLightStatusBars = true
+            controller.isAppearanceLightNavigationBars = true
+            onDispose {
+                controller.isAppearanceLightStatusBars = !appIsDark
+                controller.isAppearanceLightNavigationBars = !appIsDark
+            }
+        }
+    }
 
     var contentVisible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { contentVisible = true }
@@ -124,7 +164,7 @@ private fun LoginScreenContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(FundoPagina)
             .imePadding()
     ) {
         LoginAmbientGlow()
@@ -243,7 +283,7 @@ private fun LoginFrostedDrawer(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val sheet = if (LocalDarkTheme.current) MarinhoSuperficie else MarinhoInstitucional
+    val sheet = MarinhoInstitucional
     Box(
         modifier = modifier
             .clip(LoginSheetShape)
@@ -299,7 +339,7 @@ private fun LoginStageHero() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
+            .background(FundoPagina)
             .statusBarsPadding()
             .height(StageHeight),
         contentAlignment = Alignment.Center

@@ -130,12 +130,19 @@ class IdeiasViewModel @Inject constructor(
         _filtroSelecionado.value = filtro
     }
 
+    fun selecionarOrdenacao(nova: OrdenacaoIdeias) {
+        if (!canEvaluateIdeias || nova == _ordenacao.value) return
+        _ordenacao.value = nova
+    }
+
     fun alternarOrdenacao() {
-        if (!canEvaluateIdeias) return
-        _ordenacao.value = when (_ordenacao.value) {
-            OrdenacaoIdeias.FILA -> OrdenacaoIdeias.RECOMENDACAO_IA
-            OrdenacaoIdeias.RECOMENDACAO_IA -> OrdenacaoIdeias.FILA
-        }
+        selecionarOrdenacao(
+            if (_ordenacao.value == OrdenacaoIdeias.FILA) {
+                OrdenacaoIdeias.RECOMENDACAO_IA
+            } else {
+                OrdenacaoIdeias.FILA
+            }
+        )
     }
 
     fun clearActionMessage() {

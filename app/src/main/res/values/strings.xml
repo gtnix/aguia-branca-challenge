@@ -883,12 +883,13 @@
     <!-- Pontuação por IA: rubrica, selo e governança -->
     <string name="ideia_detalhe_reanalisar_ia">Reanalisar com IA</string>
     <string name="ideias_score_dados_insuficientes">Algumas ideias ficaram sem score: IA indisponível e impacto/esforço ainda não definidos.</string>
-    <string name="ideias_ordenar_ia">Ordenar por recomendação da IA</string>
-    <string name="ideias_ordem_fila_hint">Fila por ordem de chegada</string>
-    <string name="ideias_ordem_ia_hint">Maior aderência primeiro</string>
-    <string name="ia_selo_ia_alta">IA · Alta aderência</string>
-    <string name="ia_selo_ia_media">IA · Média aderência</string>
-    <string name="ia_selo_ia_baixa">IA · Baixa aderência</string>
+    <string name="ideias_ordem_chegada">Chegada</string>
+    <string name="ideias_ordem_ia">IA</string>
+    <string name="cd_ideias_ordem_chegada">Ordenar por ordem de chegada</string>
+    <string name="cd_ideias_ordem_ia">Ordenar pela recomendação da IA</string>
+    <string name="ia_selo_ia_alta">IA · Alta</string>
+    <string name="ia_selo_ia_media">IA · Média</string>
+    <string name="ia_selo_ia_baixa">IA · Baixa</string>
     <string name="ia_selo_estimativa_alta">Estimativa · Alta</string>
     <string name="ia_selo_estimativa_media">Estimativa · Média</string>
     <string name="ia_selo_estimativa_baixa">Estimativa · Baixa</string>

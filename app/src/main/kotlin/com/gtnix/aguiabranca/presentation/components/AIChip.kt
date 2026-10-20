@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,55 +36,43 @@ fun AIChip(
     onClick: (() -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val shape = RoundedCornerShape(20.dp)
-    
+    val shape = RoundedCornerShape(8.dp)
+
     val chipModifier = if (onClick != null) {
-        modifier
-            .shadow(
-                elevation = 4.dp,
-                shape = shape,
-                ambientColor = AISpark.copy(alpha = 0.3f),
-                spotColor = AISpark.copy(alpha = 0.3f)
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            )
-    } else {
-        modifier.shadow(
-            elevation = 4.dp,
-            shape = shape,
-            ambientColor = AISpark.copy(alpha = 0.3f),
-            spotColor = AISpark.copy(alpha = 0.3f)
+        modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null,
+            onClick = onClick
         )
+    } else {
+        modifier
     }
-    
+
     Surface(
         modifier = chipModifier,
         shape = shape,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.28f)
         )
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Outlined.AutoAwesome,
                 contentDescription = stringResource(R.string.cd_ai_suggestion),
-                modifier = Modifier.size(14.dp),
+                modifier = Modifier.size(11.dp),
                 tint = AISpark
             )
-            
-            Spacer(modifier = Modifier.width(6.dp))
-            
+
+            Spacer(modifier = Modifier.width(4.dp))
+
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary
             )
         }

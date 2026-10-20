@@ -2,17 +2,23 @@ package com.gtnix.aguiabranca.presentation.screens.ideias
 
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -36,7 +42,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,6 +59,8 @@ import com.gtnix.aguiabranca.presentation.components.IdeiaCard
 import com.gtnix.aguiabranca.presentation.components.PremiumFilterChip
 import com.gtnix.aguiabranca.presentation.components.SkeletonListPlaceholder
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import com.gtnix.aguiabranca.presentation.theme.LocalDarkTheme
+import com.gtnix.aguiabranca.presentation.theme.LocalInovagabColors
 import com.gtnix.aguiabranca.presentation.theme.NavBarDimensions
 import com.gtnix.aguiabranca.presentation.theme.ScreenPadding
 import com.gtnix.aguiabranca.presentation.util.UiState
@@ -124,9 +138,9 @@ fun IdeiasScreen(
             )
 
             if (viewModel.canEvaluateIdeias) {
-                OrdenacaoRow(
+                OrdenacaoSegmento(
                     ordenacao = ordenacao,
-                    onAlternar = viewModel::alternarOrdenacao
+                    onSelecionar = viewModel::selecionarOrdenacao
                 )
             }
             
@@ -222,49 +236,94 @@ private fun IdeiasFilterRow(
     LazyRow(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = ScreenPadding.Horizontal, vertical = 12.dp),
+            .padding(horizontal = ScreenPadding.Horizontal, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(filters) { (filtro, labelRes) ->
             PremiumFilterChip(
                 label = stringResource(labelRes),
                 selected = filtro == selectedFilter,
-                onClick = { onFilterSelected(filtro) }
+                onClick = { onFilterSelected(filtro) },
+                compact = true,
+                showCheck = false
             )
         }
     }
 }
 
 @Composable
-private fun OrdenacaoRow(
+private fun OrdenacaoSegmento(
     ordenacao: OrdenacaoIdeias,
-    onAlternar: () -> Unit
+    onSelecionar: (OrdenacaoIdeias) -> Unit
 ) {
-    Row(
+    val isDarkTheme = LocalDarkTheme.current
+    val cardBorder = LocalInovagabColors.current.cardBorder
+    val trilho = if (isDarkTheme) {
+        MaterialTheme.colorScheme.surfaceContainerHigh
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+    }
+    val ativo = if (isDarkTheme) {
+        MaterialTheme.colorScheme.surfaceContainerHighest
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+    val opcoes = listOf(
+        OrdenacaoIdeias.FILA to Pair(R.string.ideias_ordem_chegada, R.string.cd_ideias_ordem_chegada),
+        OrdenacaoIdeias.RECOMENDACAO_IA to Pair(R.string.ideias_ordem_ia, R.string.cd_ideias_ordem_ia)
+    )
+
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = ScreenPadding.Horizontal)
-            .padding(bottom = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(bottom = 8.dp)
+            .height(36.dp),
+        shape = CircleShape,
+        color = trilho
     ) {
-        PremiumFilterChip(
-            label = stringResource(R.string.ideias_ordenar_ia),
-            selected = ordenacao == OrdenacaoIdeias.RECOMENDACAO_IA,
-            onClick = onAlternar
-        )
-        Text(
-            text = stringResource(
-                if (ordenacao == OrdenacaoIdeias.FILA) {
-                    R.string.ideias_ordem_fila_hint
-                } else {
-                    R.string.ideias_ordem_ia_hint
+        Row(
+            modifier = Modifier
+                .padding(3.dp)
+                .selectableGroup()
+        ) {
+            opcoes.forEach { (valor, labels) ->
+                val selecionada = ordenacao == valor
+                val descricao = stringResource(labels.second)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(CircleShape)
+                        .background(if (selecionada) ativo else Color.Transparent)
+                        .then(
+                            if (selecionada && !isDarkTheme) {
+                                Modifier.border(1.dp, cardBorder, CircleShape)
+                            } else {
+                                Modifier
+                            }
+                        )
+                        .semantics { contentDescription = descricao }
+                        .selectable(
+                            selected = selecionada,
+                            role = Role.Tab,
+                            onClick = { onSelecionar(valor) }
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(labels.first),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = if (selecionada) FontWeight.SemiBold else FontWeight.Medium,
+                        color = if (selecionada) {
+                            MaterialTheme.colorScheme.onSurface
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                    )
                 }
-            ),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
-        )
+            }
+        }
     }
 }
 
@@ -286,8 +345,12 @@ private fun IdeiasScreenPreview() {
                         FiltroIdeia.APROVADAS to R.string.filter_approved,
                         FiltroIdeia.EM_PROJETO to R.string.filter_in_project
                     ),
-                    selectedFilter = FiltroIdeia.TODAS,
+                    selectedFilter = FiltroIdeia.PENDENTES,
                     onFilterSelected = {}
+                )
+                OrdenacaoSegmento(
+                    ordenacao = OrdenacaoIdeias.FILA,
+                    onSelecionar = {}
                 )
             }
         }
