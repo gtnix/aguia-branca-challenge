@@ -1,0 +1,606 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "28064a7fb94bc93b908a419d40c8f398",
+    "entities": [
+      {
+        "tableName": "usuarios",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `nome` TEXT NOT NULL, `email` TEXT NOT NULL, `senhaHash` TEXT NOT NULL, `perfil` TEXT NOT NULL, `area` TEXT NOT NULL, `divisao` TEXT NOT NULL, `fotoPerfil` TEXT, `dataCadastro` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nome",
+            "columnName": "nome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senhaHash",
+            "columnName": "senhaHash",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "perfil",
+            "columnName": "perfil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "area",
+            "columnName": "area",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "divisao",
+            "columnName": "divisao",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fotoPerfil",
+            "columnName": "fotoPerfil",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dataCadastro",
+            "columnName": "dataCadastro",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "orientacoes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `titulo` TEXT NOT NULL, `descricao` TEXT NOT NULL, `categoria` TEXT NOT NULL, `prioridade` INTEGER NOT NULL, `ativa` INTEGER NOT NULL, `criadoPor` TEXT, `dataCriacao` INTEGER NOT NULL, `dataExpiracao` INTEGER, PRIMARY KEY(`id`), FOREIGN KEY(`criadoPor`) REFERENCES `usuarios`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titulo",
+            "columnName": "titulo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descricao",
+            "columnName": "descricao",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoria",
+            "columnName": "categoria",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prioridade",
+            "columnName": "prioridade",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ativa",
+            "columnName": "ativa",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "criadoPor",
+            "columnName": "criadoPor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dataCriacao",
+            "columnName": "dataCriacao",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataExpiracao",
+            "columnName": "dataExpiracao",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_orientacoes_criadoPor",
+            "unique": false,
+            "columnNames": [
+              "criadoPor"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_orientacoes_criadoPor` ON `${TABLE_NAME}` (`criadoPor`)"
+          },
+          {
+            "name": "index_orientacoes_ativa",
+            "unique": false,
+            "columnNames": [
+              "ativa"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_orientacoes_ativa` ON `${TABLE_NAME}` (`ativa`)"
+          },
+          {
+            "name": "index_orientacoes_categoria",
+            "unique": false,
+            "columnNames": [
+              "categoria"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_orientacoes_categoria` ON `${TABLE_NAME}` (`categoria`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "usuarios",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "criadoPor"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "ideias",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `titulo` TEXT NOT NULL, `descricao` TEXT NOT NULL, `tipo` TEXT NOT NULL, `area` TEXT NOT NULL, `status` TEXT NOT NULL, `autorId` TEXT NOT NULL, `autorNome` TEXT NOT NULL, `orientacaoId` TEXT, `feedback` TEXT, `projetoId` TEXT, `dataCriacao` INTEGER NOT NULL, `dataAvaliacao` INTEGER, `impactoEstimado` INTEGER NOT NULL, `esforcoEstimado` INTEGER NOT NULL, `upvotes` INTEGER NOT NULL, `temSimilaridade` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`autorId`) REFERENCES `usuarios`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`orientacaoId`) REFERENCES `orientacoes`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`projetoId`) REFERENCES `projetos`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titulo",
+            "columnName": "titulo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descricao",
+            "columnName": "descricao",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tipo",
+            "columnName": "tipo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "area",
+            "columnName": "area",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "autorId",
+            "columnName": "autorId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "autorNome",
+            "columnName": "autorNome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orientacaoId",
+            "columnName": "orientacaoId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "feedback",
+            "columnName": "feedback",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "projetoId",
+            "columnName": "projetoId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dataCriacao",
+            "columnName": "dataCriacao",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataAvaliacao",
+            "columnName": "dataAvaliacao",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "impactoEstimado",
+            "columnName": "impactoEstimado",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "esforcoEstimado",
+            "columnName": "esforcoEstimado",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "upvotes",
+            "columnName": "upvotes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "temSimilaridade",
+            "columnName": "temSimilaridade",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ideias_autorId",
+            "unique": false,
+            "columnNames": [
+              "autorId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ideias_autorId` ON `${TABLE_NAME}` (`autorId`)"
+          },
+          {
+            "name": "index_ideias_area",
+            "unique": false,
+            "columnNames": [
+              "area"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ideias_area` ON `${TABLE_NAME}` (`area`)"
+          },
+          {
+            "name": "index_ideias_status",
+            "unique": false,
+            "columnNames": [
+              "status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ideias_status` ON `${TABLE_NAME}` (`status`)"
+          },
+          {
+            "name": "index_ideias_orientacaoId",
+            "unique": false,
+            "columnNames": [
+              "orientacaoId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ideias_orientacaoId` ON `${TABLE_NAME}` (`orientacaoId`)"
+          },
+          {
+            "name": "index_ideias_projetoId",
+            "unique": false,
+            "columnNames": [
+              "projetoId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ideias_projetoId` ON `${TABLE_NAME}` (`projetoId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "usuarios",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "autorId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "orientacoes",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "orientacaoId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "projetos",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "projetoId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "projetos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `nome` TEXT NOT NULL, `objetivo` TEXT NOT NULL, `descricao` TEXT NOT NULL, `area` TEXT NOT NULL, `status` TEXT NOT NULL, `ideiaOrigemId` TEXT, `orientacaoId` TEXT, `responsavelId` TEXT, `responsavelNome` TEXT NOT NULL, `membrosIds` TEXT NOT NULL, `dataCriacao` INTEGER NOT NULL, `dataInicio` INTEGER, `dataPrevistaConclusao` INTEGER, `dataConclusao` INTEGER, `progresso` INTEGER NOT NULL, `resultados` TEXT, `investimentoEstimado` REAL NOT NULL, `investimentoRealizado` REAL NOT NULL, `retornoEstimadoMensal` REAL NOT NULL, `retornoRealizadoMensal` REAL NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`responsavelId`) REFERENCES `usuarios`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`orientacaoId`) REFERENCES `orientacoes`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`ideiaOrigemId`) REFERENCES `ideias`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nome",
+            "columnName": "nome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "objetivo",
+            "columnName": "objetivo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descricao",
+            "columnName": "descricao",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "area",
+            "columnName": "area",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ideiaOrigemId",
+            "columnName": "ideiaOrigemId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "orientacaoId",
+            "columnName": "orientacaoId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "responsavelId",
+            "columnName": "responsavelId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "responsavelNome",
+            "columnName": "responsavelNome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "membrosIds",
+            "columnName": "membrosIds",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataCriacao",
+            "columnName": "dataCriacao",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataInicio",
+            "columnName": "dataInicio",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dataPrevistaConclusao",
+            "columnName": "dataPrevistaConclusao",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dataConclusao",
+            "columnName": "dataConclusao",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "progresso",
+            "columnName": "progresso",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resultados",
+            "columnName": "resultados",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "investimentoEstimado",
+            "columnName": "investimentoEstimado",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "investimentoRealizado",
+            "columnName": "investimentoRealizado",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retornoEstimadoMensal",
+            "columnName": "retornoEstimadoMensal",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retornoRealizadoMensal",
+            "columnName": "retornoRealizadoMensal",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_projetos_responsavelId",
+            "unique": false,
+            "columnNames": [
+              "responsavelId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_projetos_responsavelId` ON `${TABLE_NAME}` (`responsavelId`)"
+          },
+          {
+            "name": "index_projetos_area",
+            "unique": false,
+            "columnNames": [
+              "area"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_projetos_area` ON `${TABLE_NAME}` (`area`)"
+          },
+          {
+            "name": "index_projetos_status",
+            "unique": false,
+            "columnNames": [
+              "status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_projetos_status` ON `${TABLE_NAME}` (`status`)"
+          },
+          {
+            "name": "index_projetos_orientacaoId",
+            "unique": false,
+            "columnNames": [
+              "orientacaoId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_projetos_orientacaoId` ON `${TABLE_NAME}` (`orientacaoId`)"
+          },
+          {
+            "name": "index_projetos_ideiaOrigemId",
+            "unique": false,
+            "columnNames": [
+              "ideiaOrigemId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_projetos_ideiaOrigemId` ON `${TABLE_NAME}` (`ideiaOrigemId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "usuarios",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "responsavelId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "orientacoes",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "orientacaoId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "ideias",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "ideiaOrigemId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '28064a7fb94bc93b908a419d40c8f398')"
+    ]
+  }
+}

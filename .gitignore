@@ -1,0 +1,24 @@
+# Android / Gradle
+.gradle/
+.kotlin/
+**/build/
+local.properties
+
+# Backend / Maven
+backend/target/
+backend/.env
+**/*.log
+
+# IDE and OS
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local signing material
+*.jks
+*.keystore
+keystore.properties
+
+# Generated delivery staging
+docs/entregaveis/.staging/

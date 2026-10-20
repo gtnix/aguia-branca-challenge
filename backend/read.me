@@ -1,0 +1,39 @@
+INOVAGAB API — INSTRUÇÕES DE EXECUÇÃO
+=======================================
+
+Pré-requisitos:
+- Java 17 ou superior
+- Maven 3.8 ou superior
+- Docker com Docker Compose
+
+1. Extraia o ZIP e abra um terminal na pasta que contém o arquivo pom.xml.
+
+2. Crie o arquivo local de ambiente:
+   cp .env.example .env
+
+3. Configure no .env:
+   - JWT_SECRET com pelo menos 32 caracteres
+   - GEMINI_API_KEY com uma chave válida (opcional; sem chave há fallback)
+   - MONGODB_URI, se não utilizar o valor local padrão
+
+4. Suba o MongoDB:
+   docker compose up -d
+
+5. Execute os testes:
+   mvn -q test
+
+6. Inicie a API:
+   mvn spring-boot:run
+
+Endereços:
+- API: http://localhost:8080/api/v1
+- Health: http://localhost:8080/api/v1/health
+- Swagger: http://localhost:8080/api/v1/swagger-ui.html
+- OpenAPI: http://localhost:8080/api/v1/openapi
+
+Usuários de demonstração — senha 123456:
+- Operador: pedro.santos@aguiabranca.com.br
+- Gestor: ana.oliveira@aguiabranca.com.br
+- Líder: marcos.silva@aguiabranca.com.br
+
+Consulte README.md para contratos, exemplos curl, RBAC, IA e detalhes completos.

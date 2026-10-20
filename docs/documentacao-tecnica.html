@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InovaGAB — Documentação Técnica Sprint 2</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+    :root {
+      --primary:#00d4b2; --primary-dim:#005244; --secondary:#ff7a00;
+      --bg:#0e0e10; --surface:#171719; --surface-2:#202023;
+      --text:#f1f1f4; --muted:#b9bbc4; --outline:#73757e;
+      --border:rgba(255,255,255,.12); --success:#36b37e; --warning:#ffab00;
+      --danger:#ff5c57; --info:#5b9dff;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
+    body{font-size:9.2pt;line-height:1.45;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    @page{size:A4;margin:0}
+    .page{width:210mm;height:297mm;padding:13mm 16mm 12mm;position:relative;overflow:hidden;page-break-after:always;background:var(--bg)}
+    .page:last-child{page-break-after:auto}
+    .cover{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:linear-gradient(155deg,#0e0e10 0%,#0b2522 52%,#0e0e10 100%)}
+    .cover:before{content:"";position:absolute;width:120mm;height:120mm;border:1px solid rgba(0,212,178,.14);border-radius:50%;top:-55mm;right:-45mm}
+    .eyebrow{color:var(--primary);font-size:8pt;font-weight:700;letter-spacing:1.7px;text-transform:uppercase}
+    .cover h1{font-family:"Plus Jakarta Sans";font-size:29pt;line-height:1.08;margin:8mm 0 2mm}
+    .cover h1 span{color:var(--primary)}
+    .cover h2{font-size:12pt;font-weight:400;color:var(--muted);margin:0 0 10mm}
+    .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm;width:160mm}
+    .pillar,.card{background:var(--surface);border:1px solid var(--border);border-radius:3mm}
+    .pillar{padding:5mm 3mm}.pillar b{display:block;color:var(--primary);font-size:15pt}.pillar strong,.pillar small{display:block}.pillar strong{margin:1mm 0}.pillar small{color:var(--muted)}
+    .cover-meta{margin-top:10mm;padding:5mm 8mm;border:1px solid var(--border);border-radius:3mm;background:rgba(20,20,22,.88)}
+    .cover-meta b{display:block;margin-bottom:1mm}.cover-meta span{color:var(--muted)}
+    .header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:3mm;margin-bottom:7mm;color:var(--outline);font-size:7.5pt;letter-spacing:.7px;text-transform:uppercase}
+    .header b{color:var(--primary)}
+    .section-no{color:var(--primary);font-size:8pt;font-weight:700;letter-spacing:1.6px;text-transform:uppercase}
+    h2{font-family:"Plus Jakarta Sans";font-size:20pt;line-height:1.15;margin:1.5mm 0 6mm}
+    h3{font-family:"Plus Jakarta Sans";font-size:11pt;margin:5mm 0 2.5mm}
+    p{color:var(--muted);margin:0 0 3mm}
+    strong{color:var(--text)}
+    .lead{font-size:11pt;line-height:1.55;max-width:170mm}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm}
+    .card{padding:4mm}.card h3{margin-top:0}.card p:last-child{margin-bottom:0}
+    .metric{padding:4mm;background:var(--surface);border-top:2px solid var(--primary);border-radius:2mm}
+    .metric b{display:block;font:700 18pt "Plus Jakarta Sans";color:var(--primary)}
+    .metric span{color:var(--muted);font-size:8pt}
+    .tag{display:inline-block;padding:1.2mm 2.5mm;border-radius:10mm;background:var(--surface-2);border:1px solid var(--border);margin:0 1mm 1.5mm 0;font-size:7.5pt}
+    .tag.ok{color:var(--success)}.tag.ai{color:var(--primary)}.tag.warn{color:var(--warning)}
+    table{width:100%;border-collapse:collapse;margin:2mm 0 4mm;font-size:7.7pt}
+    th{background:var(--surface-2);color:var(--primary);text-align:left;padding:2.2mm;border:1px solid var(--border)}
+    td{padding:2mm 2.2mm;border:1px solid var(--border);color:var(--muted);vertical-align:top}
+    td strong,td code{color:var(--text)}
+    code,pre{font-family:"DejaVu Sans Mono",monospace}
+    code{font-size:7.2pt;color:var(--primary)}
+    pre{white-space:pre-wrap;background:#0a0a0c;border:1px solid var(--border);border-radius:2mm;padding:3mm;color:#d8d8dd;font-size:7pt;line-height:1.35;margin:2mm 0 4mm}
+    ul{margin:1mm 0 4mm;padding-left:5mm;color:var(--muted)}li{margin-bottom:1.2mm}
+    .flow{display:flex;align-items:stretch;gap:2mm;margin:5mm 0;flex-wrap:nowrap}
+    .node{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:2mm;padding:3mm;text-align:center}
+    .node b{display:block;color:var(--text);margin-bottom:1mm}.node span{color:var(--muted);font-size:7.4pt}
+    .arrow{display:flex;align-items:center;color:var(--primary);font-size:16pt}
+    .arch{display:grid;grid-template-columns:1.1fr .9fr;gap:5mm;align-items:stretch}
+    .stack{display:flex;flex-direction:column;gap:2.5mm}
+    .layer{background:var(--surface);border-left:3px solid var(--primary);padding:4mm;border-radius:2mm}
+    .layer b{display:block;margin-bottom:1mm}.layer span{color:var(--muted);font-size:8pt}
+    .callout{border-left:3px solid var(--secondary);background:rgba(255,122,0,.08);padding:3mm 4mm;margin:4mm 0;color:var(--muted)}
+    .success{border-left-color:var(--success);background:rgba(54,179,126,.08)}
+    .warning{border-left-color:var(--warning);background:rgba(255,171,0,.08)}
+    .footer{position:absolute;left:16mm;right:16mm;bottom:7mm;display:flex;justify-content:space-between;color:var(--outline);font-size:7pt}
+    .check{color:var(--success);font-weight:700}.deny{color:var(--danger);font-weight:700}.read{color:var(--info);font-weight:700}
+    .small{font-size:7.5pt}.muted{color:var(--muted)}.accent{color:var(--primary)}
+    .endpoint td:first-child{font-weight:800;color:var(--primary);width:13mm}.endpoint td:nth-child(2){font-family:"DejaVu Sans Mono";color:var(--text)}
+    .contract{font-size:6.65pt;line-height:1.25}.contract th,.contract td{padding:1.55mm 1.7mm}.contract td:first-child{font-weight:800;color:var(--primary);width:12mm}.contract td:nth-child(2){font-family:"DejaVu Sans Mono";color:var(--text);width:49mm}
+    .timeline{border-left:2px solid var(--primary);padding-left:5mm;margin-left:3mm}.timeline div{margin-bottom:5mm;position:relative}.timeline div:before{content:"";width:3mm;height:3mm;background:var(--primary);border-radius:50%;position:absolute;left:-6.6mm;top:1mm}
+  </style>
+</head>
+<body>
+
+<section class="page cover">
+  <div class="eyebrow">Challenge FIAP 2026 · Grupo Águia Branca</div>
+  <h1>Plataforma de Inovação<br><span>Corporativa</span></h1>
+  <h2>Documentação Técnica Unificada — Sprint 2</h2>
+  <div class="pillars">
+    <div class="pillar"><b>01</b><strong>CAPTURAR</strong><small>Dores e oportunidades operacionais</small></div>
+    <div class="pillar"><b>02</b><strong>ESTRUTURAR</strong><small>Priorizar e transformar em projetos</small></div>
+    <div class="pillar"><b>03</b><strong>ACOMPANHAR</strong><small>Medir resultados e retorno</small></div>
+  </div>
+  <div class="cover-meta">
+    <b>Giuliana Abe Takara · RM 562736</b>
+    <b>André Luiz Oliveira da Silva · RM 565836</b>
+    <span>2TDSA · Sprint 2 · 21/09/2026</span>
+  </div>
+  <div class="footer"><span>InovaGAB</span><span>Spring Boot · MongoDB · Android · Gemini</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Documentação Técnica Sprint 2</span></div>
+  <div class="section-no">Seção 01</div><h2>Visão Executiva</h2>
+  <p class="lead">A Sprint 2 transforma o MVP Android offline em uma plataforma integrada, com backend real, segurança no servidor, banco NoSQL e IA generativa para apoiar a priorização de iniciativas.</p>
+  <div class="grid-4" style="margin:7mm 0">
+    <div class="metric"><b>128</b><span>testes backend</span></div>
+    <div class="metric"><b>206</b><span>testes Android</span></div>
+    <div class="metric"><b>3</b><span>perfis com RBAC</span></div>
+    <div class="metric"><b>0</b><span>mocks de domínio</span></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><h3>Objetivo técnico</h3><p>APIs REST completas, autenticação JWT, MongoDB, integração nativa, validação, tratamento de erros e documentação OpenAPI.</p></div>
+    <div class="card"><h3>Objetivo de negócio</h3><p>Conectar estratégia, conhecimento dos colaboradores e execução de projetos de inovação com resultados mensuráveis.</p></div>
+    <div class="card"><h3>Duas IAs implementadas</h3><p>IA-A prioriza ideias para o Gestor; IA-C gera relatório executivo para o Líder. Ambas usam Gemini e fallback.</p></div>
+    <div class="card"><h3>Fluxo demonstrável</h3><p>Operador cria ideia → Gestor pontua e aprova → Gestor converte em projeto → Líder acompanha o dashboard.</p></div>
+  </div>
+  <div class="callout success"><strong>Resultado:</strong> backend e app compilam, testes passam, smoke dos três perfis foi validado e o fluxo integrado foi executado de ponta a ponta.</div>
+  <div class="footer"><span>Challenge FIAP 2026</span><span>2 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Solução</span></div>
+  <div class="section-no">Seção 02</div><h2>Escopo da Sprint 2</h2>
+  <p class="lead">A evolução concentrou-se em levar os fluxos da Sprint 1 para uma arquitetura cliente-servidor segura, rastreável e preparada para análise executiva.</p>
+  <div class="grid-2" style="margin-top:7mm">
+    <div class="card"><h3>API de negócio</h3><p>Orientações estratégicas, ideias, avaliações, projetos, progresso e indicadores consolidados.</p></div>
+    <div class="card"><h3>Aplicativo integrado</h3><p>Android nativo consumindo contratos REST reais por Retrofit, sem mocks nos fluxos oficiais.</p></div>
+    <div class="card"><h3>Segurança</h3><p>Autenticação JWT, senhas BCrypt, autorização por perfil e ownership das ideias.</p></div>
+    <div class="card"><h3>Persistência</h3><p>MongoDB com documentos, índices, histórico estratégico e exclusão lógica.</p></div>
+    <div class="card"><h3>IA para o Gestor</h3><p>Scoring e priorização de ideias com justificativa e decisão final humana.</p></div>
+    <div class="card"><h3>IA para o Líder</h3><p>Relatório executivo com evidências dos KPIs e ação recomendada.</p></div>
+  </div>
+  <h3>Do protótipo à plataforma integrada</h3>
+  <div class="flow">
+    <div class="node"><b>Sprint 1</b><span>Room e fluxos locais</span></div><div class="arrow">→</div>
+    <div class="node"><b>Sprint 2</b><span>API como fonte oficial</span></div><div class="arrow">→</div>
+    <div class="node"><b>Decisão</b><span>dados consolidados + IA</span></div>
+  </div>
+  <div class="callout"><strong>Princípio central:</strong> regras de acesso e negócio são aplicadas no backend; o aplicativo apresenta somente as ações permitidas para cada perfil.</div>
+  <div class="footer"><span>Challenge FIAP 2026</span><span>3 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Arquitetura integrada</span></div>
+  <div class="section-no">Seção 03</div><h2>Arquitetura da Solução</h2>
+  <div class="flow">
+    <div class="node"><b>Android Nativo</b><span>Compose · MVVM · Hilt</span></div><div class="arrow">→</div>
+    <div class="node"><b>REST + JWT</b><span>Retrofit · OkHttp · JSON</span></div><div class="arrow">→</div>
+    <div class="node"><b>Spring Boot</b><span>Security · Validation · Services</span></div>
+  </div>
+  <div class="flow">
+    <div class="node"><b>MongoDB</b><span>Usuários · orientações · ideias · projetos</span></div><div class="arrow">←</div>
+    <div class="node"><b>Repositories</b><span>Spring Data MongoDB</span></div><div class="arrow">→</div>
+    <div class="node"><b>Google Gemini</b><span>Scoring e narrativa</span></div>
+  </div>
+  <div class="arch" style="margin-top:7mm">
+    <div class="stack">
+      <div class="layer"><b>Presentation</b><span>Screens, ViewModels, navegação, StateFlow e componentes</span></div>
+      <div class="layer"><b>Domain</b><span>Modelos, contratos de repositório, use cases e sessão</span></div>
+      <div class="layer"><b>Data</b><span>Retrofit, DTOs, mappers, interceptors, Room de apoio e token criptografado</span></div>
+    </div>
+    <div class="stack">
+      <div class="layer"><b>Controller</b><span>Rotas REST, validação e autorização</span></div>
+      <div class="layer"><b>Service</b><span>Negócio, ownership, estados, IA e KPIs</span></div>
+      <div class="layer"><b>Repository</b><span>Persistência MongoDB e índices</span></div>
+    </div>
+  </div>
+  <div class="callout success"><strong>Regra de dependência:</strong> UI depende do domínio; implementações e infraestrutura ficam nas bordas. O servidor é a autoridade para segurança e regras de negócio.</div>
+  <div class="footer"><span>Challenge FIAP 2026</span><span>4 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Aplicativo Android</span></div>
+  <div class="section-no">Seção 04</div><h2>Android — Clean Architecture + MVVM</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Presentation</h3><p>Jetpack Compose, ViewModels Hilt, estados imutáveis e navegação com guardas por perfil.</p><span class="tag">17 ViewModels</span><span class="tag">Material 3</span></div>
+    <div class="card"><h3>Domain</h3><p>Models, interfaces e use cases independentes da origem dos dados.</p><span class="tag">Result&lt;T&gt;</span><span class="tag">Flow</span></div>
+    <div class="card"><h3>Data remota</h3><p>Retrofit para Auth, Orientações, Ideias, Projetos, Dashboard e IA.</p><span class="tag ok">sem mock</span><span class="tag">DTO mappers</span></div>
+    <div class="card"><h3>Sessão segura</h3><p>JWT e expiração em EncryptedSharedPreferences; 401 encerra a sessão globalmente.</p><span class="tag">AES256</span><span class="tag">Bearer</span></div>
+  </div>
+  <h3>Configuração por ambiente</h3>
+  <pre>./gradlew assembleDebug
+./gradlew assembleRelease
+./gradlew assembleRelease \
+  -PINOVAGAB_API_BASE_URL=https://api.exemplo.com/api/v1/</pre>
+  <ul>
+    <li><strong>Emulador:</strong> <code>10.0.2.2</code> acessa a API da máquina host.</li>
+    <li><strong>Dispositivo físico:</strong> URL configurável pelo IP LAN.</li>
+    <li><strong>Ambiente exposto:</strong> endpoint HTTPS obrigatório.</li>
+    <li><strong>Mutações:</strong> login, create, update e delete exigem rede.</li>
+  </ul>
+  <div class="callout"><strong>Legado controlado:</strong> Room permanece apenas para apoio local à gamificação. O seeding e a autenticação local da Sprint 1 foram removidos do fluxo oficial.</div>
+  <div class="footer"><span>Challenge FIAP 2026</span><span>5 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Backend</span></div>
+  <div class="section-no">Seção 05</div><h2>Backend Spring Boot + MongoDB</h2>
+  <div class="arch">
+    <div class="stack">
+      <div class="layer"><b>Controllers</b><span>7 recursos REST, versionamento e @PreAuthorize</span></div>
+      <div class="layer"><b>Services</b><span>Regras, transições, ownership, agregações e Gemini</span></div>
+      <div class="layer"><b>Repositories</b><span>MongoRepository e queries por documentos ativos</span></div>
+      <div class="layer"><b>Documents</b><span>Soft-delete, timestamps e índices compostos</span></div>
+    </div>
+    <div class="card">
+      <h3>Stack</h3>
+      <span class="tag">Java 17</span><span class="tag">Spring Boot 3.3.5</span>
+      <span class="tag">Spring Security</span><span class="tag">MongoDB</span>
+      <span class="tag">Jakarta Validation</span><span class="tag">Springdoc</span>
+      <h3>Hardening</h3>
+      <ul><li>Erros JSON 400/401/403/404/500</li><li>CORS por ambiente</li><li>Logs sem token/body</li><li>Profile prod sem secrets default</li><li>Swagger desabilitado em produção</li></ul>
+    </div>
+  </div>
+  <h3>Organização do código</h3>
+  <pre>com.gtnix.inovagab/
+├── config/       Security, seed, OpenAPI, Gemini
+├── controller/   REST /api/v1
+├── service/      regras de negócio
+├── repository/   Spring Data MongoDB
+├── document/     @Document + índices
+├── dto/          requests/responses validados
+├── security/     JWT + UserDetails
+└── web/          erros e observabilidade</pre>
+  <div class="footer"><span>Challenge FIAP 2026</span><span>6 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Segurança</span></div>
+  <div class="section-no">Seção 06</div><h2>JWT, BCrypt e RBAC</h2>
+  <div class="flow">
+    <div class="node"><b>Login</b><span>email + senha</span></div><div class="arrow">→</div>
+    <div class="node"><b>BCrypt</b><span>validação no servidor</span></div><div class="arrow">→</div>
+    <div class="node"><b>JWT</b><span>email + perfil + expiração</span></div><div class="arrow">→</div>
+    <div class="node"><b>Bearer</b><span>filtro em cada request</span></div>
+  </div>
+  <table>
+    <tr><th>Recurso / ação</th><th>Operador</th><th>Gestor</th><th>Líder</th></tr>
+    <tr><td>Consultar orientações</td><td class="check">Sim</td><td class="check">Sim</td><td class="check">Sim</td></tr>
+    <tr><td>CRUD orientações</td><td class="deny">Não</td><td class="deny">Não</td><td class="check">Sim</td></tr>
+    <tr><td>CRUD ideias</td><td class="check">Próprias</td><td class="read">Leitura</td><td class="read">Leitura</td></tr>
+    <tr><td>Priorizar, IA e avaliar</td><td class="deny">Não</td><td class="check">Sim</td><td class="deny">Não</td></tr>
+    <tr><td>CRUD projetos</td><td class="deny">Não</td><td class="check">Sim</td><td class="read">Leitura</td></tr>
+    <tr><td>Dashboard executivo</td><td class="deny">Não</td><td class="deny">Não</td><td class="check">Sim</td></tr>
+  </table>
+  <div class="grid-2">
+    <div class="card"><h3>401</h3><p>Token ausente, inválido ou expirado. O app limpa a credencial e retorna ao login.</p></div>
+    <div class="card"><h3>403</h3><p>Usuário autenticado, mas sem o perfil exigido para a operação.</p></div>
+    <div class="card"><h3>Ownership</h3><p>O Operador só consulta e altera ideias associadas ao próprio userId.</p></div>
+    <div class="card"><h3>Decisão humana</h3><p>A IA recomenda; apenas o Gestor altera o status de avaliação.</p></div>
+  </div>
+  <div class="footer"><span>Challenge FIAP 2026</span><span>7 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Persistência</span></div>
+  <div class="section-no">Seção 07</div><h2>Modelo de Dados MongoDB</h2>
+  <div class="grid-2">
+    <div class="card"><h3>usuarios</h3><p><code>id, nome, email, senhaHash, perfil, area, ativo</code></p><span class="tag">email unique</span></div>
+    <div class="card"><h3>orientacoes</h3><p><code>titulo, categoria, campanha, datas, ativo, deletedAt</code></p><span class="tag">histórico</span></div>
+    <div class="card"><h3>ideias</h3><p><code>autorUserId, orientacaoId, status, prioridade, scoreIa</code></p><span class="tag">ownership</span></div>
+    <div class="card"><h3>projetos</h3><p><code>ideiaId, orientacaoId, status, progresso, investimento, retorno</code></p><span class="tag">ROI</span></div>
+  </div>
+  <h3>Relacionamentos lógicos</h3>
+  <div class="flow">
+    <div class="node"><b>Orientação</b><span>estratégia vigente</span></div><div class="arrow">→</div>
+    <div class="node"><b>Ideia</b><span>proposta do Operador</span></div><div class="arrow">→</div>
+    <div class="node"><b>Projeto</b><span>execução aprovada</span></div>
+  </div>
+  <h3>Boas práticas adotadas</h3>
+  <ul>
+    <li>Soft-delete preserva histórico e evita quebrar referências.</li>
+    <li>Orientação ativa é validada na criação de ideias e projetos.</li>
+    <li>Índice parcial impede dois projetos ativos para a mesma ideia.</li>
+    <li>Índices cobrem autor, status, área, orientação e flag ativo.</li>
+    <li>Conversão ideia → projeto é idempotente.</li>
+  </ul>
+  <div class="callout success"><strong>Histórico estratégico:</strong> o Líder consulta orientações ativas, inativas e excluídas; Operador e Gestor visualizam somente as vigentes.</div>
+  <div class="footer"><span>Challenge FIAP 2026</span><span>8 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Fluxo integrado</span></div>
+  <div class="section-no">Seção 08</div><h2>Da Ideia ao Resultado</h2>
+  <div class="timeline">
+    <div><strong>1. Operador captura</strong><p>Registra ideia ou problema, por texto ou voz, e vincula a uma orientação vigente.</p></div>
+    <div><strong>2. Backend protege</strong><p>JWT identifica o autor; validação e ownership impedem alteração de terceiros.</p></div>
+    <div><strong>3. Gestor prioriza</strong><p>Consulta todas as ideias, solicita scoring Gemini e define a prioridade humana.</p></div>
+    <div><strong>4. Gestor avalia</strong><p>Aprova ou reprova; feedback é obrigatório na reprovação.</p></div>
+    <div><strong>5. Projeto é criado</strong><p>Uma ideia aprovada é convertida sem duplicidade e mantém rastreabilidade.</p></div>
+    <div><strong>6. Resultados são atualizados</strong><p>Etapa, status, progresso, investimento, prazo e retorno são persistidos.</p></div>
+    <div><strong>7. Líder acompanha</strong><p>Dashboard agrega ROI, lucro, prazos, produtividade, funil e áreas.</p></div>
+  </div>
+  <div class="callout success"><strong>Validação executada:</strong> o fluxo completo foi reproduzido na API com dados reais no MongoDB e os três perfis foram autenticados no emulador Android.</div>
+  <div class="footer"><span>Challenge FIAP 2026</span><span>9 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Especificação E5</span></div>
+  <div class="section-no">Seção 09</div><h2>Contratos — Auth, Orientações e Ideias</h2>
+  <table class="contract">
+    <tr><th>Método</th><th>Rota</th><th>Perfil</th><th>Payload / parâmetros</th><th>Resposta</th></tr>
+    <tr><td>GET</td><td>/health</td><td>Público</td><td>—</td><td>200 · status e serviço</td></tr>
+    <tr><td>POST</td><td>/auth/login</td><td>Público</td><td><code>LoginRequest</code>: email, senha</td><td>200 · JWT, expiração e usuário</td></tr>
+    <tr><td>GET</td><td>/auth/me</td><td>Todos</td><td>Bearer JWT</td><td>200 · <code>UsuarioResponse</code></td></tr>
+    <tr><td>GET</td><td>/orientacoes</td><td>Todos</td><td>query <code>apenasAtivas</code></td><td>200 · lista de orientações</td></tr>
+    <tr><td>GET</td><td>/orientacoes/{id}</td><td>Todos</td><td>path <code>id</code></td><td>200 · <code>OrientacaoResponse</code></td></tr>
+    <tr><td>POST</td><td>/orientacoes</td><td>Líder</td><td><code>OrientacaoRequest</code></td><td>200 · orientação criada</td></tr>
+    <tr><td>PUT</td><td>/orientacoes/{id}</td><td>Líder</td><td>path id + <code>OrientacaoRequest</code></td><td>200 · orientação atualizada</td></tr>
+    <tr><td>PUT</td><td>/orientacoes/{id}/ativo</td><td>Líder</td><td>path id + query <code>ativo</code></td><td>200 · orientação atualizada</td></tr>
+    <tr><td>DELETE</td><td>/orientacoes/{id}</td><td>Líder</td><td>path <code>id</code></td><td>204 · sem conteúdo</td></tr>
+    <tr><td>GET</td><td>/ideias</td><td>Todos</td><td>query status, area, orientacaoId</td><td>200 · lista conforme RBAC</td></tr>
+    <tr><td>GET</td><td>/ideias/{id}</td><td>Todos</td><td>path <code>id</code></td><td>200 · <code>IdeiaResponse</code></td></tr>
+    <tr><td>POST</td><td>/ideias</td><td>Operador</td><td><code>IdeiaRequest</code></td><td>200 · ideia criada</td></tr>
+    <tr><td>PUT</td><td>/ideias/{id}</td><td>Operador</td><td>path id + <code>IdeiaRequest</code></td><td>200 · ideia atualizada</td></tr>
+    <tr><td>DELETE</td><td>/ideias/{id}</td><td>Operador</td><td>path <code>id</code></td><td>204 · sem conteúdo</td></tr>
+    <tr><td>PATCH</td><td>/ideias/{id}/prioridade</td><td>Gestor</td><td><code>PrioridadeRequest</code>: 1–100</td><td>200 · ideia priorizada</td></tr>
+    <tr><td>PATCH</td><td>/ideias/{id}/avaliacao</td><td>Gestor</td><td><code>AvaliacaoRequest</code>: status, feedback</td><td>200 · ideia avaliada</td></tr>
+  </table>
+  <div class="callout"><strong>Erros comuns:</strong> 400 validação/transição; 401 JWT; 403 perfil/ownership; 404 recurso inexistente.</div>
+  <div class="footer"><span>Base: /api/v1</span><span>10 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Especificação E5</span></div>
+  <div class="section-no">Seção 10</div><h2>Contratos — Projetos, Dashboard e IA</h2>
+  <table class="contract">
+    <tr><th>Método</th><th>Rota</th><th>Perfil</th><th>Payload / parâmetros</th><th>Resposta</th></tr>
+    <tr><td>GET</td><td>/projetos</td><td>Gestor/Líder</td><td>Bearer JWT</td><td>200 · lista de projetos ativos</td></tr>
+    <tr><td>GET</td><td>/projetos/{id}</td><td>Gestor/Líder</td><td>path <code>id</code></td><td>200 · <code>ProjetoResponse</code></td></tr>
+    <tr><td>POST</td><td>/projetos</td><td>Gestor</td><td><code>ProjetoRequest</code>, ideiaId opcional</td><td>200 · projeto criado/idempotente</td></tr>
+    <tr><td>PUT</td><td>/projetos/{id}</td><td>Gestor</td><td>path id + <code>ProjetoRequest</code></td><td>200 · projeto atualizado</td></tr>
+    <tr><td>PATCH</td><td>/projetos/{id}/progresso</td><td>Gestor</td><td><code>ProgressoRequest</code></td><td>200 · progresso atualizado</td></tr>
+    <tr><td>DELETE</td><td>/projetos/{id}</td><td>Gestor</td><td>path <code>id</code></td><td>204 · sem conteúdo</td></tr>
+    <tr><td>GET</td><td>/dashboard/summary</td><td>Líder</td><td>query orientacaoId opcional</td><td>200 · KPIs, funil e áreas</td></tr>
+    <tr><td>GET</td><td>/dashboard/funnel</td><td>Líder</td><td>Bearer JWT</td><td>200 · <code>FunnelStep[]</code></td></tr>
+    <tr><td>GET</td><td>/dashboard/by-area</td><td>Líder</td><td>Bearer JWT</td><td>200 · <code>AreaDesempenho[]</code></td></tr>
+    <tr><td>GET</td><td>/dashboard/by-strategy/{id}</td><td>Líder</td><td>path orientacaoId</td><td>200 · retorno por estratégia</td></tr>
+    <tr><td>GET</td><td>/dashboard/by-project/{id}</td><td>Líder</td><td>path projetoId</td><td>200 · retorno por projeto</td></tr>
+    <tr><td>POST</td><td>/ai/score-ideas</td><td>Gestor</td><td><code>ScoreIdeasRequest</code></td><td>200 · ranking, modelo, fallback</td></tr>
+    <tr><td>GET</td><td>/ai/dashboard-narrative</td><td>Líder</td><td>query orientacaoId opcional</td><td>200 · relatório executivo IA</td></tr>
+  </table>
+  <h3>Contrato de erros</h3>
+  <div class="grid-4">
+    <div class="card"><strong>400</strong><p>Validação ou estado inválido</p></div>
+    <div class="card"><strong>401</strong><p>JWT ausente/inválido</p></div>
+    <div class="card"><strong>403</strong><p>Perfil sem acesso</p></div>
+    <div class="card"><strong>404</strong><p>Recurso não encontrado</p></div>
+  </div>
+  <div class="footer"><span>Base: /api/v1</span><span>11 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Contratos E5</span></div>
+  <div class="section-no">Seção 11</div><h2>Payloads e Responses</h2>
+  <div class="grid-2">
+    <div><h3>Login</h3><pre>POST /auth/login
+{
+  "email": "ana.oliveira@aguiabranca.com.br",
+  "senha": "123456"
+}
+
+200
+{
+  "accessToken": "eyJ...",
+  "tokenType": "Bearer",
+  "expiresIn": 3600,
+  "usuario": {"perfil":"GESTOR"}
+}</pre></div>
+    <div><h3>Scoring IA</h3><pre>POST /ai/score-ideas
+{
+  "orientacaoId": "64f...",
+  "ideiaIds": ["64a..."]
+}
+
+200
+{
+  "ranking": [{
+    "ideiaId": "64a...",
+    "score": 87,
+    "justificativa": "..."
+  }],
+  "modelo": "gemini-3.6-flash",
+  "fallback": false
+}</pre></div>
+  </div>
+  <h3>Dashboard summary</h3>
+  <pre>{
+  "roiMedio": 35.00, "lucroTotal": 28000.00,
+  "investimentoTotal": 80000.00, "retornoTotal": 9000.00,
+  "projetosNoPrazo": 1, "projetosAtrasados": 0,
+  "totalIdeias": 5, "ideiasAprovadas": 1,
+  "ideiasEmProjeto": 1, "projetosAtivos": 1,
+  "funil": [...], "desempenhoPorArea": [...]
+}</pre>
+  <div class="callout"><strong>Contrato completo:</strong> o arquivo <code>openapi-sprint2.json</code> acompanha a entrega e pode ser importado no Swagger Editor, Postman ou Insomnia.</div>
+  <div class="footer"><span>OpenAPI 3</span><span>12 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Documentação E6 · IA 1</span></div>
+  <div class="section-no">Seção 12</div><h2>IA 1 — Avaliação e Priorização de Ideias</h2>
+  <p class="lead">Funcionalidade destinada ao Gestor para ordenar ideias pendentes por alinhamento estratégico, impacto e esforço, preservando a decisão humana.</p>
+  <div class="flow">
+    <div class="node"><b>Contexto</b><span>orientação + ideias pendentes</span></div><div class="arrow">→</div>
+    <div class="node"><b>Gemini</b><span>score 0–100 + justificativa</span></div><div class="arrow">→</div>
+    <div class="node"><b>Persistência</b><span>score e justificativa na ideia</span></div><div class="arrow">→</div>
+    <div class="node"><b>Gestor</b><span>prioriza, aprova ou reprova</span></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><h3>Endpoint e acesso</h3><p><code>POST /api/v1/ai/score-ideas</code><br>Somente perfil <strong>GESTOR</strong>.</p></div>
+    <div class="card"><h3>Entrada usada pela IA</h3><p>Título/campanha da orientação, id e título da ideia, impacto e esforço. Máximo de 50 ids pendentes da mesma orientação.</p></div>
+    <div class="card"><h3>Modelo e segurança</h3><p>Modelo configurável por <code>GEMINI_MODEL</code>; chave permanece no backend e segue no header <code>x-goog-api-key</code>.</p></div>
+    <div class="card"><h3>Saída estruturada</h3><p>Array JSON com <code>ideiaId</code>, <code>score</code> 0–100 e <code>justificativa</code>, ordenado de forma decrescente.</p></div>
+  </div>
+  <h3>Prompt e resposta esperada</h3>
+  <pre>Contexto: "Estratégia atual: {titulo} — {campanha}"
+Formato: [{"ideiaId":"...","score":0-100,"justificativa":"..."}]</pre>
+  <div class="callout success"><strong>Governança:</strong> a IA apenas recomenda. A aprovação/reprovação ocorre em <code>PATCH /ideias/{id}/avaliacao</code>, exclusivamente pelo Gestor.</div>
+  <div class="callout warning"><strong>Fallback:</strong> <code>clamp(impacto × 20 − esforço × 5, 10, 100)</code>, com <code>modelo=heuristic-local</code> e <code>fallback=true</code>.</div>
+  <div class="footer"><span>Google Gemini · Priorização de ideias</span><span>13 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Documentação E6 · IA 2</span></div>
+  <div class="section-no">Seção 13</div><h2>IA 2 — Relatório Executivo do Dashboard</h2>
+  <p class="lead">Funcionalidade destinada ao Líder para transformar indicadores consolidados em um relatório curto, fundamentado em evidências e com uma ação recomendada.</p>
+  <div class="flow">
+    <div class="node"><b>DashboardService</b><span>KPIs reais e filtro por estratégia</span></div><div class="arrow">→</div>
+    <div class="node"><b>Gemini</b><span>analisa padrão ou anomalia</span></div><div class="arrow">→</div>
+    <div class="node"><b>Relatório</b><span>título, resumo, evidências e ação</span></div><div class="arrow">→</div>
+    <div class="node"><b>App do Líder</b><span>insight junto aos gráficos</span></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><h3>Endpoint e acesso</h3><p><code>GET /api/v1/ai/dashboard-narrative</code><br>Somente perfil <strong>LÍDER</strong>; filtro opcional <code>orientacaoId</code>.</p></div>
+    <div class="card"><h3>Dados analisados</h3><p>Ideias, aprovações, conversões, projetos, prazos, investimento, retorno, lucro, ROI, progresso, tempo de aprovação e áreas.</p></div>
+    <div class="card"><h3>Regras do prompt</h3><p>Usar somente números fornecidos, identificar um padrão/gargalo, citar evidências exatas e responder em português em JSON.</p></div>
+    <div class="card"><h3>Integração Android</h3><p><code>LeaderDashboardViewModel</code> atualiza a narrativa ao carregar, atualizar ou selecionar uma orientação estratégica.</p></div>
+  </div>
+  <h3>Response estruturado</h3>
+  <pre>{
+  "titulo": "Portfólio com retorno positivo e prazo em risco",
+  "resumo": "Síntese executiva em até duas frases.",
+  "evidencias": ["ROI de 28%", "2 projetos atrasados", "40 ideias"],
+  "acaoRecomendada": "Revisar os projetos atrasados e definir recuperação.",
+  "modelo": "gemini-3.6-flash", "fallback": false, "geradoEm": "..."
+}</pre>
+  <div class="callout warning"><strong>Fallback executivo:</strong> regras locais analisam ausência de ideias, projetos atrasados, ROI e conversão, devolvendo o mesmo contrato com <code>fallback=true</code>.</div>
+  <div class="footer"><span>Google Gemini · Relatório executivo</span><span>14 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Dashboard</span></div>
+  <div class="section-no">Seção 14</div><h2>Indicadores Executivos</h2>
+  <div class="grid-4">
+    <div class="metric"><b>ROI</b><span>retorno anualizado</span></div>
+    <div class="metric"><b>Lucro</b><span>retorno anual − investimento</span></div>
+    <div class="metric"><b>Prazo</b><span>no prazo e atrasados</span></div>
+    <div class="metric"><b>Prod.</b><span>progresso médio</span></div>
+  </div>
+  <h3>Cálculos no servidor</h3>
+  <pre>ROI (%) = ((retorno mensal × 12) − investimento) / investimento × 100
+Lucro total = retorno mensal × 12 − investimento
+Produtividade = média do progresso da carteira não cancelada
+Tempo de aprovação = data de avaliação − data de criação</pre>
+  <div class="grid-2">
+    <div class="card"><h3>Funil</h3><p>Ideias totais → aprovadas atuais → convertidas em projeto.</p><p><strong>Aprovadas</strong> não duplica as já convertidas.</p></div>
+    <div class="card"><h3>Áreas</h3><p>Distribuição das ideias por Operações, Logística, Comercial, Financeiro, RH, TI, Marketing e Qualidade.</p></div>
+    <div class="card"><h3>Por estratégia</h3><p>Investimento, retorno, lucro, ROI, prazos e projetos vinculados a uma orientação.</p></div>
+    <div class="card"><h3>Por projeto</h3><p>Status, prazo, progresso, investimento, retorno e ROI de uma iniciativa específica.</p></div>
+  </div>
+  <div class="callout"><strong>Fonte única:</strong> Home do Líder e Resumo Executivo consomem <code>/dashboard/summary</code>; não há KPI hardcoded no cliente.</div>
+  <div class="footer"><span>Dashboard via API</span><span>15 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Qualidade</span></div>
+  <div class="section-no">Seção 15</div><h2>Testes e Evidências</h2>
+  <div class="grid-4">
+    <div class="metric"><b>128</b><span>testes Java</span></div>
+    <div class="metric"><b>206</b><span>testes Kotlin</span></div>
+    <div class="metric"><b>0</b><span>falhas</span></div>
+    <div class="metric"><b>100%</b><span>smoke perfis</span></div>
+  </div>
+  <table>
+    <tr><th>Validação</th><th>Escopo</th><th>Resultado</th></tr>
+    <tr><td>Maven</td><td>Services, JWT, OpenAPI, seed e RBAC WebMvc</td><td class="check">Sucesso</td></tr>
+    <tr><td>Gradle</td><td>Use cases, repositories, DTOs e ViewModels</td><td class="check">Sucesso</td></tr>
+    <tr><td>Lint release</td><td>Backup, segurança e empacotamento Android</td><td class="check">Sucesso</td></tr>
+    <tr><td>Builds</td><td>JAR, APK debug e APK release</td><td class="check">Sucesso</td></tr>
+    <tr><td>Smoke API</td><td>Health, 400, 401, 403, 404 e três perfis</td><td class="check">Sucesso</td></tr>
+    <tr><td>E2E API</td><td>Ideia → IA → aprovação → projeto → dashboard</td><td class="check">Sucesso</td></tr>
+    <tr><td>Emulador</td><td>Login Operador, Gestor e Líder; homes sem erro</td><td class="check">Sucesso</td></tr>
+  </table>
+  <h3>Práticas de entrega</h3>
+  <div class="grid-2">
+    <div class="card"><p>ZIPs por lista de inclusão, sem <code>.env</code>, caches, builds ou caminhos locais.</p></div>
+    <div class="card"><p>Hashes SHA-256 e manifesto permitem conferir a integridade dos artefatos.</p></div>
+  </div>
+  <div class="footer"><span>Validação: 21/09/2026</span><span>16 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Material complementar</span></div>
+  <div class="section-no">Seção 16</div><h2>Artefatos Técnicos</h2>
+  <p class="lead">A apresentação é acompanhada por artefatos executáveis e contratos de máquina que permitem reproduzir e inspecionar a solução.</p>
+  <div class="grid-2" style="margin-top:6mm">
+    <div class="card"><h3>Backend</h3><p>Código Spring Boot, testes, Docker Compose, configuração de ambiente e instruções de execução.</p></div>
+    <div class="card"><h3>Aplicativo Android</h3><p>Projeto Gradle completo, código Kotlin/Compose, testes e APK release assinado.</p></div>
+    <div class="card"><h3>Contrato OpenAPI</h3><p>Especificação OpenAPI 3 em JSON, importável no Swagger Editor, Postman ou Insomnia.</p></div>
+    <div class="card"><h3>Integridade</h3><p>Manifesto e hashes SHA-256 para conferência dos arquivos distribuídos.</p></div>
+  </div>
+  <h3>Organização do pacote</h3>
+  <pre>01_BACKEND/       código da API compactado
+02_APLICATIVO/    projeto Android compactado
+03_APK/           executável Android
+04_APRESENTACAO/  documentação técnica
+05_API/           especificação OpenAPI
+06_INTEGRIDADE/   hashes SHA-256</pre>
+  <h3>Referências técnicas</h3>
+  <ul>
+    <li>Spring Boot, Spring Security e Spring Data MongoDB — documentação oficial.</li>
+    <li>Android Developers — Jetpack Compose, Hilt, Room e segurança criptográfica.</li>
+    <li>Google AI for Developers — Gemini API, generateContent e limites de quota.</li>
+    <li>OpenAPI Specification 3.0.1 — contrato REST exportado pelo Springdoc.</li>
+  </ul>
+  <div class="footer"><span>Material complementar</span><span>17 / 18</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>InovaGAB</b><span>Execução e entrega</span></div>
+  <div class="section-no">Seção 17</div><h2>Como Demonstrar</h2>
+  <div class="grid-2">
+    <div>
+      <h3>1. Backend</h3>
+      <pre>cd backend
+cp .env.example .env
+docker compose up -d
+mvn spring-boot:run</pre>
+      <h3>2. Android</h3>
+      <pre>./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk</pre>
+    </div>
+    <div>
+      <h3>Usuários demo</h3>
+      <table>
+        <tr><th>Perfil</th><th>Email</th></tr>
+        <tr><td>Operador</td><td>pedro.santos@aguiabranca.com.br</td></tr>
+        <tr><td>Gestor</td><td>ana.oliveira@aguiabranca.com.br</td></tr>
+        <tr><td>Líder</td><td>marcos.silva@aguiabranca.com.br</td></tr>
+      </table>
+      <p>Senha comum: <code>123456</code></p>
+      <h3>Roteiro</h3>
+      <ol class="muted">
+        <li>Pedro registra uma ideia.</li>
+        <li>Ana executa IA, prioriza e aprova.</li>
+        <li>Ana converte e atualiza o projeto.</li>
+        <li>Marcos confere KPIs e gráficos.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="callout success"><strong>Entrega organizada:</strong> backend ZIP, mobile ZIP, APK, PDF unificado, OpenAPI e manifesto estão reunidos em <code>docs/entregaveis/</code>.</div>
+  <div style="text-align:center;margin-top:12mm">
+    <div class="eyebrow">Equipe</div>
+    <h3>Giuliana Abe Takara · RM 562736</h3>
+    <h3>André Luiz Oliveira da Silva · RM 565836</h3>
+    <p>Plataforma de Inovação Corporativa · Grupo Águia Branca</p>
+  </div>
+  <div class="footer"><span>Challenge FIAP 2026</span><span>18 / 18</span></div>
+</section>
+
+</body>
+</html>
