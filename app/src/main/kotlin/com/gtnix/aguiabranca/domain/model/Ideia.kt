@@ -31,7 +31,7 @@ data class Ideia(
     val analiseIa: AnaliseIa? = null
 ) {
     val scorePriorizacao: Int
-        get() = impactoEstimado - esforcoEstimado
+        get() = impactoEstimado - esforcoEstimado + upvotes
 
     val temContexto: Boolean
         get() = !problema.isNullOrBlank() || !publicoAfetado.isNullOrBlank() ||

@@ -99,12 +99,12 @@
     <string name="novo_projeto_retorno_placeholder">Ex: 8000</string>
     <string name="novo_projeto_salvar">Salvar Projeto</string>
     <string name="novo_projeto_origem_ideia">Origem: Ideia #%1$s</string>
-    <string name="novo_projeto_erro_campos">Preencha todos os campos obrigatórios</string>
+    <string name="novo_projeto_erro_campos">Escolha a orientação estratégica para salvar o projeto.</string>
     <string name="novo_projeto_erro_salvar">Erro ao salvar projeto</string>
     <string name="novo_projeto_descricao">Descrição</string>
     <string name="novo_projeto_descricao_placeholder">Descreva o projeto em detalhes</string>
     <string name="novo_projeto_orientacao">Orientação estratégica</string>
-    <string name="novo_projeto_orientacao_nenhuma">Nenhuma orientação</string>
+    <string name="novo_projeto_orientacao_nenhuma">Escolha a orientação estratégica</string>
     <string name="novo_projeto_equipe">Equipe</string>
     <string name="novo_projeto_equipe_hint">Selecione os membros da equipe</string>
     <string name="novo_projeto_prazo">Prazo Previsto</string>
@@ -128,7 +128,9 @@
     <string name="action_show_more">Ver todas</string>
 
     <!-- Content Descriptions (Acessibilidade) -->
-    <string name="cd_logo">Logo InovaGAB</string>
+    <string name="brand_grupo_aguia_branca">Grupo Águia Branca</string>
+    <string name="brand_plataforma_grupo">Uma plataforma do Grupo Águia Branca</string>
+    <string name="cd_logo">Grupo Águia Branca · InovaGAB</string>
     <string name="cd_menu">Menu de navegação</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_notifications">Notificações</string>
@@ -258,6 +260,7 @@
     <string name="home_ideia_convertida_roi">ROI do projeto: %1$s</string>
     
     <!-- Hero Card Operador -->
+    <string name="hero_kicker_operador">Sua experiência no dia a dia</string>
     <string name="hero_headline_operador">Você viu algo que pode melhorar?</string>
     <string name="hero_subheadline_operador">Sua experiência no dia a dia é valiosa. Compartilhe suas ideias e ajude a transformar a empresa.</string>
     <string name="hero_cta_operador">Compartilhar Ideia</string>
@@ -479,6 +482,7 @@
     <string name="ideia_detalhe_impacto_estimado">Impacto Estimado: %1$d</string>
     <string name="ideia_detalhe_esforco_estimado">Esforço Estimado: %1$d</string>
     <string name="ideia_detalhe_score_priorizacao">Score de Priorização</string>
+    <string name="ideia_detalhe_score_apoios">%1$d colegas apoiaram esta ideia. O apoio mostra que o problema também afeta outras áreas.</string>
     <string name="ideia_detalhe_feedback">Feedback</string>
     <string name="ideia_detalhe_feedback_placeholder">Deixe seu feedback para o autor da ideia</string>
     <string name="ideia_detalhe_feedback_gestor">Feedback do Gestor</string>
@@ -556,7 +560,7 @@
     <string name="leader_retorno_mensal">Retorno mensal</string>
     <string name="leader_funil_titulo">Funil</string>
     <string name="leader_funil_acao">Ideias</string>
-    <string name="leader_funil_na_fila">Na fila</string>
+    <string name="leader_funil_na_fila">Aprovadas</string>
     <string name="leader_execucao_acao">Projetos</string>
     <string name="leader_aprovacao_curto">Aprovação</string>
     <string name="leader_conversao_curto">Conversão</string>

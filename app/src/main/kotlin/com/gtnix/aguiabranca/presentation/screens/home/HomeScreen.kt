@@ -338,7 +338,7 @@ private fun HomePremiumContent(
             item(key = "pipeline") {
                 PipelineSection(
                     totalIdeias = uiState.totalIdeias,
-                    ideiasAprovadas = uiState.ideiasAprovadas,
+                    ideiasAprovadas = uiState.aprovadasSemProjeto.size,
                     ideiasEmProjeto = uiState.ideiasEmProjeto,
                     taxaConversao = uiState.taxaConversao,
                     onAbrirProjetos = onNavigateToProjetos,
@@ -383,6 +383,52 @@ private fun HomePremiumContent(
         }
 
         if (uiState.perfil == PerfilUsuario.OPERADOR) {
+            item(key = "hero-operador") {
+                InspirationHeroCard(
+                    kicker = stringResource(R.string.hero_kicker_operador),
+                    headline = stringResource(R.string.hero_headline_operador),
+                    subheadline = stringResource(R.string.hero_subheadline_operador),
+                    ctaText = stringResource(R.string.hero_cta_operador),
+                    onCtaClick = onNavigateToNovaIdeia,
+                    modifier = Modifier.padding(horizontal = ScreenPadding.Horizontal)
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(HomeSectionGap))
+            }
+
+            if (uiState.orientacoes.isNotEmpty()) {
+                item(key = "orientacoes") {
+                    HomeOrientacoesSection(
+                        orientacoes = uiState.orientacoes,
+                        onSeeAllClick = onNavigateToOrientacoes,
+                        onOrientacaoClick = onNavigateToOrientacaoDetalhe,
+                        sectionActionLabel = stringResource(R.string.orientacao_ver_todas),
+                        mostrarContagemIdeias = false
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(HomeSectionGap))
+                }
+            }
+
+            if (uiState.minhasIdeias.isNotEmpty()) {
+                item(key = "minhas-ideias") {
+                    MinhasIdeiasSection(
+                        ideias = uiState.minhasIdeias.sortedByDescending { it.dataCriacao }.take(3),
+                        enviadas = uiState.totalIdeias,
+                        aprovadas = uiState.ideiasAprovadas,
+                        emAvaliacao = uiState.ideiasPendentesAvaliacao,
+                        onSeeAllClick = onNavigateToIdeias,
+                        onIdeiaClick = onNavigateToIdeiaDetalhe,
+                        modifier = Modifier.padding(horizontal = ScreenPadding.Horizontal)
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(HomeSectionGap))
+                }
+            }
+
             uiState.ideiasConvertidasRecentes.firstOrNull()?.let { convertida ->
                 item(key = "convertida") {
                     IdeiaConvertidaCard(
@@ -406,46 +452,6 @@ private fun HomePremiumContent(
                         onAbrirLoja = onNavigateToLoja,
                         onAbrirCarteira = onNavigateToCarteira,
                         modifier = Modifier.padding(horizontal = ScreenPadding.Horizontal)
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(HomeSectionGap))
-                }
-            }
-
-            item(key = "minhas-ideias") {
-                if (uiState.minhasIdeias.isNotEmpty()) {
-                    MinhasIdeiasSection(
-                        ideias = uiState.minhasIdeias.sortedByDescending { it.dataCriacao }.take(3),
-                        enviadas = uiState.totalIdeias,
-                        aprovadas = uiState.ideiasAprovadas,
-                        emAvaliacao = uiState.ideiasPendentesAvaliacao,
-                        onSeeAllClick = onNavigateToIdeias,
-                        onIdeiaClick = onNavigateToIdeiaDetalhe,
-                        modifier = Modifier.padding(horizontal = ScreenPadding.Horizontal)
-                    )
-                } else {
-                    InspirationHeroCard(
-                        headline = stringResource(R.string.hero_headline_operador),
-                        subheadline = stringResource(R.string.hero_subheadline_operador),
-                        ctaText = stringResource(R.string.hero_cta_operador),
-                        onCtaClick = onNavigateToNovaIdeia,
-                        modifier = Modifier.padding(horizontal = ScreenPadding.Horizontal)
-                    )
-                }
-            }
-            item {
-                Spacer(modifier = Modifier.height(HomeSectionGap))
-            }
-
-            if (uiState.orientacoes.isNotEmpty()) {
-                item(key = "orientacoes") {
-                    HomeOrientacoesSection(
-                        orientacoes = uiState.orientacoes,
-                        onSeeAllClick = onNavigateToOrientacoes,
-                        onOrientacaoClick = onNavigateToOrientacaoDetalhe,
-                        sectionActionLabel = stringResource(R.string.orientacao_ver_todas),
-                        mostrarContagemIdeias = false
                     )
                 }
                 item {

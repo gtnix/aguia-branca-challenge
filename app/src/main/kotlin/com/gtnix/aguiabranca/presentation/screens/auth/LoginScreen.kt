@@ -69,6 +69,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
+import com.gtnix.aguiabranca.presentation.components.InovagabBrandLogo
+import com.gtnix.aguiabranca.presentation.components.InovagabBrandLogoSize
+import com.gtnix.aguiabranca.presentation.components.InovagabBrandLogoVariant
 import com.gtnix.aguiabranca.presentation.components.LoginCredentialsFieldStyle
 import com.gtnix.aguiabranca.presentation.components.LoginGroupedCredentialsCard
 import androidx.core.view.WindowCompat
@@ -344,15 +347,11 @@ private fun LoginStageHero() {
             .height(StageHeight),
         contentAlignment = Alignment.Center
     ) {
-        val logoDescription = stringResource(R.string.cd_logo)
-        Image(
-            painter = painterResource(id = R.drawable.ic_inovagab_logo),
-            contentDescription = logoDescription,
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .height(SymbolHeight)
-                .semantics(mergeDescendants = true) { heading() },
-            contentScale = ContentScale.Fit
+        InovagabBrandLogo(
+            variant = InovagabBrandLogoVariant.OnLightSurface,
+            size = InovagabBrandLogoSize.Stage,
+            markAsHeading = true,
+            modifier = Modifier.padding(horizontal = 24.dp)
         )
     }
 }

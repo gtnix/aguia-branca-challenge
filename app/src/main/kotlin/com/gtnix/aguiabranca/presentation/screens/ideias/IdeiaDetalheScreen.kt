@@ -295,6 +295,7 @@ private fun IdeiaDetalheScreenContent(
                             impacto = ideia.impactoEstimado,
                             esforco = ideia.esforcoEstimado,
                             score = ideia.scorePriorizacao,
+                            upvotes = ideia.upvotes,
                             isDarkTheme = isDarkTheme
                         )
                     }
@@ -1078,7 +1079,8 @@ private fun AvaliacaoTextField(
 @Composable
 private fun ScoreDisplay(
     score: Int,
-    isDarkTheme: Boolean
+    isDarkTheme: Boolean,
+    apoio: String? = null
 ) {
     val backgroundColor = if (isDarkTheme) {
         MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
@@ -1086,28 +1088,40 @@ private fun ScoreDisplay(
         MaterialTheme.colorScheme.primaryContainer
     }
     
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
             .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Text(
-            text = stringResource(R.string.ideia_detalhe_score_priorizacao),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = "$score",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.ideia_detalhe_score_priorizacao),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = "$score",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        if (!apoio.isNullOrBlank()) {
+            Text(
+                text = apoio,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -1116,6 +1130,7 @@ private fun PremiumScoreCard(
     impacto: Int,
     esforco: Int,
     score: Int,
+    upvotes: Int,
     isDarkTheme: Boolean
 ) {
     val shape = RoundedCornerShape(16.dp)
@@ -1162,7 +1177,15 @@ private fun PremiumScoreCard(
                 color = MaterialTheme.colorScheme.tertiary
             )
 
-            ScoreDisplay(score = score, isDarkTheme = isDarkTheme)
+            ScoreDisplay(
+                score = score,
+                isDarkTheme = isDarkTheme,
+                apoio = if (upvotes > 0) {
+                    stringResource(R.string.ideia_detalhe_score_apoios, upvotes)
+                } else {
+                    null
+                }
+            )
         }
     }
 }

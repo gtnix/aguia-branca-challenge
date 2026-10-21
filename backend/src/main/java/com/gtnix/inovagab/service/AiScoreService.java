@@ -20,10 +20,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AiScoreService {
@@ -31,6 +37,11 @@ public class AiScoreService {
     private static final Logger log = LoggerFactory.getLogger(AiScoreService.class);
 
     static final String MODELO_HEURISTICO = "heuristic-local";
+    /** Modelo com cota gratuita. O Gemini direto (gemini-3.6-flash) deixou de responder sem chave. */
+    static final String MODELO_GRATUITO = "gemini-2.5-flash";
+    private static final String MODELO_GITHUB = "google/gemini-2.5-flash";
+    private static final String GITHUB_MODELS_URL = "https://models.github.ai/inference/chat/completions";
+    private static final HttpClient HTTP = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
     static final String FALLBACK_TITULO_PT = "Resumo automático do portfólio";
     static final String FALLBACK_NARRATIVA_PT =
@@ -76,21 +87,17 @@ public class AiScoreService {
      */
     public DashboardNarrativeResponse narrativaDashboard(String orientacaoId) {
         DashboardSummaryResponse summary = dashboardService.summary(orientacaoId);
-        if (!geminiProperties.isConfigured()) {
-            log.debug("Gemini API key not configured; using local narrative fallback");
+        if (!provedorConfigurado()) {
+            log.debug("Nenhum provedor de IA configurado; using local narrative fallback");
             return buildFallbackNarrativa(summary);
         }
         try {
             String prompt = buildDashboardPrompt(summary);
-            String responseBody = geminiClient.generateContent(
-                    geminiProperties.getModel(), geminiProperties.getApiKey(), prompt);
-            JsonNode root = objectMapper.readTree(responseBody);
-            String rawText = root.path("candidates")
-                    .path(0).path("content").path("parts").path(0).path("text").asText().trim();
+            String rawText = textoDoModelo(prompt, null);
             if (rawText.isBlank()) {
                 throw new IllegalStateException("resposta Gemini vazia");
             }
-            return parseStructuredNarrativa(rawText, geminiProperties.getModel());
+            return parseStructuredNarrativa(rawText, modeloAtivo());
         } catch (Exception ex) {
             log.warn("Gemini narrative failed, using local fallback: {}", ex.getMessage());
             return buildFallbackNarrativa(summary);
@@ -176,11 +183,19 @@ public class AiScoreService {
             resumo = "Ainda não há ideias registradas. Incentive a equipe a submeter propostas alinhadas às orientações estratégicas.";
             acao = "Compartilhe as orientações estratégicas com a equipe para estimular novas submissões.";
         } else if (atrasados > 0) {
-            titulo = String.format("Portfólio com %d projeto(s) atrasado(s)", atrasados);
-            resumo = String.format("O portfólio conta com %d ideias e ROI de %.0f%% a.a. Há %d projeto(s) fora do prazo exigindo atenção.", totalIdeias, roi, atrasados);
-            acao = String.format("Revisar os %d projeto(s) atrasado(s) e definir plano de recuperação de prazo.", atrasados);
-            evidencias.add(String.format("ROI de %.0f%% a.a.", roi));
-            evidencias.add(String.format("%d projeto(s) atrasado(s)", atrasados));
+            if (atrasados == 1) {
+                titulo = "Portfólio com 1 projeto atrasado";
+                resumo = String.format("O portfólio conta com %d ideias e ROI de %.0f%% a.a. Há 1 projeto fora do prazo exigindo atenção.", totalIdeias, roi);
+                acao = "Revisar o projeto atrasado e definir plano de recuperação de prazo.";
+                evidencias.add(String.format("ROI de %.0f%% a.a.", roi));
+                evidencias.add("1 projeto atrasado");
+            } else {
+                titulo = String.format("Portfólio com %d projetos atrasados", atrasados);
+                resumo = String.format("O portfólio conta com %d ideias e ROI de %.0f%% a.a. Há %d projetos fora do prazo exigindo atenção.", totalIdeias, roi, atrasados);
+                acao = String.format("Revisar os %d projetos atrasados e definir plano de recuperação de prazo.", atrasados);
+                evidencias.add(String.format("ROI de %.0f%% a.a.", roi));
+                evidencias.add(String.format("%d projetos atrasados", atrasados));
+            }
         } else if (roi > 0) {
             titulo = String.format("Portfólio com ROI de %.0f%% e %d ideias ativas", roi, totalIdeias);
             if (aprovadas > 0) {
@@ -214,23 +229,23 @@ public class AiScoreService {
         if (ideias.isEmpty()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Nenhuma ideia pendente válida informada");
         }
-        boolean configurado = geminiProperties.isConfigured();
+        boolean configurado = provedorConfigurado();
         if (!configurado) {
-            log.debug("Gemini API key not configured; using automatic estimate fallback");
+            log.debug("Nenhum provedor de IA configurado; using automatic estimate fallback");
         }
         List<IdeaScoreItem> ranking = new ArrayList<>();
         boolean algumaIa = false;
         boolean algumFallback = false;
         for (IdeiaDocument ideia : ideias) {
             AnaliseIa analise = configurado ? analisar(orientacao, ideia, gestorUserId) : null;
-            String modelo = analise != null ? geminiProperties.getModel() : MODELO_HEURISTICO;
+            String modelo = analise != null ? modeloAtivo() : MODELO_HEURISTICO;
             IdeaScoreItem item = ideiaService.aplicarAnalise(ideia, analise, modelo);
             ranking.add(item);
             algumaIa |= item.status() == StatusAnaliseIa.IA;
             algumFallback |= analise == null;
         }
         ranking.sort(Comparator.comparing(IdeaScoreItem::score, Comparator.nullsLast(Comparator.reverseOrder())));
-        return new ScoreIdeasResponse(ranking, algumaIa ? geminiProperties.getModel() : MODELO_HEURISTICO, algumFallback);
+        return new ScoreIdeasResponse(ranking, algumaIa ? modeloAtivo() : MODELO_HEURISTICO, algumFallback);
     }
 
     /** Uma chamada por ideia: a nota não depende de quais outras ideias estão no lote nem da posição. */
@@ -239,15 +254,14 @@ public class AiScoreService {
         long inicio = System.nanoTime();
         String saida = null;
         try {
-            saida = extrairTexto(geminiClient.generateContent(
-                    geminiProperties.getModel(), geminiProperties.getApiKey(), prompt, PromptsIa.SCHEMA_SCORE));
+            saida = textoDoModelo(prompt, PromptsIa.SCHEMA_SCORE);
             AnaliseIa analise = PromptsIa.parseScore(objectMapper, saida);
-            auditar(AiScoreRunDocument.TIPO_SCORE, ideia, gestorUserId, geminiProperties.getModel(),
+            auditar(AiScoreRunDocument.TIPO_SCORE, ideia, gestorUserId, modeloAtivo(),
                     PromptsIa.VERSAO_SCORE, prompt, saida, inicio, false, null);
             return analise;
         } catch (Exception ex) {
             log.warn("Gemini scoring failed for idea {}, using automatic estimate: {}", ideia.getId(), ex.getMessage());
-            auditar(AiScoreRunDocument.TIPO_SCORE, ideia, gestorUserId, geminiProperties.getModel(),
+            auditar(AiScoreRunDocument.TIPO_SCORE, ideia, gestorUserId, modeloAtivo(),
                     PromptsIa.VERSAO_SCORE, prompt, saida, inicio, true, ex.getMessage());
             return null;
         }
@@ -256,7 +270,7 @@ public class AiScoreService {
     public RascunhoFeedbackResponse rascunhoFeedback(String ideiaId, RascunhoFeedbackRequest request, String gestorUserId) {
         IdeiaDocument ideia = ideiaService.buscarAtiva(ideiaId);
         String observacoes = request == null ? null : request.observacoes();
-        if (!geminiProperties.isConfigured()) {
+        if (!provedorConfigurado()) {
             return new RascunhoFeedbackResponse(PromptsIa.rascunhoLocal(ideia, observacoes), MODELO_HEURISTICO, true);
         }
         OrientacaoDocument orientacao = orientacaoOuNulo(ideia.getOrientacaoId());
@@ -264,15 +278,14 @@ public class AiScoreService {
         long inicio = System.nanoTime();
         String saida = null;
         try {
-            saida = extrairTexto(geminiClient.generateContent(
-                    geminiProperties.getModel(), geminiProperties.getApiKey(), prompt, PromptsIa.SCHEMA_RASCUNHO));
+            saida = textoDoModelo(prompt, PromptsIa.SCHEMA_RASCUNHO);
             String rascunho = PromptsIa.parseRascunho(objectMapper, saida);
-            auditar(AiScoreRunDocument.TIPO_RASCUNHO_FEEDBACK, ideia, gestorUserId, geminiProperties.getModel(),
+            auditar(AiScoreRunDocument.TIPO_RASCUNHO_FEEDBACK, ideia, gestorUserId, modeloAtivo(),
                     PromptsIa.VERSAO_RASCUNHO, prompt, saida, inicio, false, null);
-            return new RascunhoFeedbackResponse(rascunho, geminiProperties.getModel(), false);
+            return new RascunhoFeedbackResponse(rascunho, modeloAtivo(), false);
         } catch (Exception ex) {
             log.warn("Gemini feedback draft failed, using local template: {}", ex.getMessage());
-            auditar(AiScoreRunDocument.TIPO_RASCUNHO_FEEDBACK, ideia, gestorUserId, geminiProperties.getModel(),
+            auditar(AiScoreRunDocument.TIPO_RASCUNHO_FEEDBACK, ideia, gestorUserId, modeloAtivo(),
                     PromptsIa.VERSAO_RASCUNHO, prompt, saida, inicio, true, ex.getMessage());
             return new RascunhoFeedbackResponse(PromptsIa.rascunhoLocal(ideia, observacoes), MODELO_HEURISTICO, true);
         }
@@ -284,6 +297,76 @@ public class AiScoreService {
         } catch (ApiException ex) {
             return null;
         }
+    }
+
+    private boolean provedorConfigurado() {
+        return geminiProperties.isConfigured() || githubDisponivel();
+    }
+
+    private boolean githubDisponivel() {
+        String token = System.getenv("GITHUB_MODELS_TOKEN");
+        return token != null && !token.isBlank();
+    }
+
+    private String modeloAtivo() {
+        return geminiProperties.isConfigured() ? geminiProperties.getModel() : MODELO_GRATUITO;
+    }
+
+    private String textoDoModelo(String prompt, Map<String, Object> schema) throws Exception {
+        if (geminiProperties.isConfigured()) {
+            try {
+                String body = schema == null
+                        ? geminiClient.generateContent(geminiProperties.getModel(), geminiProperties.getApiKey(), prompt)
+                        : geminiClient.generateContent(
+                                geminiProperties.getModel(), geminiProperties.getApiKey(), prompt, schema);
+                return jsonPuro(extrairTexto(body));
+            } catch (Exception ex) {
+                if (!githubDisponivel()) {
+                    throw ex;
+                }
+                log.warn("Gemini indisponível ({}), usando {}", ex.getMessage(), MODELO_GRATUITO);
+            }
+        }
+        if (!githubDisponivel()) {
+            throw new IllegalStateException("IA indisponível");
+        }
+        return jsonPuro(githubGenerate(prompt));
+    }
+
+    private String githubGenerate(String prompt) throws Exception {
+        String pedido = prompt + "\n\nResponda somente JSON válido, sem markdown.";
+        String body = objectMapper.writeValueAsString(Map.of(
+                "model", MODELO_GITHUB,
+                "temperature", 0.2,
+                "messages", List.of(Map.of("role", "user", "content", pedido))
+        ));
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(GITHUB_MODELS_URL))
+                .timeout(Duration.ofSeconds(25))
+                .header("Authorization", "Bearer " + System.getenv("GITHUB_MODELS_TOKEN"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+        HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() >= 300) {
+            throw new IllegalStateException("GitHub Models HTTP " + response.statusCode());
+        }
+        String texto = objectMapper.readTree(response.body())
+                .path("choices").path(0).path("message").path("content").asText();
+        if (texto.isBlank()) {
+            throw new IllegalStateException("resposta do modelo gratuito vazia");
+        }
+        return texto;
+    }
+
+    private static String jsonPuro(String texto) {
+        String limpo = texto == null ? "" : texto.trim();
+        int inicio = limpo.indexOf('{');
+        int fim = limpo.lastIndexOf('}');
+        if (inicio >= 0 && fim > inicio) {
+            return limpo.substring(inicio, fim + 1);
+        }
+        return limpo;
     }
 
     private String extrairTexto(String responseBody) throws Exception {

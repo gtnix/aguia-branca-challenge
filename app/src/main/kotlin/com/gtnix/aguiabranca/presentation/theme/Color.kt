@@ -27,6 +27,7 @@ val VerdeMarca = Color(0xFF00A544)
 val LaranjaMarca = Color(0xFFE87C1A)
 val CianoMarca = Color(0xFF00B7D7)
 val RoxoMarca = Color(0xFF7A2E85)
+val LimaMarca = Color(0xFFF1FF89)
 
 // Noite fechada: matiz do marinho #002361 empurrada ao preto (profundidade, não azul aberto).
 // Fundo #000814 → card #0A1628 → card alto #102033 → elevado/nav #15283F.

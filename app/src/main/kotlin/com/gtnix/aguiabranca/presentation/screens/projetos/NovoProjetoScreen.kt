@@ -708,22 +708,6 @@ private fun OrientacaoDropdown(
                 onDismissRequest = { onExpandedChange(false) },
                 shape = RoundedCornerShape(12.dp)
             ) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(R.string.novo_projeto_orientacao_nenhuma),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = if (selectedId == null) FontWeight.SemiBold else FontWeight.Normal,
-                            color = if (selectedId == null) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    onClick = { onOrientacaoSelected(null) },
-                    modifier = Modifier.background(
-                        if (selectedId == null) MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
-                        else Color.Transparent
-                    )
-                )
                 orientacoes.forEach { orientacao ->
                     val isSelected = orientacao.id == selectedId
                     DropdownMenuItem(

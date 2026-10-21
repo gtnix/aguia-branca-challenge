@@ -72,34 +72,34 @@ public class GamificacaoSeeder implements CommandLineRunner {
                     ev(TipoEvento.IDEIA_ENVIADA, 2), ev(TipoEvento.IDEIA_APROVADA, 1),
                     ev(TipoEvento.IDEIA_ENVIADA, 16), ev(TipoEvento.FEEDBACK_RECEBIDO, 12))),
             new Colega("user-op-rafael", "Rafael Costa", "rafael.costa@aguiabranca.com.br", PerfilUsuario.OPERADOR,
-                    "LOGISTICA", "CD Serra", List.of(
+                    "LOGISTICA", "VIX · Jardim Limoeiro", List.of(
                     ev(TipoEvento.IDEIA_ENVIADA, 12), ev(TipoEvento.IDEIA_ENVIADA, 5),
                     ev(TipoEvento.IDEIA_APROVADA, 4), ev(TipoEvento.APOIO_RECEBIDO, 4))),
             new Colega("user-op-bruna", "Bruna Lima", "bruna.lima@aguiabranca.com.br", PerfilUsuario.OPERADOR,
-                    "LOGISTICA", "Transportadora Cariacica", List.of(
+                    "LOGISTICA", "SERVICARGA · Grande Vitória", List.of(
                     ev(TipoEvento.IDEIA_ENVIADA, 8), ev(TipoEvento.FEEDBACK_RECEBIDO, 6),
                     ev(TipoEvento.IDEIA_ENVIADA, 3))),
             new Colega("user-op-carlos", "Carlos Mendes", "carlos.mendes@aguiabranca.com.br", PerfilUsuario.OPERADOR,
-                    "PASSAGEIROS", "Garagem Vitória", List.of(
+                    "PASSAGEIROS", "Terminal de Vitória", List.of(
                     ev(TipoEvento.IDEIA_ENVIADA, 10), ev(TipoEvento.IDEIA_APROVADA, 9),
                     ev(TipoEvento.IDEIA_CONVERTIDA, 6), ev(TipoEvento.IDEIA_ENVIADA, 6),
                     ev(TipoEvento.IDEIA_APROVADA, 3), ev(TipoEvento.IDEIA_ENVIADA, 1))),
             new Colega("user-op-lucia", "Lúcia Ferraz", "lucia.ferraz@aguiabranca.com.br", PerfilUsuario.OPERADOR,
-                    "PASSAGEIROS", "Garagem Vitória", List.of(
+                    "PASSAGEIROS", "Terminal de Vitória", List.of(
                     ev(TipoEvento.IDEIA_ENVIADA, 11), ev(TipoEvento.IDEIA_ENVIADA, 4),
                     ev(TipoEvento.IDEIA_APROVADA, 2))),
             new Colega("user-op-thiago", "Thiago Alves", "thiago.alves@aguiabranca.com.br", PerfilUsuario.OPERADOR,
-                    "COMERCIO", "Concessionária Vila Velha", List.of(
+                    "COMERCIO", "Vitória Motors", List.of(
                     ev(TipoEvento.IDEIA_ENVIADA, 7), ev(TipoEvento.IDEIA_APROVADA, 5))),
             new Colega("user-gestor-paulo", "Paulo Nunes", "paulo.nunes@aguiabranca.com.br", PerfilUsuario.GESTOR,
-                    "PASSAGEIROS", "Garagem Vitória", List.of(
+                    "PASSAGEIROS", "Terminal de Vitória", List.of(
                     ev(TipoEvento.AVALIACAO_NO_PRAZO, 13), ev(TipoEvento.AVALIACAO_NO_PRAZO, 9),
                     ev(TipoEvento.AVALIACAO_NO_PRAZO, 5), ev(TipoEvento.FEEDBACK_UTIL, 4),
                     ev(TipoEvento.AVALIACAO_NO_PRAZO, 2)))
     );
 
     static final List<Item> CATALOGO = List.of(
-            new Item("rec-passagem", "Passagem rodoviária Águia Branca",
+            new Item("rec-passagem", "Passagem Águia Branca",
                     "Ida e volta em linha da Viação Águia Branca para você ou um familiar.",
                     "VIAGEM", "Viação Águia Branca", 120, 30, NivelGamificacao.EM_ASCENSAO),
             new Item("rec-revisao", "30% na revisão do seu carro",
@@ -111,18 +111,18 @@ public class GamificacaoSeeder implements CommandLineRunner {
             new Item("rec-folga", "Day-off de reconhecimento",
                     "Um dia de folga remunerada, agendado com o seu gestor.",
                     "TEMPO", "RH Águia Branca", 200, 20, NivelGamificacao.ENGAJADO),
-            new Item("rec-vale", "Vale-compras R$ 100",
-                    "Crédito em rede parceira de supermercados.",
-                    "VALE", "Parceiro de varejo", 60, 100, NivelGamificacao.INICIANTE),
-            new Item("rec-trilha", "Trilha de capacitação",
+            new Item("rec-reserva", "Visita à Reserva Águia Branca",
+                    "Visita guiada à Reserva Ambiental Águia Branca, em Vargem Alta/ES, com a equipe de educação ambiental.",
+                    "VIAGEM", "Reserva Águia Branca", 180, 20, NivelGamificacao.EM_ASCENSAO),
+            new Item("rec-trilha", "Trilha na Universidade Corporativa GAB",
                     "Curso de liderança, segurança ou tecnologia na Universidade Corporativa.",
                     "CARREIRA", "Universidade Corporativa GAB", 40, 200, NivelGamificacao.INICIANTE),
-            new Item("rec-almoco", "Almoço com a diretoria",
-                    "Apresente sua ideia pessoalmente para a diretoria da sua divisão.",
+            new Item("rec-almoco", "Almoço com a liderança do Grupo",
+                    "Apresente sua ideia pessoalmente para a liderança da sua divisão.",
                     "CARREIRA", "Holding Águia Branca", 250, 6, NivelGamificacao.VISIONARIO),
-            new Item("rec-demoday", "Vaga no Demoday InovaGAB",
-                    "Pitch da sua ideia no Demoday do Prêmio InovaGAB, com mentoria antes do evento.",
-                    "CARREIRA", "Prêmio InovaGAB", 400, 3, NivelGamificacao.VISIONARIO)
+            new Item("rec-demoday", "Vaga no Demoday do Prêmio Inovação",
+                    "Pitch da sua ideia no Demoday do Prêmio Inovação Águia Branca, com mentoria antes do evento.",
+                    "CARREIRA", "Prêmio Inovação Águia Branca", 400, 3, NivelGamificacao.VISIONARIO)
     );
 
     /**
@@ -141,6 +141,8 @@ public class GamificacaoSeeder implements CommandLineRunner {
         HISTORICO_IDEIAS_DIAS.put(DataSeeder.ID_IDEIA_ENCOMENDA, 12);
         HISTORICO_IDEIAS_DIAS.put(DataSeeder.ID_IDEIA_OFICINA_COMERCIO, 11);
         HISTORICO_IDEIAS_DIAS.put(DataSeeder.ID_IDEIA_ROTAS, 15);
+        HISTORICO_IDEIAS_DIAS.put(DataSeeder.ID_IDEIA_RECARGA, 14);
+        HISTORICO_IDEIAS_DIAS.put(DataSeeder.ID_IDEIA_TEST_DRIVE, 8);
     }
 
     private final UsuarioRepository usuarioRepository;
@@ -191,14 +193,12 @@ public class GamificacaoSeeder implements CommandLineRunner {
 
     void definirEquipesPrincipais() {
         Map<String, String> equipes = Map.of(
-                ID_OPERADOR, "Transportadora Cariacica",
+                ID_OPERADOR, "CD Serra",
                 ID_GESTOR, "CD Serra",
                 ID_LIDER, "Holding");
         equipes.forEach((id, equipe) -> usuarioRepository.findById(id).ifPresent(u -> {
-            if (u.getEquipe() == null) {
-                u.setEquipe(equipe);
-                usuarioRepository.save(u);
-            }
+            u.setEquipe(equipe);
+            usuarioRepository.save(u);
         }));
     }
 
@@ -223,12 +223,8 @@ public class GamificacaoSeeder implements CommandLineRunner {
                 u.setEquipe(c.equipe());
                 usuarioRepository.save(u);
             } else {
-                if (u.getDivisao() == null) {
-                    u.setDivisao(c.divisao());
-                }
-                if (u.getEquipe() == null) {
-                    u.setEquipe(c.equipe());
-                }
+                u.setDivisao(c.divisao());
+                u.setEquipe(c.equipe());
                 usuarioRepository.save(u);
             }
             for (int i = 0; i < c.eventos().size(); i++) {

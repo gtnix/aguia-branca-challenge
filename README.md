@@ -224,8 +224,8 @@ Senha de todos: `123456` (seed da API + botões demo do app).
 - [x] Entregáveis: zips, APK, apresentação unificada e especificação OpenAPI
 
 ### Qualidade verificada em 21/09/2026
-- Backend: **128 testes**, 0 falhas
-- Android: **206 testes**, 0 falhas
+- Backend: **241 testes**, 0 falhas
+- Android: **268 testes**, 0 falhas
 - `lintVitalRelease`, build debug/release e smoke dos três perfis: sucesso
 - Fluxo ideia → IA/fallback → aprovação → projeto → dashboard: sucesso
 

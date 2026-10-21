@@ -1,5 +1,7 @@
 # Roteiro do pitch — InovaGAB para a holding Grupo Águia Branca
 
+> **Nota:** roteiro histórico da apresentação de 20/10/2026. O dataset do demo foi refeito em [`DEMO_CASES.md`](./DEMO_CASES.md) com casos reais da operação (Docas inteligentes no CD Serra, preditiva de cubo e suspensão, embarque sem fila, roteirização verde). Onde este roteiro citar “Oficina sem papel”, vale o novo mapa.
+
 **Live com a empresa parceira:** terça-feira, 20/10/2026, 19h30  
 **Tempo:** 8 a 10 minutos (cronometrado pelo Scrum Guilherme)  
 **Ordem pedida:** problemática → solução → demonstração do app → diferenciais  
@@ -155,7 +157,7 @@ O que já está na tela, para não parecer vazio:
 >
 > Obrigado.
 
-Se houver avaliadores técnicos, uma frase extra antes do obrigado: "São 334 testes automatizados entre app e servidor, e toda a documentação técnica foi entregue."
+Se houver avaliadores técnicos, uma frase extra antes do obrigado: "São 509 testes automatizados entre app e servidor, e toda a documentação técnica foi entregue."
 
 ---
 

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class GeminiProperties {
 
     private String apiKey = "";
-    private String model = "gemini-3.6-flash";
+    private String model = "gemini-2.5-flash";
     private String embeddingModel = "gemini-embedding-001";
 
     public String getApiKey() {

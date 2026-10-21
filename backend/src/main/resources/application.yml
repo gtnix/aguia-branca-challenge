@@ -18,7 +18,7 @@ inovagab:
     expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}
   gemini:
     api-key: ${GEMINI_API_KEY:}
-    model: ${GEMINI_MODEL:gemini-3.6-flash}
+    model: ${GEMINI_MODEL:gemini-2.5-flash}
     embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
   cors:
     origins: ${CORS_ORIGINS:http://localhost:8080,http://127.0.0.1:8080}

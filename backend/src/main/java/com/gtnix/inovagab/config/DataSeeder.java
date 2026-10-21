@@ -47,10 +47,13 @@ public class DataSeeder implements CommandLineRunner {
     static final String ID_IDEIA_ENCOMENDA = "ideia-encomenda";
     static final String ID_IDEIA_OFICINA_COMERCIO = "ideia-oficina-comercio";
     static final String ID_IDEIA_ROTAS = "ideia-rotas";
+    static final String ID_IDEIA_RECARGA = "ideia-recarga";
+    static final String ID_IDEIA_TEST_DRIVE = "ideia-test-drive";
 
     static final String ID_PROJ_PREDITIVA = "proj-preditiva";
     static final String ID_PROJ_CHECKIN = "proj-checkin";
     static final String ID_PROJ_ROTAS = "proj-rotas";
+    static final String ID_PROJ_MAIS_CARGA = "proj-mais-carga";
 
     static final String ID_LIDER = "user-lider";
     static final String ID_GESTOR = "user-gestor";
@@ -103,28 +106,28 @@ public class DataSeeder implements CommandLineRunner {
                 "LOGISTICA", "LOGISTICA", "CD Serra"));
         usuarioRepository.save(usuario(ID_OPERADOR, "Pedro Santos",
                 "pedro.santos@aguiabranca.com.br", hash, PerfilUsuario.OPERADOR,
-                "LOGISTICA", "LOGISTICA", "Transportadora Cariacica"));
+                "LOGISTICA", "LOGISTICA", "CD Serra"));
         usuarioRepository.save(usuario(ID_OP_JOANA, "Joana Ribeiro",
                 "joana.ribeiro@aguiabranca.com.br", hash, PerfilUsuario.OPERADOR,
                 "LOGISTICA", "LOGISTICA", "CD Serra"));
         usuarioRepository.save(usuario(ID_OP_RAFAEL, "Rafael Costa",
                 "rafael.costa@aguiabranca.com.br", hash, PerfilUsuario.OPERADOR,
-                "LOGISTICA", "LOGISTICA", "CD Serra"));
+                "LOGISTICA", "LOGISTICA", "VIX · Jardim Limoeiro"));
         usuarioRepository.save(usuario(ID_OP_BRUNA, "Bruna Lima",
                 "bruna.lima@aguiabranca.com.br", hash, PerfilUsuario.OPERADOR,
-                "LOGISTICA", "LOGISTICA", "Transportadora Cariacica"));
+                "LOGISTICA", "LOGISTICA", "SERVICARGA · Grande Vitória"));
         usuarioRepository.save(usuario(ID_OP_CARLOS, "Carlos Mendes",
                 "carlos.mendes@aguiabranca.com.br", hash, PerfilUsuario.OPERADOR,
-                "OPERACOES", "PASSAGEIROS", "Garagem Vitória"));
+                "OPERACOES", "PASSAGEIROS", "Terminal de Vitória"));
         usuarioRepository.save(usuario(ID_OP_LUCIA, "Lúcia Ferraz",
                 "lucia.ferraz@aguiabranca.com.br", hash, PerfilUsuario.OPERADOR,
-                "OPERACOES", "PASSAGEIROS", "Garagem Vitória"));
+                "OPERACOES", "PASSAGEIROS", "Terminal de Vitória"));
         usuarioRepository.save(usuario(ID_OP_THIAGO, "Thiago Alves",
                 "thiago.alves@aguiabranca.com.br", hash, PerfilUsuario.OPERADOR,
-                "COMERCIAL", "COMERCIO", "Concessionária Vila Velha"));
+                "COMERCIAL", "COMERCIO", "Vitória Motors"));
         usuarioRepository.save(usuario(ID_GESTOR_PAULO, "Paulo Nunes",
                 "paulo.nunes@aguiabranca.com.br", hash, PerfilUsuario.GESTOR,
-                "OPERACOES", "PASSAGEIROS", "Garagem Vitória"));
+                "OPERACOES", "PASSAGEIROS", "Terminal de Vitória"));
     }
 
     void normalizarCategoriasLegadas() {
@@ -159,120 +162,125 @@ public class DataSeeder implements CommandLineRunner {
 
     void upsertCatalogoSetorial() {
         Instant now = Instant.now();
-        String campanha = "Águia 2026 — Inovação em Campo";
 
         salvarOrientacao(
                 ID_ORI_EFICIENCIA,
-                "Eficiência operacional nas 690 bases",
-                "Priorizar iniciativas que reduzam tempo de pátio, retrabalho de oficina e custo por km em todas as bases do grupo.",
+                "Disponibilidade da frota e eficiência do pátio",
+                "Reduzir tempo parado, espera em doca e custo por km nas operações da Logística, com manutenção, telemetria e pátio conectado.",
                 CATEGORIA_DEMO,
-                campanha,
+                "Circuito Inovação 2026",
                 "LOGISTICA",
                 now
         );
         salvarOrientacao(
                 ID_ORI_PASSAGEIRO,
-                "Experiência digital do passageiro",
-                "Modernizar embarque, bilhetagem, encomendas rápidas e comunicação com o passageiro nos terminais e no aplicativo.",
+                "Experiência do cliente: do guichê à entrega",
+                "Melhorar embarque, encomendas, atendimento e pós-venda nas operações de Passageiros e Comércio.",
                 "EXPERIENCIA_CLIENTE",
-                campanha,
+                "Circuito Inovação 2026",
                 "PASSAGEIROS",
                 now
         );
         salvarOrientacao(
                 ID_ORI_SEGURANCA,
-                "Segurança operacional e jornada segura",
-                "Reduzir incidentes com treinamento, telemetria de condução e checagens digitais na frota, oficinas e pátios.",
+                "Segurança inegociável: zero incidentes na operação",
+                "Reduzir incidentes com comportamento seguro, telemetria, inspeções e cultura de segurança em todas as bases.",
                 "SEGURANCA",
-                campanha,
+                "Jornada Segura 2026",
                 null,
                 now
         );
         salvarOrientacao(
                 ID_ORI_SUSTENTABILIDADE,
-                "Redução de emissões da frota",
-                "Monitorar consumo de combustível, quilometragem ociosa e transição energética da frota até 2027.",
+                "Transição energética e logística verde",
+                "Reduzir emissões, km ocioso e consumo com eletrificação, roteirização e energia limpa.",
                 "SUSTENTABILIDADE",
-                campanha,
+                "Circuito Inovação 2026",
                 "LOGISTICA",
                 now
         );
 
-        Instant d10 = now.minus(Duration.ofDays(10));
-        Instant d13 = now.minus(Duration.ofDays(13));
-        Instant d8 = now.minus(Duration.ofDays(8));
-        Instant d7 = now.minus(Duration.ofDays(7));
-        Instant d9 = now.minus(Duration.ofDays(9));
-        Instant d20 = now.minus(Duration.ofDays(20));
-        Instant d12 = now.minus(Duration.ofDays(12));
-        Instant d11 = now.minus(Duration.ofDays(11));
-        Instant d15 = now.minus(Duration.ofDays(15));
-
-        salvarIdeia(new IdeiaSeed(
-                ID_IDEIA_PREDITIVA, ID_OPERADOR, ID_ORI_EFICIENCIA,
-                "Manutenção preditiva da frota",
-                "Sensores IoT antecipam falhas e reduzem tempo parado na oficina da Transportadora Cariacica.",
-                "LOGISTICA", StatusIdeia.CONVERTIDA_PROJETO, 5, 3, 1, d10, now.minus(Duration.ofDays(3)),
-                ID_GESTOR, null, 0));
         salvarIdeia(new IdeiaSeed(
                 ID_IDEIA_OFICINA, ID_OPERADOR, ID_ORI_EFICIENCIA,
-                "Oficina sem papel",
-                "Ordens de serviço digitais na manutenção da frota, com histórico por veículo e foto da peça.",
-                "LOGISTICA", StatusIdeia.PENDENTE, 3, 4, null, d13, null, null, null, 0));
-        salvarIdeia(new IdeiaSeed(
-                ID_IDEIA_INSPECAO_PAPEL, ID_OPERADOR, ID_ORI_SEGURANCA,
-                "Inspeção pré-viagem em papel na tesouraria",
-                "Motorista ainda assina folha impressa na tesouraria antes de sair. A folha some, o horário atrasa e o item crítico não trava a saída.",
-                "LOGISTICA", StatusIdeia.REPROVADA, 4, 2, null, d8, now.minus(Duration.ofDays(6)),
-                ID_GESTOR,
-                "Papel não escala nas 690 bases e some no chão da garagem. Traga de novo com fluxo no celular, item crítico bloqueando a saída.",
-                0));
+                "Docas inteligentes no CD Serra",
+                "Carreta espera até 3h por uma doca porque o pátio não tem visão das janelas. Com agendamento por janela e alerta no celular do motorista, o CD Serra reduz a espera, libera o pátio e aumenta as viagens por dia.",
+                "LOGISTICA", StatusIdeia.PENDENTE, 4, 3, null,
+                now.minus(Duration.ofDays(13)), null, null, null, 12));
         salvarIdeia(new IdeiaSeed(
                 ID_IDEIA_PONTO_CEGO, ID_OP_JOANA, ID_ORI_SEGURANCA,
-                "Sensor de ponto cego no pátio do CD Serra",
-                "Carreta em manobra no CD Serra tem ponto cego na lateral esquerda. Sensor de aproximação no espelho e alarme no rádio da equipe de pátio.",
-                "LOGISTICA", StatusIdeia.PENDENTE, 5, 2, 2, d7, null, null, null, 0));
+                "Ponto cego em manobras de carreta",
+                "Na manobra da carreta no pátio do CD Serra, o ponto cego na lateral esquerda já provocou quase-acidente. Sensor de aproximação no espelho e alerta sonoro no rádio da equipe de pátio.",
+                "LOGISTICA", StatusIdeia.PENDENTE, 5, 3, null,
+                now.minus(Duration.ofDays(7)), null, null, null, 9));
         salvarIdeia(new IdeiaSeed(
                 ID_IDEIA_TELEMETRIA, ID_OP_RAFAEL, ID_ORI_EFICIENCIA,
-                "Rastreamento de frota em tempo real",
-                "Usar telemetria para reduzir combustível e melhorar pontualidade das linhas da Logística.",
-                "LOGISTICA", StatusIdeia.PENDENTE, 4, 3, 3, d9, null, null, null, 0));
+                "Estoque inteligente de peças críticas",
+                "Quando falta uma peça crítica, a carreta fica parada na oficina de Jardim Limoeiro esperando reposição. Previsão de consumo por telemetria e estoque mínimo dinâmico por base.",
+                "LOGISTICA", StatusIdeia.PENDENTE, 4, 4, null,
+                now.minus(Duration.ofDays(9)), null, null, null, 7));
+        salvarIdeia(new IdeiaSeed(
+                ID_IDEIA_OFICINA_COMERCIO, ID_OP_THIAGO, ID_ORI_PASSAGEIRO,
+                "Diagnóstico remoto na oficina",
+                "Na Vitória Diesel, o veículo chega sem diagnóstico e o box fica ocupado esperando peça. Diagnóstico remoto e pré-ordem de serviço antes da chegada do cliente.",
+                "COMERCIAL", StatusIdeia.PENDENTE, 4, 3, null,
+                now.minus(Duration.ofDays(11)), null, null, null, 6));
         salvarIdeia(new IdeiaSeed(
                 ID_IDEIA_CHECKIN, ID_OP_CARLOS, ID_ORI_PASSAGEIRO,
-                "Check-in digital no embarque",
-                "QR Code no aplicativo reduz filas e agiliza a conferência de passageiros nos terminais da Garagem Vitória.",
-                "OPERACOES", StatusIdeia.CONVERTIDA_PROJETO, 5, 2, 1, d20, now.minus(Duration.ofDays(14)),
-                ID_GESTOR, null, 0));
+                "Embarque sem fila no Terminal de Vitória",
+                "No pico, a fila de conferência de passagem faz o passageiro perder o horário. Check-in digital com QR Code e aviso de embarque no app da Viação Águia Branca.",
+                "OPERACOES", StatusIdeia.CONVERTIDA_PROJETO, 5, 2, 1,
+                now.minus(Duration.ofDays(20)), now.minus(Duration.ofDays(14)), ID_GESTOR, null, 15));
         salvarIdeia(new IdeiaSeed(
                 ID_IDEIA_ENCOMENDA, ID_OP_LUCIA, ID_ORI_PASSAGEIRO,
                 "Rastreio de encomenda no guichê",
-                "Atendente de encomendas consulta o volume pelo código de barras e avisa o destinatário por SMS, sem caderno de protocolo.",
-                "OPERACOES", StatusIdeia.APROVADA, 4, 2, 2, d12, now.minus(Duration.ofDays(8)),
-                ID_GESTOR, null, 0));
+                "O atendente de encomendas consulta caderno e protocolo, e o cliente liga para saber onde está a carga. Rastreio por código e aviso por WhatsApp reduzem a ligação e liberam o guichê.",
+                "OPERACOES", StatusIdeia.APROVADA, 4, 2, 2,
+                now.minus(Duration.ofDays(12)), now.minus(Duration.ofDays(8)), ID_GESTOR, null, 11));
         salvarIdeia(new IdeiaSeed(
-                ID_IDEIA_OFICINA_COMERCIO, ID_OP_THIAGO, ID_ORI_EFICIENCIA,
-                "Peça certa na primeira visita da oficina",
-                "Técnico da concessionária Vila Velha aponta a peça pelo VIN no tablet e o estoque confirma antes de abrir o capô. Menos retrabalho e menos cliente esperando.",
-                "COMERCIAL", StatusIdeia.PENDENTE, 4, 3, null, d11, null, null, null, 0));
+                ID_IDEIA_PREDITIVA, ID_OPERADOR, ID_ORI_EFICIENCIA,
+                "Preditiva de cubo e suspensão",
+                "Falha de cubo ou suspensão só aparece na estrada, e a carreta perde a janela do cliente. Sensores, modelo preditivo e agenda de manutenção por base para as carretas de minério e celulose da VIX.",
+                "LOGISTICA", StatusIdeia.CONVERTIDA_PROJETO, 5, 3, 1,
+                now.minus(Duration.ofDays(10)), now.minus(Duration.ofDays(3)), ID_GESTOR, null, 10));
         salvarIdeia(new IdeiaSeed(
                 ID_IDEIA_ROTAS, ID_OP_BRUNA, ID_ORI_SUSTENTABILIDADE,
-                "Roteirização sustentável da última milha",
-                "Algoritmo de rotas reduz km ocioso e emissões na operação logística da Transportadora Cariacica.",
-                "LOGISTICA", StatusIdeia.APROVADA, 4, 3, 3, d15, now.minus(Duration.ofDays(9)),
-                ID_GESTOR, null, 0));
+                "Roteirização verde da última milha",
+                "Km ocioso e emissões na entrega urbana da SERVICARGA na Grande Vitória. Roteirização por janela de coleta, consolidação de carga e prioridade para veículos elétricos.",
+                "LOGISTICA", StatusIdeia.CONVERTIDA_PROJETO, 4, 3, 3,
+                now.minus(Duration.ofDays(15)), now.minus(Duration.ofDays(9)), ID_GESTOR, null, 8));
+        salvarIdeia(new IdeiaSeed(
+                ID_IDEIA_RECARGA, ID_GESTOR_PAULO, ID_ORI_SUSTENTABILIDADE,
+                "Recarga inteligente da frota elétrica",
+                "A recarga no horário de pico encarece a operação e reduz a disponibilidade dos caminhões elétricos em teste na VIX. Janela por tarifa e prioridade por viagem.",
+                "LOGISTICA", StatusIdeia.APROVADA, 4, 4, 3,
+                now.minus(Duration.ofDays(14)), now.minus(Duration.ofDays(10)), ID_GESTOR, null, 5));
+        salvarIdeia(new IdeiaSeed(
+                ID_IDEIA_TEST_DRIVE, ID_OP_THIAGO, ID_ORI_PASSAGEIRO,
+                "Test-drive digital e trade-in",
+                "O lead esfria entre o site e a concessionária, e a avaliação do usado demora. Agendamento digital do test-drive e avaliação preliminar do trade-in na Vitória Motors.",
+                "COMERCIAL", StatusIdeia.APROVADA, 4, 2, 3,
+                now.minus(Duration.ofDays(8)), now.minus(Duration.ofDays(5)), ID_GESTOR, null, 8));
+        salvarIdeia(new IdeiaSeed(
+                ID_IDEIA_INSPECAO_PAPEL, ID_OPERADOR, ID_ORI_EFICIENCIA,
+                "Grupo de WhatsApp para avisos do pátio",
+                "Criar mais um grupo de WhatsApp para avisar as equipes do pátio sobre janelas e prioridades.",
+                "LOGISTICA", StatusIdeia.REPROVADA, 1, 1, null,
+                now.minus(Duration.ofDays(8)), now.minus(Duration.ofDays(6)), ID_GESTOR,
+                "O canal já existe; o problema não é falta de aviso, é falta de priorização e dono. Traga de volta com uma fila de prioridades por turno.",
+                0));
 
         salvarProjeto(
                 ID_PROJ_PREDITIVA,
                 ID_ORI_EFICIENCIA,
                 ID_IDEIA_PREDITIVA,
-                "Manutenção preditiva da frota",
-                "Reduzir tempo parado da frota com sensores IoT na Transportadora Cariacica.",
-                "Sensores nas carretas da Logística antecipam falha de cubo e suspensão.",
+                "Preditiva de cubo e suspensão nas carretas da VIX",
+                "Reduzir paradas não planejadas e aumentar a disponibilidade da frota de carretas.",
+                "Sensores de vibração e temperatura em cubo e suspensão, com modelo preditivo e agenda de manutenção por base.",
                 "LOGISTICA",
                 "EM_ANDAMENTO",
                 "EM_ANDAMENTO",
-                BigDecimal.valueOf(80_000),
-                BigDecimal.valueOf(9_000),
+                BigDecimal.valueOf(1_800_000),
+                BigDecimal.valueOf(420_000),
                 35,
                 LocalDate.now().plusMonths(6),
                 null,
@@ -282,33 +290,50 @@ public class DataSeeder implements CommandLineRunner {
                 ID_PROJ_CHECKIN,
                 ID_ORI_PASSAGEIRO,
                 ID_IDEIA_CHECKIN,
-                "Check-in digital no embarque",
-                "Eliminar a fila de conferência de passagem nos terminais da Divisão Passageiros.",
-                "QR Code no aplicativo da Viação, validado no embarque da Garagem Vitória. Candidato natural ao Demoday.",
+                "Embarque sem fila no Terminal de Vitória",
+                "Reduzir a fila de conferência e o tempo de embarque no pico.",
+                "Check-in digital com QR Code no app da Viação Águia Branca e aviso de embarque no celular do passageiro.",
                 "OPERACOES",
                 "CONCLUIDO",
                 "CONCLUIDO",
-                BigDecimal.valueOf(45_000),
-                BigDecimal.valueOf(22_000),
+                BigDecimal.valueOf(650_000),
+                BigDecimal.valueOf(180_000),
                 100,
                 LocalDate.now().plusDays(10),
-                "Fila de embarque caiu 18 minutos no pico. Retorno mensal de R$ 22 mil em produtividade de guichê e bordo.",
+                "Fila de embarque caiu 18 minutos no pico; NPS +12; guichê liberado para encomendas.",
                 now.minus(Duration.ofDays(5))
+        );
+        salvarProjeto(
+                ID_PROJ_MAIS_CARGA,
+                ID_ORI_EFICIENCIA,
+                null,
+                "Mais Carga, Mais Valor: 5 veículos por carreta",
+                "Aumentar a capacidade por viagem na operação de transporte de veículos em Juiz de Fora/MG.",
+                "Estrutura metálica móvel que permite carregar cinco veículos por carreta, com ganho de frete por unidade e menos viagens.",
+                "LOGISTICA",
+                "CONCLUIDO",
+                "CONCLUIDO",
+                BigDecimal.valueOf(1_200_000),
+                BigDecimal.valueOf(300_000),
+                100,
+                LocalDate.now().plusDays(20),
+                "Cinco veículos por viagem; redução de 20% no custo logístico por unidade.",
+                now.minus(Duration.ofDays(8))
         );
         salvarProjeto(
                 ID_PROJ_ROTAS,
                 ID_ORI_SUSTENTABILIDADE,
-                null,
-                "Roteirização da última milha",
-                "Reduzir km ocioso e emissões na distribuição da Logística.",
-                "Iniciativa da gestora a partir da orientação de sustentabilidade, ainda em planejamento.",
+                ID_IDEIA_ROTAS,
+                "Roteirização verde da última milha",
+                "Reduzir km ocioso e emissões nas entregas urbanas da SERVICARGA na Grande Vitória.",
+                "Roteirização por janela de coleta, consolidação de carga e priorização de veículos elétricos.",
                 "LOGISTICA",
                 "PLANEJADO",
                 "PLANEJADO",
-                BigDecimal.valueOf(60_000),
-                BigDecimal.valueOf(12_000),
+                BigDecimal.valueOf(900_000),
+                BigDecimal.valueOf(210_000),
                 0,
-                LocalDate.now().plusMonths(4),
+                LocalDate.now().minusDays(15),
                 null,
                 now
         );

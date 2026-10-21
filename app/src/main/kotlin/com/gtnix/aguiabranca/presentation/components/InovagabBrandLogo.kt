@@ -4,10 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,19 +33,25 @@ import com.gtnix.aguiabranca.presentation.theme.AsaAzul
 import com.gtnix.aguiabranca.presentation.theme.FundoPagina
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.LightBackground
+import com.gtnix.aguiabranca.presentation.theme.LimaMarca
+import com.gtnix.aguiabranca.presentation.theme.MarinhoInstitucional
 
+/**
+ * Assinatura de marca do InovaGAB.
+ *
+ * A marca principal é o logo oficial do Grupo Águia Branca; o nome do produto
+ * aparece como wordmark, no mesmo desenho da navegação do site institucional.
+ * O símbolo antigo do produto (asa/rota) não é mais usado como logo.
+ */
 enum class InovagabBrandLogoVariant {
     OnLightSurface,
-    /** Symbol + Compose wordmark for dark headers (no plate). */
     OnDarkSurface,
-    /** Lockup on light surfaces; symbol + wordmark on dark. */
     Auto
 }
 
 enum class InovagabBrandLogoSize {
     Header,
     Hero,
-    /** Login stage: large symbol stacked above wordmark on navy. */
     Stage
 }
 
@@ -70,114 +74,112 @@ fun InovagabBrandLogo(
     }
 
     val cdLogo = stringResource(R.string.cd_logo)
-    val semanticsModifier = modifier.semantics { contentDescription = cdLogo }
-        .then(
-            if (markAsHeading) Modifier.semantics { heading() } else Modifier
-        )
+    val semanticsModifier = modifier
+        .semantics { contentDescription = cdLogo }
+        .then(if (markAsHeading) Modifier.semantics { heading() } else Modifier)
 
     when (resolvedVariant) {
         InovagabBrandLogoVariant.OnLightSurface -> {
-            val logoHeight = when (size) {
-                InovagabBrandLogoSize.Header -> 32.dp
-                InovagabBrandLogoSize.Hero,
-                InovagabBrandLogoSize.Stage -> 72.dp
-            }
-            val logoMaxWidth = when (size) {
-                InovagabBrandLogoSize.Header -> 168.dp
-                InovagabBrandLogoSize.Hero,
-                InovagabBrandLogoSize.Stage -> 320.dp
-            }
-            Box(modifier = semanticsModifier) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_inovagab_lockup),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .height(logoHeight)
-                        .widthIn(max = logoMaxWidth),
-                    contentScale = ContentScale.Fit
-                )
+            if (size == InovagabBrandLogoSize.Header) {
+                Box(modifier = semanticsModifier) {
+                    Image(
+                        painter = painterResource(id = R.drawable.grupo_aguia_branca),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(26.dp)
+                            .widthIn(max = 120.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+            } else {
+                Column(
+                    modifier = semanticsModifier,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.grupo_aguia_branca),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(if (size == InovagabBrandLogoSize.Stage) 52.dp else 44.dp)
+                            .widthIn(max = 260.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = brandWordmark(
+                            inovaColor = MarinhoInstitucional,
+                            gabColor = AsaAzul
+                        ),
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontSize = if (size == InovagabBrandLogoSize.Stage) 28.sp else 24.sp
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.brand_plataforma_grupo),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
         InovagabBrandLogoVariant.OnDarkSurface -> {
-            val wordmark = buildAnnotatedString {
-                withStyle(
-                    SpanStyle(
-                        color = FundoPagina,
-                        fontWeight = FontWeight.SemiBold
+            if (size == InovagabBrandLogoSize.Header) {
+                Box(modifier = semanticsModifier) {
+                    Image(
+                        painter = painterResource(id = R.drawable.grupo_aguia_branca_branco),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(26.dp)
+                            .widthIn(max = 120.dp),
+                        contentScale = ContentScale.Fit
                     )
-                ) {
-                    append("Inova")
                 }
-                withStyle(
-                    SpanStyle(
-                        color = AsaAzul,
-                        fontWeight = FontWeight.Bold
+            } else {
+                Column(
+                    modifier = semanticsModifier,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.grupo_aguia_branca_branco),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(if (size == InovagabBrandLogoSize.Stage) 52.dp else 44.dp)
+                            .widthIn(max = 260.dp),
+                        contentScale = ContentScale.Fit
                     )
-                ) {
-                    append("GAB")
-                }
-            }
-            when (size) {
-                InovagabBrandLogoSize.Stage -> {
-                    Column(
-                        modifier = semanticsModifier,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_inovagab_logo),
-                            contentDescription = null,
-                            modifier = Modifier.height(112.dp),
-                            contentScale = ContentScale.Fit
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = brandWordmark(
+                            inovaColor = FundoPagina,
+                            gabColor = LimaMarca
+                        ),
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontSize = if (size == InovagabBrandLogoSize.Stage) 28.sp else 24.sp
                         )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = wordmark,
-                            style = MaterialTheme.typography.headlineSmall.copy(fontSize = 28.sp)
-                        )
-                    }
-                }
-                InovagabBrandLogoSize.Header,
-                InovagabBrandLogoSize.Hero -> {
-                    val symbolHeight = when (size) {
-                        InovagabBrandLogoSize.Header -> 28.dp
-                        InovagabBrandLogoSize.Hero -> 48.dp
-                        InovagabBrandLogoSize.Stage -> 48.dp
-                    }
-                    val wordmarkStyle = when (size) {
-                        InovagabBrandLogoSize.Header -> MaterialTheme.typography.titleMedium
-                        InovagabBrandLogoSize.Hero -> MaterialTheme.typography.headlineSmall
-                        InovagabBrandLogoSize.Stage -> MaterialTheme.typography.headlineSmall
-                    }
-                    Row(
-                        modifier = semanticsModifier,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_inovagab_logo),
-                            contentDescription = null,
-                            modifier = Modifier.height(symbolHeight),
-                            contentScale = ContentScale.Fit
-                        )
-                        Spacer(
-                            modifier = Modifier.width(
-                                if (size == InovagabBrandLogoSize.Hero) 10.dp else 6.dp
-                            )
-                        )
-                        Text(
-                            text = wordmark,
-                            style = wordmarkStyle.copy(
-                                fontSize = when (size) {
-                                    InovagabBrandLogoSize.Header -> wordmarkStyle.fontSize
-                                    InovagabBrandLogoSize.Hero -> 26.sp
-                                    InovagabBrandLogoSize.Stage -> 26.sp
-                                }
-                            )
-                        )
-                    }
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.brand_plataforma_grupo),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = FundoPagina.copy(alpha = 0.62f)
+                    )
                 }
             }
         }
         InovagabBrandLogoVariant.Auto -> error("Auto must be resolved before rendering")
+    }
+}
+
+private fun brandWordmark(
+    inovaColor: Color,
+    gabColor: Color
+) = buildAnnotatedString {
+    withStyle(SpanStyle(color = inovaColor, fontWeight = FontWeight.SemiBold)) {
+        append("Inova")
+    }
+    withStyle(SpanStyle(color = gabColor, fontWeight = FontWeight.Bold)) {
+        append("GAB")
     }
 }
 
@@ -194,14 +196,14 @@ private fun InovagabBrandLogoHeaderLightPreview() {
     }
 }
 
-@Preview(name = "Hero on light (login)")
+@Preview(name = "Login stage on light")
 @Composable
-private fun InovagabBrandLogoHeroLightPreview() {
+private fun InovagabBrandLogoStageLightPreview() {
     InovagabTheme(darkTheme = false) {
         Surface(color = LightBackground) {
             InovagabBrandLogo(
                 variant = InovagabBrandLogoVariant.OnLightSurface,
-                size = InovagabBrandLogoSize.Hero,
+                size = InovagabBrandLogoSize.Stage,
                 markAsHeading = true
             )
         }

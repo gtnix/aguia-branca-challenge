@@ -22,3 +22,6 @@ keystore.properties
 
 # Generated delivery staging
 docs/entregaveis/.staging/
+
+# Local Netlify folder
+.netlify
