@@ -14,7 +14,6 @@
   bottom: 0;
   z-index: 3;
   width: 250px;
-  height: 520px;
   padding: 8px;
   border-radius: 40px;
   background: linear-gradient(160deg, #1d2735, #05080d 42%, #111a28);
@@ -45,6 +44,31 @@
   border-radius: 33px;
   background: #000814;
   color: #f1f4f7;
+}
+
+.phone-screen--shot,
+.app-screen--shot {
+  display: block;
+  height: auto;
+  padding: 0;
+  aspect-ratio: 720 / 1560;
+}
+
+.phone-shot,
+.app-shot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
+}
+
+.hero-dash-shot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
 }
 
 .phone-status {
@@ -364,12 +388,18 @@
   left: -4px;
   z-index: 2;
   width: 340px;
-  padding: 16px 17px;
+  height: 430px;
+  padding: 8px;
+  overflow: hidden;
   border-radius: 18px;
   background: #fff;
   color: var(--ink);
   box-shadow: 0 40px 80px rgba(0, 5, 20, 0.4), 0 0 0 1px rgba(0, 35, 97, 0.06);
   transform: rotate(-2.5deg);
+}
+
+.hero-dash-shot {
+  border-radius: 12px;
 }
 
 .hero-dash-head {
@@ -617,6 +647,13 @@
   border-radius: 34px;
   background: #000814;
   color: #f1f4f7;
+}
+
+.app-screen--shot {
+  display: block;
+  height: auto;
+  padding: 0;
+  aspect-ratio: 720 / 1560;
 }
 
 .app-status {
@@ -1353,11 +1390,11 @@
 
   .phone {
     width: 238px;
-    height: 496px;
   }
 
   .hero-dash {
     width: 320px;
+    height: 400px;
   }
 }
 
@@ -1371,7 +1408,6 @@
   .phone {
     right: 50%;
     width: 246px;
-    height: 508px;
     transform: translateX(50%) rotate(0);
   }
 
@@ -1402,7 +1438,6 @@
 
   .phone {
     width: 222px;
-    height: 458px;
   }
 
   .float-card {
@@ -1440,6 +1475,10 @@
   .app-screen {
     height: 614px;
     border-radius: 30px;
+  }
+
+  .app-screen--shot {
+    height: auto;
   }
 
   .app-notch {

@@ -48,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -67,6 +68,7 @@ import com.gtnix.aguiabranca.domain.model.CategoriaOrientacao
 import com.gtnix.aguiabranca.domain.model.FrequenciaProblema
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.InovagabButton
 import com.gtnix.aguiabranca.presentation.components.InovagabButtonVariant
 import com.gtnix.aguiabranca.presentation.components.InovagabTextField
@@ -109,6 +111,7 @@ fun NovaIdeiaScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NovaIdeiaScreenContent(
     uiState: NovaIdeiaUiState,
@@ -134,12 +137,15 @@ private fun NovaIdeiaScreenContent(
         }
     }
 
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             AguiaTopBar(
                 title = stringResource(R.string.nova_ideia_title),
                 subtitle = stringResource(R.string.nova_ideia_subtitle),
-                onBackClick = onNavigateBack
+                onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior
             )
         },
         bottomBar = {

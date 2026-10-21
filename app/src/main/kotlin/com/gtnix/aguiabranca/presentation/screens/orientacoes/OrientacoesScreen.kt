@@ -4,9 +4,6 @@ import com.gtnix.aguiabranca.presentation.theme.LocalDarkTheme
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,11 +34,9 @@ import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,13 +48,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -74,10 +69,11 @@ import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.CategoriaOrientacao
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.EmptyState
+import com.gtnix.aguiabranca.presentation.components.InovagabFlatCard
 import com.gtnix.aguiabranca.presentation.components.SectionHeader
 import com.gtnix.aguiabranca.presentation.components.SkeletonListPlaceholder
-import com.gtnix.aguiabranca.presentation.theme.CardDimensions
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.spacing
 import com.gtnix.aguiabranca.presentation.util.orientacaoCategoriaColor
@@ -85,6 +81,7 @@ import com.gtnix.aguiabranca.presentation.util.orientacaoCategoriaIconForList
 import com.gtnix.aguiabranca.presentation.util.orientacaoCategoriaShortLabel
 import com.gtnix.aguiabranca.presentation.util.orientacaoDivisaoLabel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrientacoesScreen(
     viewModel: OrientacoesViewModel,
@@ -99,14 +96,6 @@ fun OrientacoesScreen(
     val listState = rememberLazyListState()
     var orientacaoParaExcluir by remember { mutableStateOf<OrientacaoEstrategica?>(null) }
 
-    val isFabVisible by remember {
-        derivedStateOf {
-            val firstVisibleIndex = listState.firstVisibleItemIndex
-            val scrollOffset = listState.firstVisibleItemScrollOffset
-            firstVisibleIndex == 0 || scrollOffset <= 0
-        }
-    }
-
     LaunchedEffect(uiState.errorMessageRes) {
         uiState.errorMessageRes?.let { messageRes ->
             snackbarHostState.showSnackbar(context.getString(messageRes))
@@ -114,33 +103,27 @@ fun OrientacoesScreen(
         }
     }
 
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             AguiaTopBar(
                 title = stringResource(R.string.orientacoes_title),
-                onBackClick = onNavigateBack
-            )
-        },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        floatingActionButton = {
-            if (uiState.isLider) {
-                AnimatedVisibility(
-                    visible = isFabVisible,
-                    enter = scaleIn(),
-                    exit = scaleOut()
-                ) {
-                    FloatingActionButton(
-                        onClick = onNavigateToNova,
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.orientacoes_nova)
-                        )
+                onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior,
+                actions = {
+                    if (uiState.isLider) {
+                        IconButton(onClick = onNavigateToNova) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = stringResource(R.string.orientacoes_nova)
+                            )
+                        }
                     }
                 }
-            }
-        }
+            )
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         when {
             uiState.isLoading -> {
@@ -165,7 +148,13 @@ fun OrientacoesScreen(
                             stringResource(R.string.orientacoes_empty_subtitle_lider)
                         } else {
                             stringResource(R.string.orientacoes_empty_subtitle_readonly)
-                        }
+                        },
+                        actionLabel = if (uiState.isLider) {
+                            stringResource(R.string.orientacoes_nova)
+                        } else {
+                            null
+                        },
+                        onActionClick = if (uiState.isLider) onNavigateToNova else null
                     )
                 }
             }
@@ -286,39 +275,25 @@ private fun OrientacaoCard(
     onExcluir: () -> Unit
 ) {
     val isDarkTheme = LocalDarkTheme.current
-    val shape = RoundedCornerShape(CardDimensions.CornerRadiusSmall)
     val categoriaAccent = orientacaoCategoriaColor(orientacao.categoria)
-    val borderColor = if (isDarkTheme) {
-        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f)
-    } else {
-        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-    }
     val containerColor = if (orientacao.ativa) {
         MaterialTheme.colorScheme.surface
     } else {
         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
     }
 
-    Card(
-        onClick = onClick,
+    InovagabFlatCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        shape = shape,
-        border = if (isDarkTheme) null else BorderStroke(1.dp, borderColor),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isDarkTheme) 0.dp else if (orientacao.ativa) 2.dp else 1.dp
+        onClick = onClick,
+        containerColor = containerColor,
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            top = 16.dp,
+            end = if (showActions) 4.dp else 16.dp,
+            bottom = 16.dp
         )
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 16.dp,
-                    top = 16.dp,
-                    end = if (showActions) 4.dp else 16.dp,
-                    bottom = 16.dp
-                )
-        ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Top,
@@ -417,12 +392,7 @@ private fun OrientacaoInativaRow(
     onToggleAtivacao: () -> Unit,
     onExcluir: () -> Unit
 ) {
-    val isDarkTheme = LocalDarkTheme.current
-    val shape = RoundedCornerShape(CardDimensions.CornerRadiusSmall)
     val categoriaAccent = orientacaoCategoriaColor(orientacao.categoria)
-    val borderColor = MaterialTheme.colorScheme.outlineVariant.copy(
-        alpha = if (isDarkTheme) 0.18f else 0.32f
-    )
     val campanha = orientacao.campanha.trim()
     val caption = buildString {
         append(orientacaoDivisaoLabel(orientacao.divisao))
@@ -433,25 +403,19 @@ private fun OrientacaoInativaRow(
         )
     }
 
-    Card(
-        onClick = onClick,
+    InovagabFlatCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
-        ),
-        shape = shape,
-        border = if (isDarkTheme) null else BorderStroke(1.dp, borderColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        onClick = onClick,
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+        contentPadding = PaddingValues(
+            start = 12.dp,
+            top = 10.dp,
+            end = if (showActions) 2.dp else 12.dp,
+            bottom = 10.dp
+        )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 12.dp,
-                    top = 10.dp,
-                    end = if (showActions) 2.dp else 12.dp,
-                    bottom = 10.dp
-                ),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {

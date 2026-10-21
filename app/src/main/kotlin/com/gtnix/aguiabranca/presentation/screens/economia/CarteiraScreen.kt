@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +35,7 @@ import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.EventoPontos
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.EmptyState
 import com.gtnix.aguiabranca.presentation.components.InovagabFlatCard
 import com.gtnix.aguiabranca.presentation.components.SaldoCard
@@ -48,6 +51,7 @@ import java.util.Locale
 
 private val dataExtratoFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("pt", "BR"))
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarteiraScreen(
     viewModel: CarteiraViewModel,
@@ -56,14 +60,17 @@ fun CarteiraScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             AguiaTopBar(
                 title = stringResource(
                     if (viewModel.perfil == PerfilUsuario.LIDER) R.string.carteira_extrato
                     else R.string.carteira_titulo
                 ),
-                onBackClick = onNavigateBack
+                onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior
             )
         },
         containerColor = MaterialTheme.colorScheme.background

@@ -2,7 +2,6 @@ package com.gtnix.aguiabranca.presentation.components
 
 import com.gtnix.aguiabranca.presentation.theme.LocalDarkTheme
 import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,11 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,16 +34,13 @@ import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.Projeto
 import com.gtnix.aguiabranca.domain.model.StatusProjeto
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
-import com.gtnix.aguiabranca.presentation.theme.LocalInovagabColors
-import com.gtnix.aguiabranca.presentation.util.bounceClick
 
 /**
  * ProjetoCard - Card premium reutilizável para exibir um projeto.
  *
  * Usado em ProjetosScreen e HomeScreen.
  * Segue o design system Inovagab com:
- * - Glass effect no dark mode
- * - Bordas sutis no light mode
+ * - Card de conteúdo (16.dp, borda suave no claro)
  * - GradientProgressBar animada
  * - Ícone em círculo com fundo alpha
  *
@@ -61,36 +54,13 @@ fun ProjetoCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDarkTheme = LocalDarkTheme.current
-    val shape = RoundedCornerShape(16.dp)
-    
-    val cardContent = @Composable {
+    InovagabFlatCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {},
+        onClick = onClick
+    ) {
         ProjetoCardContent(projeto = projeto)
-    }
-    
-    if (isDarkTheme) {
-        GlassCard(
-            modifier = modifier
-                .fillMaxWidth()
-                .bounceClick(onClick = onClick)
-        ) {
-            cardContent()
-        }
-    } else {
-        Card(
-            modifier = modifier
-                .fillMaxWidth()
-                .bounceClick(onClick = onClick)
-                .semantics(mergeDescendants = true) {},
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            shape = shape,
-            border = BorderStroke(1.dp, LocalInovagabColors.current.cardBorder),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Box(modifier = Modifier.padding(16.dp)) {
-                cardContent()
-            }
-        }
     }
 }
 

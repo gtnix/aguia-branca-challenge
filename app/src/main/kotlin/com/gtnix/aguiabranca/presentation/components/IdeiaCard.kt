@@ -1,11 +1,11 @@
 package com.gtnix.aguiabranca.presentation.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,9 +44,9 @@ import com.gtnix.aguiabranca.domain.model.Ideia
 import com.gtnix.aguiabranca.domain.model.StatusAnaliseIa
 import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
+import com.gtnix.aguiabranca.presentation.theme.CardDimensions
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.util.SeloIa
-import com.gtnix.aguiabranca.presentation.util.bounceClick
 import com.gtnix.aguiabranca.presentation.util.formatLongDate
 import com.gtnix.aguiabranca.presentation.util.labelRes
 
@@ -64,26 +64,14 @@ fun IdeiaCard(
     val statusColor = ideiaStatusColor(ideia.status)
     val statusLabel = ideiaStatusLabel(ideia.status)
 
-    Card(
+    InovagabFlatCard(
         modifier = modifier
             .fillMaxWidth()
-            .bounceClick(onClick = onClick)
             .semantics(mergeDescendants = true) {},
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
+        onClick = onClick,
+        contentPadding = PaddingValues(CardDimensions.ContentPadding)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Top

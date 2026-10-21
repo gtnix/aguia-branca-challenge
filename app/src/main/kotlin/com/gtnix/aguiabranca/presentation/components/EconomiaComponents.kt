@@ -17,7 +17,6 @@ import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Storefront
-import androidx.compose.material.icons.filled.Toll
 import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -76,7 +75,7 @@ fun AsasBadge(asas: Int, modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Icon(
-            imageVector = Icons.Default.Toll,
+            imageVector = AsasIcons.Wings,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.size(18.dp)
@@ -131,7 +130,7 @@ fun SaldoCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = if (asas != null) Icons.Default.Toll else Icons.Default.WorkspacePremium,
+                    imageVector = if (asas != null) AsasIcons.Wings else Icons.Default.WorkspacePremium,
                     contentDescription = null,
                     tint = ouro,
                     modifier = Modifier.size(20.dp)

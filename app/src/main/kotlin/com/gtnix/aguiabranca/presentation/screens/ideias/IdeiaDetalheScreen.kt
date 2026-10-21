@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,8 +41,6 @@ import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -65,6 +64,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -95,12 +95,15 @@ import com.gtnix.aguiabranca.domain.model.StatusIdeia
 import com.gtnix.aguiabranca.domain.model.TipoIdeia
 import com.gtnix.aguiabranca.presentation.components.AIChip
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.CelebrationOverlay
-import com.gtnix.aguiabranca.presentation.components.GlassCard
 import com.gtnix.aguiabranca.presentation.components.InovagabButton
 import com.gtnix.aguiabranca.presentation.components.InovagabButtonVariant
+import com.gtnix.aguiabranca.presentation.components.InovagabFlatCard
+import com.gtnix.aguiabranca.presentation.components.InovagabInsetSurface
 import com.gtnix.aguiabranca.presentation.components.PremiumFilterChip
 import com.gtnix.aguiabranca.presentation.components.ideiaStatusColor
+import com.gtnix.aguiabranca.presentation.theme.CardDimensions
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.LocalDarkTheme
 import com.gtnix.aguiabranca.presentation.theme.LocalInovagabColors
@@ -184,13 +187,16 @@ private fun IdeiaDetalheScreenContent(
         }
     }
 
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AguiaTopBar(
                 title = stringResource(R.string.ideia_detalhe_titulo),
-                onBackClick = onNavigateBack
+                onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior
             )
         },
         bottomBar = {
@@ -263,8 +269,7 @@ private fun IdeiaDetalheScreenContent(
                 ) {
                     IdeiaResumoCard(
                         ideia = ideia,
-                        orientacao = uiState.orientacao,
-                        isDarkTheme = isDarkTheme
+                        orientacao = uiState.orientacao
                     )
 
                     val podeAnalisar = uiState.isPendingEvaluation && uiState.canEvaluate
@@ -275,15 +280,13 @@ private fun IdeiaDetalheScreenContent(
                             fallback = uiState.scoreFallback || ideia.scoreIaFallback,
                             podeAnalisar = podeAnalisar,
                             analisando = uiState.scoringInProgress,
-                            onAnalisar = onIniciarAnalise,
-                            isDarkTheme = isDarkTheme
+                            onAnalisar = onIniciarAnalise
                         )
                     }
 
                     if (podeAnalisar) {
                         SuaAvaliacaoCard(
                             uiState = uiState,
-                            isDarkTheme = isDarkTheme,
                             onImpactoChange = onImpactoChange,
                             onEsforcoChange = onEsforcoChange,
                             onFeedbackChange = onFeedbackChange,
@@ -295,8 +298,7 @@ private fun IdeiaDetalheScreenContent(
                             impacto = ideia.impactoEstimado,
                             esforco = ideia.esforcoEstimado,
                             score = ideia.scorePriorizacao,
-                            upvotes = ideia.upvotes,
-                            isDarkTheme = isDarkTheme
+                            upvotes = ideia.upvotes
                         )
                     }
 
@@ -422,24 +424,11 @@ private fun ideiaStatusLabel(status: StatusIdeia): String = when (status) {
 
 @Composable
 private fun DetalheCard(
-    isDarkTheme: Boolean,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val shape = RoundedCornerShape(16.dp)
-    val borderColor = MaterialTheme.colorScheme.outlineVariant.copy(
-        alpha = if (isDarkTheme) 0.25f else 0.4f
-    )
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = shape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
+    InovagabFlatCard(modifier = Modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(if (!isDarkTheme) Modifier.border(1.dp, borderColor, shape) else Modifier)
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             content = content
         )
@@ -450,14 +439,13 @@ private fun DetalheCard(
 @Composable
 private fun IdeiaResumoCard(
     ideia: Ideia,
-    orientacao: OrientacaoEstrategica?,
-    isDarkTheme: Boolean
+    orientacao: OrientacaoEstrategica?
 ) {
     val statusColor = ideiaStatusColor(ideia.status)
     val data = remember(ideia.dataCriacao) { formatShortDate(ideia.dataCriacao) }
     val textSecondary = LocalInovagabColors.current.textSecondary
 
-    DetalheCard(isDarkTheme = isDarkTheme) {
+    DetalheCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
@@ -559,8 +547,7 @@ private fun LeituraIaCard(
     fallback: Boolean,
     podeAnalisar: Boolean,
     analisando: Boolean,
-    onAnalisar: () -> Unit,
-    isDarkTheme: Boolean
+    onAnalisar: () -> Unit
 ) {
     val analise = ideia.analiseIa
     val score = ideia.scoreIa
@@ -568,7 +555,7 @@ private fun LeituraIaCard(
     var expandido by remember { mutableStateOf(false) }
     var textoCortado by remember { mutableStateOf(false) }
 
-    DetalheCard(isDarkTheme = isDarkTheme) {
+    DetalheCard {
         if (!temAnalise) {
             Text(
                 text = stringResource(R.string.ideia_score_ia_title),
@@ -757,14 +744,13 @@ private fun ListaIa(titulo: String, itens: List<String>) {
 @Composable
 private fun SuaAvaliacaoCard(
     uiState: IdeiaDetalheUiState,
-    isDarkTheme: Boolean,
     onImpactoChange: (Float) -> Unit,
     onEsforcoChange: (Float) -> Unit,
     onFeedbackChange: (String) -> Unit,
     onConcordaIaChange: (Boolean) -> Unit,
     onMotivoDiscordanciaChange: (String) -> Unit
 ) {
-    DetalheCard(isDarkTheme = isDarkTheme) {
+    DetalheCard {
         Text(
             text = stringResource(R.string.ideia_sua_avaliacao),
             style = MaterialTheme.typography.titleMedium,
@@ -902,7 +888,7 @@ private fun FeedbackUtilCard(
     acabouDeResponder: Boolean,
     onResponder: (Boolean) -> Unit
 ) {
-    GlassCard(modifier = Modifier.fillMaxWidth()) {
+    InovagabFlatCard(modifier = Modifier.fillMaxWidth()) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             when {
                 acabouDeResponder -> Text(
@@ -968,8 +954,8 @@ private fun PremiumFeedbackCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(CardDimensions.CornerRadiusSmall))
+            .border(1.dp, borderColor, RoundedCornerShape(CardDimensions.CornerRadiusSmall))
             .background(backgroundColor)
     ) {
         Row(
@@ -1079,21 +1065,11 @@ private fun AvaliacaoTextField(
 @Composable
 private fun ScoreDisplay(
     score: Int,
-    isDarkTheme: Boolean,
     apoio: String? = null
 ) {
-    val backgroundColor = if (isDarkTheme) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-    } else {
-        MaterialTheme.colorScheme.primaryContainer
-    }
-    
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(backgroundColor)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+    InovagabInsetSurface(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Row(
@@ -1130,28 +1106,14 @@ private fun PremiumScoreCard(
     impacto: Int,
     esforco: Int,
     score: Int,
-    upvotes: Int,
-    isDarkTheme: Boolean
+    upvotes: Int
 ) {
-    val shape = RoundedCornerShape(16.dp)
-    val borderColor = MaterialTheme.colorScheme.outlineVariant.copy(
-        alpha = if (isDarkTheme) 0.25f else 0.4f
-    )
-
-    Card(
+    InovagabFlatCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = shape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isDarkTheme) 0.dp else 2.dp)
+        contentPadding = PaddingValues(20.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (!isDarkTheme) Modifier.border(1.dp, borderColor, shape)
-                    else Modifier
-                )
-                .padding(20.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
@@ -1179,7 +1141,6 @@ private fun PremiumScoreCard(
 
             ScoreDisplay(
                 score = score,
-                isDarkTheme = isDarkTheme,
                 apoio = if (upvotes > 0) {
                     stringResource(R.string.ideia_detalhe_score_apoios, upvotes)
                 } else {
@@ -1251,9 +1212,9 @@ private fun SuccessCard() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(CardDimensions.CornerRadiusInset))
             .background(backgroundColor)
-            .border(1.dp, SuccessGreen.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+            .border(1.dp, SuccessGreen.copy(alpha = 0.3f), RoundedCornerShape(CardDimensions.CornerRadiusInset))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

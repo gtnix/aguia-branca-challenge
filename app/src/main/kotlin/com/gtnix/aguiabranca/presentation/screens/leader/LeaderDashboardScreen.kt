@@ -48,6 +48,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -61,6 +62,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -79,6 +81,7 @@ import com.gtnix.aguiabranca.domain.model.FunnelStepMetric
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.usecase.dashboard.AreaDesempenhoMetric
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.BarChartData
 import com.gtnix.aguiabranca.presentation.components.EmptyState
 import com.gtnix.aguiabranca.presentation.components.ExecutiveAiInsightCard
@@ -184,6 +187,7 @@ private fun LeaderDashboardContent(
 // Main body
 // ---------------------------------------------------------------------------
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LeaderDashboardBody(
     uiState: LeaderDashboardUiState,
@@ -203,32 +207,42 @@ private fun LeaderDashboardBody(
     val cardModifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = ScreenPadding.Horizontal)
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 24.dp + navigationBarBottom)
-    ) {
-        item {
-            AguiaTopBar(
-                title = stringResource(R.string.leader_resumo_executivo),
-                subtitle = stringResource(R.string.leader_resumo_subtitulo),
-                onBackClick = onNavigateToHome
-            )
-        }
-
-        if (orientacoes.isNotEmpty()) {
-            item {
-                AnimatedSection(visible = contentVisible, delayMillis = 60) {
-                    StrategyFilterRow(
-                        orientacoes = orientacoes,
-                        selectedId = selectedOrientacaoId,
-                        onSelect = onFilterSelect
-                    )
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                AguiaTopBar(
+                    title = stringResource(R.string.leader_resumo_executivo),
+                    subtitle = stringResource(R.string.leader_resumo_subtitulo),
+                    onBackClick = onNavigateToHome,
+                    scrollBehavior = scrollBehavior
+                )
+                if (orientacoes.isNotEmpty()) {
+                    AnimatedSection(visible = contentVisible, delayMillis = 60) {
+                        StrategyFilterRow(
+                            orientacoes = orientacoes,
+                            selectedId = selectedOrientacaoId,
+                            onSelect = onFilterSelect
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
-            item { Spacer(modifier = Modifier.height(12.dp)) }
         }
-
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(bottom = 24.dp + navigationBarBottom)
+        ) {
         item {
             AnimatedSection(visible = contentVisible, delayMillis = 80) {
                 ExecutiveAiInsightCard(
@@ -306,6 +320,7 @@ private fun LeaderDashboardBody(
                 }
             }
         }
+    }
     }
 }
 
@@ -751,6 +766,7 @@ private fun AreaParticipationSection(
 // Skeleton loading state
 // ---------------------------------------------------------------------------
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LeaderDashboardSkeleton(onNavigateToHome: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -791,6 +807,7 @@ private fun LeaderDashboardSkeleton(onNavigateToHome: () -> Unit) {
 // Error state
 // ---------------------------------------------------------------------------
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LeaderDashboardError(
     messageRes: Int,

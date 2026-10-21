@@ -81,6 +81,7 @@ import com.gtnix.aguiabranca.domain.model.Pontuacao
 import com.gtnix.aguiabranca.domain.model.TemporadaInfo
 import com.gtnix.aguiabranca.domain.usecase.dashboard.IdeiaConvertidaRecente
 import com.gtnix.aguiabranca.domain.usecase.dashboard.WeeklyRecap
+import com.gtnix.aguiabranca.presentation.components.AsasIcons
 import com.gtnix.aguiabranca.presentation.components.InovagabBrandLogo
 import com.gtnix.aguiabranca.presentation.components.InspirationHeroCard
 import com.gtnix.aguiabranca.presentation.components.InovagabFlatCard
@@ -117,7 +118,6 @@ import com.gtnix.aguiabranca.presentation.components.ideiaStatusTexto
 import com.gtnix.aguiabranca.presentation.screens.ranking.RankingViewModel
 import com.gtnix.aguiabranca.domain.model.ConquistaTier
 import com.gtnix.aguiabranca.domain.model.Ideia
-import androidx.compose.material.icons.filled.Toll
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.res.pluralStringResource
 import java.util.Calendar
@@ -389,6 +389,8 @@ private fun HomePremiumContent(
                     headline = stringResource(R.string.hero_headline_operador),
                     subheadline = stringResource(R.string.hero_subheadline_operador),
                     ctaText = stringResource(R.string.hero_cta_operador),
+                    comingSoonLabel = stringResource(R.string.hero_cta_voz_em_breve),
+                    ctaContentDescription = stringResource(R.string.cd_hero_cta_operador),
                     onCtaClick = onNavigateToNovaIdeia,
                     modifier = Modifier.padding(horizontal = ScreenPadding.Horizontal)
                 )
@@ -891,7 +893,7 @@ private fun TemporadaCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Toll,
+                        imageVector = AsasIcons.Wings,
                         contentDescription = null,
                         tint = ouro,
                         modifier = Modifier.size(18.dp)
@@ -1186,7 +1188,7 @@ private fun OrientacaoCarouselCard(
             .height(OrientacaoCarouselHeight)
             .semantics(mergeDescendants = true) { role = Role.Button },
         onClick = onClick,
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp)
+        contentPadding = PaddingValues(CardDimensions.ContentPadding)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -1432,6 +1434,23 @@ private fun LiderLojaRow(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun HomeScreenOperadorPreview() {
+    InovagabTheme {
+        HomeBodyContent(
+            uiState = HomeUiState(
+                perfil = PerfilUsuario.OPERADOR,
+                nomeUsuario = "Pedro"
+            ),
+            onRefresh = {},
+            onNavigateToOrientacoes = {},
+            onNavigateToNovaIdeia = {}
+        )
     }
 }
 

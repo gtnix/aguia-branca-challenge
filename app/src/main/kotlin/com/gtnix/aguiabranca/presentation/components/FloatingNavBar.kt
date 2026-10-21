@@ -20,9 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,11 +54,13 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import com.gtnix.aguiabranca.presentation.theme.NavBarDimensions
 
 data class FloatingNavItem(
     val route: String,
@@ -80,54 +80,46 @@ fun FloatingNavBar(
 ) {
     val gab = LocalInovagabColors.current
     val pillShape = RoundedCornerShape(32.dp)
-    val backgroundColor = gab.navFill
-    val borderColor = gab.navBorder
-    
-    Box(
+    val shadowColor = Color.Black.copy(alpha = 0.2f)
+
+    Row(
         modifier = modifier
             .navigationBarsPadding()
-            .padding(bottom = 24.dp)
-            .wrapContentWidth()
-            .widthIn(max = 380.dp)
-            .shadow(
-                elevation = 20.dp,
-                shape = pillShape,
-                ambientColor = Color.Black.copy(alpha = 0.2f),
-                spotColor = Color.Black.copy(alpha = 0.2f)
-            )
-            .clip(pillShape)
-            .background(backgroundColor)
-            .border(1.dp, borderColor, pillShape),
-        contentAlignment = Alignment.Center
+            .padding(start = 12.dp, end = 12.dp, bottom = NavBarDimensions.PillPaddingBottom)
+            .wrapContentWidth(),
+        horizontalArrangement = Arrangement.spacedBy(NavBarDimensions.DockGap),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+            modifier = Modifier
+                .wrapContentWidth()
+                .shadow(
+                    elevation = 20.dp,
+                    shape = pillShape,
+                    ambientColor = shadowColor,
+                    spotColor = shadowColor
+                )
+                .clip(pillShape)
+                .background(gab.navFill)
+                .border(1.dp, gab.navBorder, pillShape)
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val middleIndex = items.size / 2
-            
-            items.forEachIndexed { index, item ->
-                if (centerAction != null && index == middleIndex) {
-                    NavBarActionButton(
-                        onClick = centerAction,
-                        contentDescription = centerActionLabel ?: stringResource(R.string.nav_nova_ideia)
-                    )
-                }
-                
+            items.forEach { item ->
                 NavBarItem(
                     item = item,
                     isSelected = item.route == selectedRoute,
                     onClick = { onItemSelected(item.route) }
                 )
             }
-            
-            if (centerAction != null && items.isEmpty()) {
-                 NavBarActionButton(
-                    onClick = centerAction,
-                    contentDescription = centerActionLabel ?: stringResource(R.string.nav_nova_ideia)
-                )
-            }
+        }
+
+        if (centerAction != null) {
+            NavBarActionButton(
+                onClick = centerAction,
+                contentDescription = centerActionLabel ?: stringResource(R.string.nav_nova_ideia)
+            )
         }
     }
 }
@@ -140,7 +132,8 @@ private fun NavBarActionButton(
     val haptic = LocalHapticFeedback.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    
+    val shadowColor = Color.Black.copy(alpha = 0.2f)
+
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.85f else 1f,
         animationSpec = spring(stiffness = Spring.StiffnessMedium),
@@ -149,9 +142,14 @@ private fun NavBarActionButton(
 
     Surface(
         modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .size(48.dp)
-            .scale(scale),
+            .size(NavBarDimensions.FabSize)
+            .scale(scale)
+            .shadow(
+                elevation = 20.dp,
+                shape = CircleShape,
+                ambientColor = shadowColor,
+                spotColor = shadowColor
+            ),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.primary,
         onClick = {
@@ -180,7 +178,7 @@ private fun NavBarItem(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val itemPillShape = RoundedCornerShape(24.dp)
-    
+
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.92f else 1f,
@@ -190,14 +188,14 @@ private fun NavBarItem(
         ),
         label = "navItemScale"
     )
-    
+
     val selectedIconTint = MaterialTheme.colorScheme.primary
     val unselectedIconTint = MaterialTheme.colorScheme.onSurfaceVariant
-    
+
     Column(
         modifier = modifier
             .scale(scale)
-            .width(68.dp)
+            .width(60.dp)
             .height(52.dp)
             .clip(itemPillShape)
             .clickable(
@@ -214,17 +212,18 @@ private fun NavBarItem(
             modifier = Modifier.size(22.dp),
             tint = if (isSelected) selectedIconTint else unselectedIconTint
         )
-        
+
         Spacer(modifier = Modifier.height(2.dp))
-        
+
         Text(
             text = item.label,
             style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
             color = if (isSelected) selectedIconTint else unselectedIconTint,
             maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
         )
-        
+
         if (isSelected) {
             Box(
                 modifier = Modifier
@@ -236,7 +235,22 @@ private fun NavBarItem(
     }
 }
 
-@Preview(name = "Light Mode - 4 Items")
+@Preview(name = "Operador 3 abas Light")
+@Preview(name = "Operador 3 abas Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun FloatingNavBarPreview3Items() {
+    InovagabTheme {
+        val items = listOf(
+            FloatingNavItem("home", "Home", Icons.Outlined.Home, Icons.Filled.Home),
+            FloatingNavItem("ideias", "Ideias", Icons.Outlined.Lightbulb, Icons.Filled.Lightbulb),
+            FloatingNavItem("perfil", "Perfil", Icons.Outlined.Person, Icons.Filled.Person)
+        )
+        FloatingNavBarPreviewHost(items)
+    }
+}
+
+@Preview(name = "Gestor 4 abas Light")
+@Preview(name = "Gestor 4 abas Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun FloatingNavBarPreview4Items() {
     InovagabTheme {
@@ -246,21 +260,24 @@ private fun FloatingNavBarPreview4Items() {
             FloatingNavItem("projetos", "Projetos", Icons.Outlined.Folder, Icons.Filled.Folder),
             FloatingNavItem("perfil", "Perfil", Icons.Outlined.Person, Icons.Filled.Person)
         )
-        
-        var selectedRoute by remember { mutableStateOf("home") }
-        
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            FloatingNavBar(
-                items = items,
-                selectedRoute = selectedRoute,
-                onItemSelected = { selectedRoute = it },
-                centerAction = { },
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
-        }
+        FloatingNavBarPreviewHost(items)
+    }
+}
+
+@Composable
+private fun FloatingNavBarPreviewHost(items: List<FloatingNavItem>) {
+    var selectedRoute by remember { mutableStateOf("home") }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        FloatingNavBar(
+            items = items,
+            selectedRoute = selectedRoute,
+            onItemSelected = { selectedRoute = it },
+            centerAction = { },
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }

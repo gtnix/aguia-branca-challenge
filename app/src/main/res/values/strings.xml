@@ -264,6 +264,8 @@
     <string name="hero_headline_operador">Você viu algo que pode melhorar?</string>
     <string name="hero_subheadline_operador">Sua experiência no dia a dia é valiosa. Compartilhe suas ideias e ajude a transformar a empresa.</string>
     <string name="hero_cta_operador">Compartilhar Ideia</string>
+    <string name="hero_cta_voz_em_breve">Em breve, por voz</string>
+    <string name="cd_hero_cta_operador">Compartilhar ideia. Em breve, também por voz.</string>
     <string name="home_activity_title">Atividade recente</string>
     <string name="home_activity_see_all">Ver todas</string>
     <string name="home_activity_new_idea">Nova ideia: %1$s</string>

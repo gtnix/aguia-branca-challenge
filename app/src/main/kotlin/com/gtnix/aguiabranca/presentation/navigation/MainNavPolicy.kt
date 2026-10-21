@@ -23,21 +23,11 @@ object MainNavPolicy {
     }
 
     fun fabActionFor(route: String, perfil: PerfilUsuario): FabAction {
+        if (!showBottomBar(route)) return FabAction.NONE
         return when (perfil) {
-            PerfilUsuario.OPERADOR -> when (route) {
-                Destination.TabHome.route,
-                Destination.Ideias.route -> FabAction.NOVA_IDEIA
-                else -> FabAction.NONE
-            }
-            PerfilUsuario.GESTOR -> when (route) {
-                Destination.TabHome.route,
-                Destination.Projetos.route -> FabAction.NOVO_PROJETO
-                else -> FabAction.NONE
-            }
-            PerfilUsuario.LIDER -> when (route) {
-                Destination.TabHome.route -> FabAction.NOVA_ORIENTACAO
-                else -> FabAction.NONE
-            }
+            PerfilUsuario.OPERADOR -> FabAction.NOVA_IDEIA
+            PerfilUsuario.GESTOR -> FabAction.NOVO_PROJETO
+            PerfilUsuario.LIDER -> FabAction.NOVA_ORIENTACAO
         }
     }
 }

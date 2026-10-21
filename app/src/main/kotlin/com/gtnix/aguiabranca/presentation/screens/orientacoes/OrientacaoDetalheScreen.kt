@@ -51,6 +51,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -75,6 +76,7 @@ import com.gtnix.aguiabranca.domain.model.Projeto
 import com.gtnix.aguiabranca.domain.model.StatusProjeto
 import com.gtnix.aguiabranca.domain.model.VencedorCampanha
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.GlassCard
 import com.gtnix.aguiabranca.presentation.components.GradientProgressBar
 import com.gtnix.aguiabranca.presentation.components.InovagabButton
@@ -129,11 +131,14 @@ fun OrientacaoDetalheScreen(
         }
     }
 
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             AguiaTopBar(
                 title = stringResource(R.string.orientacao_detalhe_title),
                 onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior,
                 actions = {
                     val orientacao = uiState.orientacao
                     if (uiState.isLider && orientacao != null) {

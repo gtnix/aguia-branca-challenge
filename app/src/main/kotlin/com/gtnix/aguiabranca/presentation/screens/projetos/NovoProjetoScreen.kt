@@ -66,6 +66,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -82,6 +83,7 @@ import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.OrientacaoEstrategica
 import com.gtnix.aguiabranca.domain.model.Usuario
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.CelebrationOverlay
 import com.gtnix.aguiabranca.presentation.components.GlassCard
 import com.gtnix.aguiabranca.presentation.components.InovagabButton
@@ -156,12 +158,15 @@ private fun NovoProjetoContent(
         }
     }
 
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             AguiaTopBar(
                 title = stringResource(R.string.novo_projeto_titulo),
-                onBackClick = onNavigateBack
+                onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior
             )
         },
         containerColor = MaterialTheme.colorScheme.background

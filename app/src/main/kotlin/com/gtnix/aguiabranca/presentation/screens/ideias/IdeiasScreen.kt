@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -54,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.EmptyState
 import com.gtnix.aguiabranca.presentation.components.IdeiaCard
 import com.gtnix.aguiabranca.presentation.components.PremiumFilterChip
@@ -65,7 +68,7 @@ import com.gtnix.aguiabranca.presentation.theme.NavBarDimensions
 import com.gtnix.aguiabranca.presentation.theme.ScreenPadding
 import com.gtnix.aguiabranca.presentation.util.UiState
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun IdeiasScreen(
     viewModel: IdeiasViewModel,
@@ -99,7 +102,9 @@ fun IdeiasScreen(
         )
     }
 
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
@@ -111,6 +116,7 @@ fun IdeiasScreen(
             AguiaTopBar(
                 title = stringResource(viewModel.listTitleRes),
                 onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior,
                 actions = {
                     if (viewModel.canEvaluateIdeias) {
                         if (scoringInProgress) {
@@ -327,6 +333,7 @@ private fun OrdenacaoSegmento(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(name = "Light Mode", showBackground = true, showSystemUi = true)
 @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true, showSystemUi = true)
 @Composable

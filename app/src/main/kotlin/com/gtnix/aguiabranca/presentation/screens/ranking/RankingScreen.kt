@@ -51,6 +51,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -80,6 +81,7 @@ import com.gtnix.aguiabranca.domain.model.TemporadaInfo
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material3.HorizontalDivider
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.PremioInovagabDialog
 import com.gtnix.aguiabranca.presentation.components.badges.BadgeGrid
 import com.gtnix.aguiabranca.presentation.components.badges.ConquistaDetailSheet
@@ -127,6 +129,7 @@ private fun RankingScreenContent(
 ) {
     val haptic = LocalHapticFeedback.current
     val pullRefreshState = rememberPullToRefreshState()
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
 
     val handleRefresh = {
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -135,10 +138,12 @@ private fun RankingScreenContent(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 AguiaTopBar(
                     title = stringResource(R.string.ranking_titulo),
-                    onBackClick = onNavigateBack
+                    onBackClick = onNavigateBack,
+                    scrollBehavior = scrollBehavior
                 )
             },
             containerColor = MaterialTheme.colorScheme.background

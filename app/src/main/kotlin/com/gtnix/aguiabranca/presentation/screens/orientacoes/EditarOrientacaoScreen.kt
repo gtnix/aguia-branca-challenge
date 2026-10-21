@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -45,6 +46,7 @@ import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.DivisaoNegocio
 import com.gtnix.aguiabranca.domain.model.CategoriaOrientacao
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import kotlin.math.roundToInt
 
@@ -99,11 +101,14 @@ private fun EditarOrientacaoScreenContent(
         }
     }
 
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             AguiaTopBar(
                 title = stringResource(R.string.editar_orientacao_title),
-                onBackClick = onNavigateBack
+                onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }

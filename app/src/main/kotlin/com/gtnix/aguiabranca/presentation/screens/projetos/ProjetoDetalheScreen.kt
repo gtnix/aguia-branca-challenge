@@ -56,6 +56,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -72,6 +73,7 @@ import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.domain.model.Projeto
 import com.gtnix.aguiabranca.domain.model.StatusProjeto
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.AvatarData
 import com.gtnix.aguiabranca.presentation.components.AvatarStack
 import com.gtnix.aguiabranca.presentation.components.GlassCard
@@ -148,13 +150,17 @@ private fun ProjetoDetalheContent(
 
     val canManage = uiState.perfil == PerfilUsuario.GESTOR
     
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Scaffold(
-        modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
+        modifier = Modifier
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AguiaTopBar(
                 title = stringResource(R.string.projeto_detalhe_titulo),
-                onBackClick = onNavigateBack
+                onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },

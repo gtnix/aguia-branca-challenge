@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -29,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -38,6 +40,7 @@ import com.gtnix.aguiabranca.domain.model.AreaAtuacao
 import com.gtnix.aguiabranca.domain.model.Projeto
 import com.gtnix.aguiabranca.domain.model.StatusProjeto
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.EmptyState
 import com.gtnix.aguiabranca.presentation.components.PremiumFilterChip
 import com.gtnix.aguiabranca.presentation.components.ProjetoCard
@@ -46,7 +49,7 @@ import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.NavBarDimensions
 import com.gtnix.aguiabranca.presentation.theme.ScreenPadding
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ProjetosScreen(
     viewModel: ProjetosViewModel,
@@ -80,11 +83,14 @@ fun ProjetosScreen(
             onNavigateBack = onNavigateBack
         )
     } else {
+        val scrollBehavior = rememberAguiaTopBarScrollBehavior()
         Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 AguiaTopBar(
                     title = stringResource(R.string.projetos_title),
-                    onBackClick = onNavigateBack
+                    onBackClick = onNavigateBack,
+                    scrollBehavior = scrollBehavior
                 )
             }
         ) { paddingValues ->
@@ -102,6 +108,7 @@ fun ProjetosScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProjetosTabContent(
     uiState: ProjetosUiState,
@@ -112,14 +119,20 @@ private fun ProjetosTabContent(
     onNavigateToDetalhe: (String) -> Unit,
     onNavigateBack: (() -> Unit)?
 ) {
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+        ) {
             AguiaTopBar(
                 title = stringResource(R.string.projetos_title),
-                onBackClick = onNavigateBack
+                onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior
             )
             ProjetosBody(
                 uiState = uiState,
@@ -235,6 +248,7 @@ private fun ProjetosBody(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark Mode")
 @Composable

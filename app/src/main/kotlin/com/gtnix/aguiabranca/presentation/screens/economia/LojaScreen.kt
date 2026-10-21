@@ -20,8 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Redeem
 import androidx.compose.material.icons.filled.Storefront
-import androidx.compose.material.icons.filled.Toll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -39,6 +39,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
@@ -54,7 +55,9 @@ import com.gtnix.aguiabranca.domain.model.NivelUsuario
 import com.gtnix.aguiabranca.domain.model.Recompensa
 import com.gtnix.aguiabranca.domain.model.Resgate
 import com.gtnix.aguiabranca.domain.model.StatusResgate
+import com.gtnix.aguiabranca.presentation.components.AsasIcons
 import com.gtnix.aguiabranca.presentation.components.AguiaTopBar
+import com.gtnix.aguiabranca.presentation.components.rememberAguiaTopBarScrollBehavior
 import com.gtnix.aguiabranca.presentation.components.EmptyState
 import com.gtnix.aguiabranca.presentation.components.InovagabButton
 import com.gtnix.aguiabranca.presentation.components.InovagabFlatCard
@@ -66,6 +69,7 @@ import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.LocalInovagabColors
 import com.gtnix.aguiabranca.presentation.theme.ScreenPadding
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LojaScreen(
     viewModel: LojaViewModel,
@@ -84,11 +88,14 @@ fun LojaScreen(
         }
     }
 
+    val scrollBehavior = rememberAguiaTopBarScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             AguiaTopBar(
                 title = stringResource(R.string.loja_titulo),
-                onBackClick = onNavigateBack
+                onBackClick = onNavigateBack,
+                scrollBehavior = scrollBehavior
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -271,7 +278,7 @@ private fun RecompensaCard(
 private fun PrecoAsas(custo: Int) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            imageVector = Icons.Default.Toll,
+            imageVector = AsasIcons.Wings,
             contentDescription = null,
             tint = asasCor(),
             modifier = Modifier.size(16.dp)

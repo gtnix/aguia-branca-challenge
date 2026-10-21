@@ -458,7 +458,8 @@ fun MainScreen(
                     centerActionLabel = when (fabAction) {
                         MainNavPolicy.FabAction.NOVO_PROJETO -> stringResource(R.string.cd_add_project)
                         MainNavPolicy.FabAction.NOVA_ORIENTACAO -> stringResource(R.string.cd_publicar_orientacao)
-                        else -> null
+                        MainNavPolicy.FabAction.NOVA_IDEIA -> stringResource(R.string.nav_nova_ideia)
+                        MainNavPolicy.FabAction.NONE -> null
                     },
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
