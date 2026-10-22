@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.gtnix.aguiabranca.presentation.theme.AsaAzul
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
 import com.gtnix.aguiabranca.presentation.theme.LocalDarkTheme
 import com.gtnix.aguiabranca.presentation.theme.LocalInovagabColors
@@ -133,6 +134,77 @@ private fun GlassCardInternal(
     }
 }
 
+private val LoginTechShape = RoundedCornerShape(20.dp)
+
+@Composable
+fun LoginTechGlassCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    val isDark = LocalDarkTheme.current
+    val veil = Color.White.copy(alpha = if (isDark) 0.12f else 0.72f)
+    val frost = if (isDark) {
+        Brush.linearGradient(
+            colors = listOf(
+                Color.White.copy(alpha = 0.08f),
+                AsaAzul.copy(alpha = 0.12f)
+            )
+        )
+    } else {
+        Brush.linearGradient(
+            colors = listOf(
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+                MaterialTheme.colorScheme.secondary.copy(alpha = 0.10f)
+            )
+        )
+    }
+
+    Box(
+        modifier = modifier
+            .shadow(
+                elevation = if (isDark) 12.dp else 3.dp,
+                shape = LoginTechShape,
+                ambientColor = if (isDark) {
+                    Color.Black.copy(alpha = 0.35f)
+                } else {
+                    MarinhoInstitucional.copy(alpha = 0.06f)
+                },
+                spotColor = if (isDark) {
+                    Color.Black.copy(alpha = 0.40f)
+                } else {
+                    MarinhoInstitucional.copy(alpha = 0.08f)
+                }
+            )
+            .clip(LoginTechShape)
+            .then(
+                if (isDark) {
+                    Modifier
+                } else {
+                    Modifier.border(
+                        width = 0.5.dp,
+                        color = AsaAzul.copy(alpha = 0.14f),
+                        shape = LoginTechShape
+                    )
+                }
+            )
+    ) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .blur(80.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                .background(brush = frost)
+        )
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(veil)
+        )
+        Box(modifier = Modifier.padding(16.dp)) {
+            content()
+        }
+    }
+}
+
 @Preview(name = "Light Mode")
 @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -178,6 +250,33 @@ private fun BackdropGlassCardPreview() {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Stronger blur with gradient overlay for profile hero areas.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(name = "Login tech light")
+@Preview(name = "Login tech dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun LoginTechGlassCardPreview() {
+    InovagabTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            LoginTechGlassCard(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Column {
+                    Text(
+                        text = "Login",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Translucent frosted glass, Apple-style.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

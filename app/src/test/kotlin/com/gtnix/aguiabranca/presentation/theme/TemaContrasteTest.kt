@@ -40,4 +40,23 @@ class TemaContrasteTest {
         assertTrue(contrastRatio(outlineSobreSurface, DarkSurface) >= 3.0)
         assertTrue(contrastRatio(DarkOnSurface, DarkSurface) >= 4.5)
     }
+
+    @Test
+    fun contrasteLoginPalcoEVidro() {
+        val glassLight = compositeOver(Color.White.copy(alpha = 0.72f), LightBackground)
+        assertTrue(contrastRatio(LightOnSurface, glassLight) >= 4.5)
+        assertTrue(contrastRatio(LightOnSurfaceVariant, glassLight) >= 4.5)
+        assertTrue(contrastRatio(LightOnSurface, LightSurfaceVariant) >= 4.5)
+        assertTrue(contrastRatio(LightOnSurfaceVariant, LightSurfaceVariant) >= 4.5)
+
+        val glassDarkFundo = compositeOver(Color.White.copy(alpha = 0.12f), NoiteFundo)
+        val glassDarkCard = compositeOver(Color.White.copy(alpha = 0.12f), NoiteCard)
+        assertTrue(contrastRatio(DarkOnSurface, glassDarkFundo) >= 4.5)
+        assertTrue(contrastRatio(DarkOnSurfaceVariant, glassDarkFundo) >= 4.5)
+        assertTrue(contrastRatio(DarkOnSurface, glassDarkCard) >= 4.5)
+        assertTrue(contrastRatio(DarkOnSurfaceVariant, glassDarkCard) >= 4.5)
+        val insetDark = compositeOver(Color.White.copy(alpha = 0.14f), glassDarkFundo)
+        assertTrue(contrastRatio(DarkOnSurface, insetDark) >= 4.5)
+        assertTrue(contrastRatio(contentOn(AzulAcao), AzulAcao) >= 4.5)
+    }
 }

@@ -1,37 +1,39 @@
 package com.gtnix.aguiabranca.presentation.screens.auth
 
-import android.app.Activity
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -41,7 +43,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,43 +53,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.gtnix.aguiabranca.R
 import com.gtnix.aguiabranca.domain.model.PerfilUsuario
 import com.gtnix.aguiabranca.presentation.components.InovagabBrandLogo
 import com.gtnix.aguiabranca.presentation.components.InovagabBrandLogoSize
 import com.gtnix.aguiabranca.presentation.components.InovagabBrandLogoVariant
-import com.gtnix.aguiabranca.presentation.components.LoginCredentialsFieldStyle
 import com.gtnix.aguiabranca.presentation.components.LoginGroupedCredentialsCard
-import androidx.core.view.WindowCompat
+import com.gtnix.aguiabranca.presentation.components.LoginTechGlassCard
 import com.gtnix.aguiabranca.presentation.theme.AsaAzul
 import com.gtnix.aguiabranca.presentation.theme.AzulAcao
+import com.gtnix.aguiabranca.presentation.theme.FundoContainer
 import com.gtnix.aguiabranca.presentation.theme.FundoPagina
 import com.gtnix.aguiabranca.presentation.theme.InovagabTheme
+import com.gtnix.aguiabranca.presentation.theme.LightSecondaryContainer
 import com.gtnix.aguiabranca.presentation.theme.LocalDarkTheme
-import com.gtnix.aguiabranca.presentation.theme.MarinhoInstitucional
+import com.gtnix.aguiabranca.presentation.theme.LocalInovagabColors
+import com.gtnix.aguiabranca.presentation.theme.MarinhoSuperficie
+import com.gtnix.aguiabranca.presentation.theme.NoiteCard
+import com.gtnix.aguiabranca.presentation.theme.NoiteCardAlto
+import com.gtnix.aguiabranca.presentation.theme.NoiteFundo
 import com.gtnix.aguiabranca.presentation.theme.contentOn
 
 private val LoginButtonShape = RoundedCornerShape(percent = 50)
-private val LoginSheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-private val IosSegmentShape = RoundedCornerShape(12.dp)
-private val StageHeight = 260.dp
-private val SymbolHeight = 124.dp
-private val SheetOverlap = 24.dp
+private val DemoChipShape = RoundedCornerShape(12.dp)
 
 @Composable
 fun LoginScreen(
@@ -121,237 +118,181 @@ private fun LoginScreenContent(
     onLoginClick: () -> Unit,
     onDemoLogin: (PerfilUsuario) -> Unit
 ) {
-    val appIsDark = LocalDarkTheme.current
-    InovagabTheme(darkTheme = false) {
-        LoginScreenBody(
-            uiState = uiState,
-            appIsDark = appIsDark,
-            onEmailChange = onEmailChange,
-            onSenhaChange = onSenhaChange,
-            onLoginClick = onLoginClick,
-            onDemoLogin = onDemoLogin
-        )
-    }
-}
-
-@Composable
-private fun LoginScreenBody(
-    uiState: LoginUiState,
-    appIsDark: Boolean,
-    onEmailChange: (String) -> Unit,
-    onSenhaChange: (String) -> Unit,
-    onLoginClick: () -> Unit,
-    onDemoLogin: (PerfilUsuario) -> Unit
-) {
+    val isDark = LocalDarkTheme.current
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val view = LocalView.current
     val featureUnderDevelopment = stringResource(R.string.feature_under_development)
-
-    if (!view.isInEditMode) {
-        DisposableEffect(appIsDark) {
-            val window = (view.context as Activity).window
-            val controller = WindowCompat.getInsetsController(window, view)
-            controller.isAppearanceLightStatusBars = true
-            controller.isAppearanceLightNavigationBars = true
-            onDispose {
-                controller.isAppearanceLightStatusBars = !appIsDark
-                controller.isAppearanceLightNavigationBars = !appIsDark
-            }
-        }
-    }
 
     var contentVisible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { contentVisible = true }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(FundoPagina)
-            .imePadding()
-    ) {
-        LoginAmbientGlow()
+    Box(modifier = Modifier.fillMaxSize()) {
+        LoginAtmosphere(isDark = isDark)
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            AnimatedVisibility(
-                visible = contentVisible,
-                enter = fadeIn(tween(280)) + slideInVertically(
-                    animationSpec = tween(280),
-                    initialOffsetY = { it / 10 }
-                )
-            ) {
-                LoginStageHero()
-            }
-
-            AnimatedVisibility(
+        AnimatedVisibility(
+            visible = contentVisible,
+            modifier = Modifier.fillMaxSize(),
+            enter = fadeIn(tween(280)) + slideInVertically(
+                animationSpec = tween(280),
+                initialOffsetY = { it / 12 }
+            )
+        ) {
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                visible = contentVisible,
-                enter = fadeIn(tween(320, delayMillis = 80)) + slideInVertically(
-                    animationSpec = tween(320, delayMillis = 80),
-                    initialOffsetY = { it / 12 }
-                )
+                    .fillMaxSize()
+                    .imePadding()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LoginFrostedDrawer(
+                BoxWithConstraints(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .offset(y = -SheetOverlap)
+                        .weight(1f)
+                        .fillMaxWidth()
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(horizontal = 24.dp)
-                            .padding(top = 28.dp, bottom = 40.dp),
+                            .fillMaxWidth()
+                            .heightIn(min = maxHeight)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = stringResource(R.string.auth_welcome),
-                            modifier = Modifier.fillMaxWidth(),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
-                        )
+                        Box(contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier
+                                    .size(160.dp)
+                                    .blur(48.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                                    .background(
+                                        brush = Brush.radialGradient(
+                                            colors = listOf(
+                                                AsaAzul.copy(alpha = if (isDark) 0.28f else 0.12f),
+                                                Color.Transparent
+                                            )
+                                        ),
+                                        shape = CircleShape
+                                    )
+                            )
+                            InovagabBrandLogo(
+                                variant = InovagabBrandLogoVariant.Auto,
+                                size = InovagabBrandLogoSize.Stage,
+                                markAsHeading = true
+                            )
+                        }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(32.dp))
 
-                        LoginFormSection(
-                            email = uiState.email,
-                            senha = uiState.senha,
-                            isLoading = uiState.isLoading,
-                            errorMessageRes = uiState.errorMessageRes,
-                            onEmailChange = onEmailChange,
-                            onSenhaChange = onSenhaChange,
-                            onLoginClick = onLoginClick,
-                            onClearFocus = { focusManager.clearFocus() },
-                            onForgotPasswordClick = {
-                                Toast.makeText(context, featureUnderDevelopment, Toast.LENGTH_SHORT).show()
-                            },
-                            onDarkSheet = true
-                        )
-
-                        Spacer(modifier = Modifier.height(28.dp))
-
-                        QuietDemoSection(
-                            onDemoLogin = onDemoLogin,
-                            onDarkSheet = true
-                        )
+                        LoginTechGlassCard(modifier = Modifier.fillMaxWidth()) {
+                            LoginFormSection(
+                                email = uiState.email,
+                                senha = uiState.senha,
+                                isLoading = uiState.isLoading,
+                                errorMessageRes = uiState.errorMessageRes,
+                                onEmailChange = onEmailChange,
+                                onSenhaChange = onSenhaChange,
+                                onLoginClick = onLoginClick,
+                                onClearFocus = { focusManager.clearFocus() },
+                                onForgotPasswordClick = {
+                                    Toast.makeText(context, featureUnderDevelopment, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
                     }
                 }
+
+                QuietDemoSection(onDemoLogin = onDemoLogin)
             }
         }
     }
 }
 
 @Composable
-private fun BoxScope.LoginAmbientGlow() {
-    Box(
-        modifier = Modifier
-            .align(Alignment.TopEnd)
-            .offset(x = 40.dp, y = 80.dp)
-            .size(200.dp)
-            .blur(80.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
-            .background(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        AzulAcao.copy(alpha = 0.22f),
-                        Color.Transparent
-                    )
-                ),
-                shape = CircleShape
-            )
+private fun LoginAtmosphere(isDark: Boolean) {
+    val infinite = rememberInfiniteTransition(label = "login-atmosphere")
+    val driftX by infinite.animateFloat(
+        initialValue = -10f,
+        targetValue = 12f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 8000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow-drift-x"
     )
-    Box(
-        modifier = Modifier
-            .align(Alignment.CenterStart)
-            .offset(x = (-60).dp, y = 200.dp)
-            .size(180.dp)
-            .blur(72.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
-            .background(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        AsaAzul.copy(alpha = 0.22f),
-                        Color.Transparent
-                    )
-                ),
-                shape = CircleShape
-            )
+    val driftY by infinite.animateFloat(
+        initialValue = 8f,
+        targetValue = -10f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 11000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow-drift-y"
     )
-}
 
-@Composable
-private fun LoginFrostedDrawer(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    val sheet = MarinhoInstitucional
+    val mesh = if (isDark) {
+        Brush.verticalGradient(
+            colors = listOf(NoiteFundo, NoiteCard, NoiteCardAlto)
+        )
+    } else {
+        Brush.verticalGradient(
+            colors = listOf(FundoPagina, FundoContainer, LightSecondaryContainer)
+        )
+    }
+
     Box(
-        modifier = modifier
-            .clip(LoginSheetShape)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(mesh)
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .blur(48.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                .align(Alignment.TopEnd)
+                .offset(x = (36 + driftX).dp, y = (56 + driftY).dp)
+                .size(220.dp)
+                .blur(90.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
                 .background(
-                    brush = Brush.verticalGradient(
+                    brush = Brush.radialGradient(
                         colors = listOf(
-                            AsaAzul.copy(alpha = 0.45f),
-                            sheet.copy(alpha = 0.72f),
-                            sheet.copy(alpha = 0.92f)
-                        )
-                    )
-                )
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(sheet.copy(alpha = 0.88f))
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.White.copy(alpha = 0.22f),
+                            AzulAcao.copy(alpha = if (isDark) 0.32f else 0.20f),
                             Color.Transparent
                         )
-                    )
+                    ),
+                    shape = CircleShape
                 )
         )
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .border(
-                    width = 1.dp,
-                    color = Color.White.copy(alpha = 0.14f),
-                    shape = LoginSheetShape
+                .align(Alignment.CenterStart)
+                .offset(x = (-72 + driftY).dp, y = (110 - driftX).dp)
+                .size(240.dp)
+                .blur(88.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            AsaAzul.copy(alpha = if (isDark) 0.34f else 0.18f),
+                            Color.Transparent
+                        )
+                    ),
+                    shape = CircleShape
                 )
         )
-        content()
-    }
-}
-
-@Composable
-private fun LoginStageHero() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(FundoPagina)
-            .statusBarsPadding()
-            .height(StageHeight),
-        contentAlignment = Alignment.Center
-    ) {
-        InovagabBrandLogo(
-            variant = InovagabBrandLogoVariant.OnLightSurface,
-            size = InovagabBrandLogoSize.Stage,
-            markAsHeading = true,
-            modifier = Modifier.padding(horizontal = 24.dp)
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = 48.dp)
+                .size(300.dp)
+                .blur(110.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            (if (isDark) MarinhoSuperficie else AsaAzul)
+                                .copy(alpha = if (isDark) 0.42f else 0.12f),
+                            Color.Transparent
+                        )
+                    ),
+                    shape = CircleShape
+                )
         )
     }
 }
@@ -366,8 +307,7 @@ private fun LoginFormSection(
     onSenhaChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onClearFocus: () -> Unit,
-    onForgotPasswordClick: () -> Unit,
-    onDarkSheet: Boolean = false
+    onForgotPasswordClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -383,12 +323,6 @@ private fun LoginFormSection(
             onSubmitFromPassword = {
                 onClearFocus()
                 onLoginClick()
-            },
-            onDarkSheet = onDarkSheet,
-            fieldStyle = if (onDarkSheet) {
-                LoginCredentialsFieldStyle.IosInset
-            } else {
-                LoginCredentialsFieldStyle.Grouped
             }
         )
 
@@ -419,8 +353,8 @@ private fun LoginFormSection(
             enabled = !isLoading,
             shape = LoginButtonShape,
             elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = if (onDarkSheet) 0.dp else 2.dp,
-                pressedElevation = if (onDarkSheet) 0.dp else 4.dp
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp
             ),
             colors = ButtonDefaults.buttonColors(
                 containerColor = AzulAcao,
@@ -454,156 +388,94 @@ private fun LoginFormSection(
             Text(
                 text = stringResource(R.string.auth_forgot_password),
                 style = MaterialTheme.typography.bodySmall,
-                color = if (onDarkSheet) {
-                    Color.White.copy(alpha = 0.72f)
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
 }
 
 @Composable
-private fun QuietDemoSection(
-    onDemoLogin: (PerfilUsuario) -> Unit,
-    onDarkSheet: Boolean = false
-) {
+private fun QuietDemoSection(onDemoLogin: (PerfilUsuario) -> Unit) {
+    val gab = LocalInovagabColors.current
+    val isDark = LocalDarkTheme.current
+    val chipColor = if (isDark) gab.surfaceElevated else Color.White.copy(alpha = 0.72f)
+    val chipBorder = if (isDark) gab.cardBorder else AsaAzul.copy(alpha = 0.14f)
+    val chipElevation = 0.dp
+    val chipBorderWidth = if (isDark) 1.dp else 0.5.dp
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(R.string.auth_login_as),
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = 10.dp),
             style = MaterialTheme.typography.labelSmall,
-            color = if (onDarkSheet) {
-                Color.White.copy(alpha = 0.6f)
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            }
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        if (onDarkSheet) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = IosSegmentShape,
-                color = Color.White.copy(alpha = 0.12f),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.18f))
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IosSegmentItem(
-                        label = stringResource(R.string.perfil_operador),
-                        onClick = { onDemoLogin(PerfilUsuario.OPERADOR) },
-                        showDivider = true
-                    )
-                    IosSegmentItem(
-                        label = stringResource(R.string.perfil_gestor),
-                        onClick = { onDemoLogin(PerfilUsuario.GESTOR) },
-                        showDivider = true
-                    )
-                    IosSegmentItem(
-                        label = stringResource(R.string.perfil_lider),
-                        onClick = { onDemoLogin(PerfilUsuario.LIDER) },
-                        showDivider = false
-                    )
-                }
-            }
-        } else {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                DemoProfileLink(
-                    label = stringResource(R.string.perfil_operador),
-                    onClick = { onDemoLogin(PerfilUsuario.OPERADOR) },
-                    onDarkSheet = onDarkSheet
-                )
-                DemoSeparator(onDarkSheet = onDarkSheet)
-                DemoProfileLink(
-                    label = stringResource(R.string.perfil_gestor),
-                    onClick = { onDemoLogin(PerfilUsuario.GESTOR) },
-                    onDarkSheet = onDarkSheet
-                )
-                DemoSeparator(onDarkSheet = onDarkSheet)
-                DemoProfileLink(
-                    label = stringResource(R.string.perfil_lider),
-                    onClick = { onDemoLogin(PerfilUsuario.LIDER) },
-                    onDarkSheet = onDarkSheet
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            DemoProfileChip(
+                label = stringResource(R.string.perfil_operador),
+                onClick = { onDemoLogin(PerfilUsuario.OPERADOR) },
+                containerColor = chipColor,
+                borderColor = chipBorder,
+                borderWidth = chipBorderWidth,
+                shadowElevation = chipElevation,
+                modifier = Modifier.weight(1f)
+            )
+            DemoProfileChip(
+                label = stringResource(R.string.perfil_gestor),
+                onClick = { onDemoLogin(PerfilUsuario.GESTOR) },
+                containerColor = chipColor,
+                borderColor = chipBorder,
+                borderWidth = chipBorderWidth,
+                shadowElevation = chipElevation,
+                modifier = Modifier.weight(1f)
+            )
+            DemoProfileChip(
+                label = stringResource(R.string.perfil_lider),
+                onClick = { onDemoLogin(PerfilUsuario.LIDER) },
+                containerColor = chipColor,
+                borderColor = chipBorder,
+                borderWidth = chipBorderWidth,
+                shadowElevation = chipElevation,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
 
 @Composable
-private fun RowScope.IosSegmentItem(
+private fun DemoProfileChip(
     label: String,
     onClick: () -> Unit,
-    showDivider: Boolean
+    containerColor: Color,
+    borderColor: Color,
+    modifier: Modifier = Modifier,
+    borderWidth: Dp = 1.dp,
+    shadowElevation: Dp = 0.dp
 ) {
-    TextButton(
+    Surface(
         onClick = onClick,
-        modifier = Modifier.weight(1f),
-        contentPadding = PaddingValues(vertical = 8.dp)
+        modifier = modifier.height(44.dp),
+        shape = DemoChipShape,
+        color = containerColor,
+        shadowElevation = shadowElevation,
+        border = BorderStroke(borderWidth, borderColor)
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Medium,
-            color = Color.White,
-            maxLines = 1
-        )
-    }
-    if (showDivider) {
-        Box(
-            modifier = Modifier
-                .width(1.dp)
-                .height(24.dp)
-                .background(Color.White.copy(alpha = 0.2f))
-        )
-    }
-}
-
-@Composable
-private fun DemoSeparator(onDarkSheet: Boolean = false) {
-    Text(
-        text = "·",
-        modifier = Modifier.padding(horizontal = 6.dp),
-        style = MaterialTheme.typography.labelSmall,
-        color = if (onDarkSheet) {
-            Color.White.copy(alpha = 0.35f)
-        } else {
-            MaterialTheme.colorScheme.outline
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                textAlign = TextAlign.Center
+            )
         }
-    )
-}
-
-@Composable
-private fun DemoProfileLink(
-    label: String,
-    onClick: () -> Unit,
-    onDarkSheet: Boolean = false
-) {
-    TextButton(
-        onClick = onClick,
-        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp)
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Medium,
-            color = if (onDarkSheet) {
-                AzulAcao
-            } else {
-                MaterialTheme.colorScheme.secondary
-            }
-        )
     }
 }
 
@@ -657,6 +529,41 @@ private fun LoginScreenLoadingPreview() {
 @Composable
 private fun LoginScreenErrorPreview() {
     InovagabTheme(darkTheme = false) {
+        LoginScreenContent(
+            uiState = LoginUiState(
+                email = "teste@email.com",
+                errorMessageRes = R.string.login_error_api_unreachable
+            ),
+            onEmailChange = {},
+            onSenhaChange = {},
+            onLoginClick = {},
+            onDemoLogin = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun LoginScreenDarkLoadingPreview() {
+    InovagabTheme(darkTheme = true) {
+        LoginScreenContent(
+            uiState = LoginUiState(
+                email = "operador@aguiabranca.com.br",
+                senha = "123456",
+                isLoading = true
+            ),
+            onEmailChange = {},
+            onSenhaChange = {},
+            onLoginClick = {},
+            onDemoLogin = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun LoginScreenDarkErrorPreview() {
+    InovagabTheme(darkTheme = true) {
         LoginScreenContent(
             uiState = LoginUiState(
                 email = "teste@email.com",
